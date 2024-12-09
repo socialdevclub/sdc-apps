@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    // # Project Options
+    "incremental": true,
+    "allowJs": false,
+    "noEmit": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "isolatedModules": true,
+    // # strict
+    "noImplicitAny": true,
+    "strict": true,
+    // # Module Resolution
+    "allowSyntheticDefaultImports": true,
+    "allowUmdGlobalAccess": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    // # Advanced
+    "resolveJsonModule": true,
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "forceConsistentCasingInFileNames": true,
+    "importsNotUsedAsValues": "remove",
+    "noErrorTruncation": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}

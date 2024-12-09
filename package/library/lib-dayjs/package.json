@@ -1,0 +1,15 @@
+{
+  "name": "lib-dayjs",
+  "main": "./src/index.ts",
+  "scripts": {
+    "--- github ---": "",
+    "github:test-code": "",
+    "github:test-type": "",
+    "github:check-type": "tsc --noEmit -p ./tsconfig.json",
+    "github:check-style": ""
+  },
+  "dependencies": {
+    "dayjs": "^1.11.10",
+    "typescript": "^5.1.3"
+  }
+}

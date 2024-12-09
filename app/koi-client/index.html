@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0 user-scalable=no"
+    />
+    <title>파레트: 일상에 색을 더하다</title>
+    <style>
+      @font-face {
+        font-family: 'DungGeunMo';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      html,
+      body,
+      #root {
+        font-family: 'DungGeunMo';
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+
+        color: #101010;
+        /* text-shadow: 2px 2px #8461f8; */
+      }
+
+      html {
+        background: url(/background.jpg) no-repeat center center;
+        background-size: 200vw 200vh;
+      }
+
+      html,
+      body {
+        position: fixed;
+        overflow: hidden;
+      }
+
+      #root {
+        overflow-y: scroll;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
