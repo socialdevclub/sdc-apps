@@ -50,44 +50,51 @@ SDC-STOCK은 실시간 주식 거래 게임 플랫폼입니다. React와 NestJS�
 
 1. NVM(Node Version Manager) 설치
 
-Windows:
-- https://github.com/coreybutler/nvm-windows/releases 에서 nvm-setup.exe 다운로드 및 실행
+- Windows:
+  
+  https://github.com/coreybutler/nvm-windows/releases 에서 nvm-setup.exe 다운로드 및 실행
 
-Mac/Linux:
-```bash
-# nvm 설치 스크립트 실행
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+- Mac/Linux:
+    ```bash
+    # nvm 설치 스크립트 실행
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 
-# 터미널 재시작 후 설치 확인
-nvm --version
-```
+    # 터미널 재시작 후 설치 확인
+    nvm --version
+    ```
 2. Node.js 설치
-```bash
-# 프로젝트에서 요구하는 Node.js 20.10.0 설치
-nvm install 20.10.0
+    ```bash
+    # 프로젝트에서 요구하는 Node.js 20.10.0 설치
+    nvm install 20.10.0
 
-# 설치된 버전으로 전환
-nvm use 20.10.0
+    # 설치된 버전으로 전환
+    nvm use 20.10.0
 
-# 기본 버전으로 설정
-nvm alias default 20.10.0
-```
+    # 기본 버전으로 설정
+    nvm alias default 20.10.0
+    ```
 
 3. Yarn 설치
-```bash
-npm install -g yarn@berry
-```
+    ```bash
+    npm install -g yarn@berry
+    ```
 
 ### 프로젝트 설정
 
 1. 의존성 설치
-```bash
-yarn install
-```
+    ```bash
+    yarn install
+    ```
 
 2. 개발 서버 실행
 
-- 서버: ./app/koi-server README.md 참고
-- 클라이언트: ./app/koi-client README.md 참고
+- 서버: [./app/koi-server README.md](https://github.com/omizha/sdc-stock/blob/main/app/koi-server/README.md) 참고
+- 클라이언트: [./app/koi-client README.md](https://github.com/omizha/sdc-stock/blob/main/app/koi-client/README.md) 참고
+
+3. VSCode에서 아래 메시지가 뜨는 경우, `허용`으로 설정
+    ![작업 영역 TypeScript 버전 사용](./docs/assets/typescript-version-mismatch.png)
+
 ## 라이선스
 AGPL-3.0
+
+
