@@ -86,15 +86,8 @@ yarn install
 ```
 
 2. 개발 서버 실행
-```bash
-# 클라이언트
-cd app/koi-client
-yarn dev
 
-# 서버
-cd app/koi-server
-yarn dev
-```
-
+- 서버: ./app/koi-server README.md 참고
+- 클라이언트: ./app/koi-client README.md 참고
 ## 라이선스
 AGPL-3.0
