@@ -28,22 +28,50 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
 ## 설치 및 실행
 
 1. 의존성 설치
-```bash
-yarn install
-```
+    ```bash
+    yarn install
+    ```
 
 2. 환경 변수 설정
-`.env` 파일을 생성하고 다음 변수를 설정하세요:
-```
-MONGO_URI=your_mongodb_connection_string
-```
+- 환경 변수에 대한 자세한 내용은 `하이안`에게 문의해 주세요.
+    ```
+    MONGO_URI=your_mongodb_connection_string
+    ```
+    
 
 3. 개발 서버 실행
-```bash
-yarn dev
-```
+    ```bash
+    yarn turbo:dev
+    ```
 
-4. 프로덕션 빌드
-```bash
-yarn build
-```
+4. 개발 서버 실행 시 오류 발생 대응
+- shared config 빌드 관련 오류
+
+  `yarn turbo:dev` 실행 시 빌드 오류가 발생하는 경우:
+    ```bash
+    # 1. koi-client 디렉토리로 이동 ( ./app/koi-client로 이동 )
+    cd ../koi-client
+
+    # 2. shared config 빌드
+    yarn build-shared~config
+
+    # 3. 다시 koi-server 디렉토리로 이동
+    cd ../koi-server
+
+    # 4. 개발 서버 재실행
+    yarn turbo:dev
+    ```
+
+- 데이터베이스 연결 오류
+
+  다음과 같은 에러 발생 시:
+  ```bash
+  koi-server:dev: [Nest] 73196  - 2024. 12. 10. 오후 9:12:54   ERROR [MongooseModule] Unable to connect to the database. Retrying (1)...
+  ```
+  `.env` 파일의 환경 변수 키와 값이 올바르게 설정되어 있는지 확인하세요.
+
+
+5. 프로덕션 빌드
+    ```bash
+    yarn build
+    ```

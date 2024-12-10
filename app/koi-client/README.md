@@ -28,14 +28,21 @@ KOI-CLIENT는 파티 게임 플랫폼의 프론트엔드 애플리케이션입�
 
 ## 설치 및 실행
 1. 의존성 설치
-```bash
-yarn install
-```
+    ```bash
+    yarn install
+    ```
 
-2. 개발 서버 실행
-```bash
-yarn dev
-```
+2. 환경 변수 설정
+- 환경 변수에 대한 자세한 내용은 `하이안`에게 문의해 주세요.
+    ```
+    PUBLIC_SUPABASE_URL=
+    PUBLIC_SUPABASE_KEY=
+    ```
+    
+3. 개발 서버 실행
+    ```bash
+    yarn dev
+    ```
 
 ## 스타일 가이드
 - Emotion과 Linaria를 사용한 스타일링 (Deprecated Linaria)
