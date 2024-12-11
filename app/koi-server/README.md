@@ -37,15 +37,29 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
     ```
     MONGO_URI=your_mongodb_connection_string
     ```
-    
 
-3. 개발 서버 실행
+3. hosts 파일 설정
+    ```bash
+    # Windows의 경우: C:\Windows\System32\drivers\etc\hosts
+    # Mac/Linux의 경우: /etc/hosts
+    
+    # 아래 내용을 hosts 파일에 추가
+    127.0.0.1    local.palete.me
+    ```
+
+4. 개발 서버 실행
     ```bash
     yarn turbo:dev
     ```
 
-4. 개발 서버 실행 시 오류 발생 대응
-- shared config 빌드 관련 오류
+5. 프로덕션 빌드
+    ```bash
+    yarn build
+    ```
+
+## 트러블 슈팅
+
+### shared config 빌드 관련 오류
 
   `yarn turbo:dev` 실행 시 빌드 오류가 발생하는 경우:
     ```bash
@@ -62,16 +76,10 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
     yarn turbo:dev
     ```
 
-- 데이터베이스 연결 오류
+### 데이터베이스 연결 오류
 
   다음과 같은 에러 발생 시:
   ```bash
   koi-server:dev: [Nest] 73196  - 2024. 12. 10. 오후 9:12:54   ERROR [MongooseModule] Unable to connect to the database. Retrying (1)...
   ```
   `.env` 파일의 환경 변수 키와 값이 올바르게 설정되어 있는지 확인하세요.
-
-
-5. 프로덕션 빌드
-    ```bash
-    yarn build
-    ```
