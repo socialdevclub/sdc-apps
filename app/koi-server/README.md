@@ -83,3 +83,58 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
   koi-server:dev: [Nest] 73196  - 2024. 12. 10. 오후 9:12:54   ERROR [MongooseModule] Unable to connect to the database. Retrying (1)...
   ```
   `.env` 파일의 환경 변수 키와 값이 올바르게 설정되어 있는지 확인하세요.
+
+## API 명세
+
+### 주식 API
+
+> sdc-stock/package/feature/feature-nest-stock 의 README.md 참고
+
+### 파티 API
+
+#### 파티 조회
+- **GET** `/party/query`
+  - 모든 파티 목록을 조회합니다
+  - 응답: `Party[]`
+
+- **GET** `/party/query/:partyId`
+  - 특정 파티의 상세 정보를 조회합니다
+  - 파라미터:
+    - `partyId`: 파티 ID
+  - 응답: `Party`
+
+#### 파티 생성
+- **POST** `/party`
+  - 새로운 파티를 생성합니다
+
+#### 파티 참가/탈퇴
+- **POST** `/party/join`
+  - 파티에 참가합니다
+  - 요청 본문:
+    ```typescript
+    {
+      partyId: string;
+      userId: string;
+    }
+    ```
+
+- **POST** `/party/leave`
+  - 파티에서 탈퇴합니다
+  - 요청 본문:
+    ```typescript
+    {
+      partyId: string;
+      userId: string;
+    }
+    ```
+  - 응답: `Party`
+
+#### 파티 수정/삭제
+- **PATCH** `/party`
+  - 파티 정보를 수정합니다
+
+- **DELETE** `/party`
+  - 파티를 삭제합니다
+  - 쿼리 파라미터:
+    - `partyId`: 삭제할 파티 ID
+  - 응답: `boolean`
