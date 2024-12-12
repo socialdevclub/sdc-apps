@@ -92,7 +92,10 @@ export class StockService {
     const newCompanies = {} as Record<stock.CompanyNames, CompanyInfo[]>;
     const playerIdxs = [...Array(players.length).keys()];
 
+    // 플레이어에게 줄 정보의 절반 개수
     const halfInfoCount = Math.min(Math.max(Math.floor(90 / players.length), 1), 3);
+
+    // 플레이어에게 줄 정보를 랜덤하게 주기 위한 배열
     const randomPlayers = [...Array(halfInfoCount).keys()]
       .map(() => playerIdxs)
       .flat()
