@@ -62,7 +62,8 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
 ### shared config 빌드 관련 오류
 
   `yarn turbo:dev` 실행 시 빌드 오류가 발생하는 경우:
-    ```bash
+
+  ```bash
     # 1. koi-client 디렉토리로 이동 ( ./app/koi-client로 이동 )
     cd ../koi-client
 
@@ -74,7 +75,8 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
 
     # 4. 개발 서버 재실행
     yarn turbo:dev
-    ```
+  ```
+
 
 ### 데이터베이스 연결 오류
 
