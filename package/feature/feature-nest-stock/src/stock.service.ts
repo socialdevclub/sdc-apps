@@ -88,10 +88,15 @@ export class StockService {
     const stock = await this.stockRepository.findOneById(stockId);
     const players = await this.userService.getUserList(stockId);
 
+    const companyPriceChange: string[][] = [[]];
     const newCompanies = {} as Record<stock.CompanyNames, CompanyInfo[]>;
     const playerIdxs = [...Array(players.length).keys()];
-    const randomPlayers = [...playerIdxs, ...playerIdxs, ...playerIdxs].sort(() => Math.random() - 0.5);
-    const companyPriceChange: string[][] = [[]];
+
+    const halfInfoCount = players.length > 30 ? Math.floor(90 / players.length) : 3;
+    const randomPlayers = [...Array(halfInfoCount).keys()]
+      .map(() => playerIdxs)
+      .flat()
+      .sort(() => Math.random() - 0.5);
 
     // 라운드 별 주가 변동 회사 선정
     for (let round = 1; round < 10; round++) {
