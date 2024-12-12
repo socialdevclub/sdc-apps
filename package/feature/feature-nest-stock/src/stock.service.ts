@@ -92,7 +92,7 @@ export class StockService {
     const newCompanies = {} as Record<stock.CompanyNames, CompanyInfo[]>;
     const playerIdxs = [...Array(players.length).keys()];
 
-    const halfInfoCount = players.length > 30 ? Math.floor(90 / players.length) : 3;
+    const halfInfoCount = Math.min(Math.max(Math.floor(90 / players.length), 1), 3);
     const randomPlayers = [...Array(halfInfoCount).keys()]
       .map(() => playerIdxs)
       .flat()
