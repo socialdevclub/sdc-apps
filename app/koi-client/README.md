@@ -41,10 +41,10 @@ KOI-CLIENT는 파티 게임 플랫폼의 프론트엔드 애플리케이션입�
       - 라이브 서버: https://api.palete.me
     
 3. 개발 서버 실행
-```bash
-yarn build-shared~config
-yarn dev
-```
+    ```bash
+    yarn build-shared~config
+    yarn dev
+    ```
 
 ## 스타일 가이드
 - Emotion과 Linaria를 사용한 스타일링 (Deprecated Linaria)
