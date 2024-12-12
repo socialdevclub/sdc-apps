@@ -92,6 +92,7 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
 #### 파티 생성
 - **POST** `/party`
   - 새로운 파티를 생성합니다
+  - 응답: `Party`
 
 #### 파티 참가/탈퇴
 - **POST** `/party/join`
@@ -102,6 +103,7 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
       partyId: string;
       userId: string;
     }
+   - 응답: `Party`
     ```
 
 - **POST** `/party/leave`
