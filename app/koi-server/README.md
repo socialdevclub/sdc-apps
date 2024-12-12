@@ -90,7 +90,7 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
 
 ### 주식 API
 
-> sdc-stock/package/feature/feature-nest-stock 의 README.md 참고
+> [sdc-stock/package/feature/feature-nest-stock의 README.md](https://github.com/omizha/sdc-stock/blob/main/package/feature/feature-nest-stock/README.md) 참고
 
 ### 파티 API
 
@@ -108,6 +108,7 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
 #### 파티 생성
 - **POST** `/party`
   - 새로운 파티를 생성합니다
+  - 응답: `Party`
 
 #### 파티 참가/탈퇴
 - **POST** `/party/join`
