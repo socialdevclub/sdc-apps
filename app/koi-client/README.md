@@ -33,14 +33,16 @@ KOI-CLIENT는 파티 게임 플랫폼의 프론트엔드 애플리케이션입�
     ```
 
 2. 환경 변수 설정
-- 환경 변수에 대한 자세한 내용은 `하이안`에게 문의해 주세요.
-    ```
-    PUBLIC_SUPABASE_URL=
-    PUBLIC_SUPABASE_KEY=
-    ```
+    > 환경 변수에 대한 자세한 내용은 `하이안`에게 문의해 주세요.
+    - PUBLIC_SUPABASE_URL: 하이안에게 문의
+    - PUBLIC_SUPABASE_KEY: 하이안에게 문의
+    - PUBLIC_SERVER_API_URL
+      - 개발 서버: http://local.palete.me:3000
+      - 라이브 서버: https://api.palete.me
     
 3. 개발 서버 실행
     ```bash
+    yarn build-shared~config
     yarn dev
     ```
 

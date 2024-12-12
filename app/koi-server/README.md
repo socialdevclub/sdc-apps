@@ -37,18 +37,33 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
     ```
     MONGO_URI=your_mongodb_connection_string
     ```
-    
 
-3. 개발 서버 실행
+3. hosts 파일 설정
+    ```bash
+    # Windows의 경우: C:\Windows\System32\drivers\etc\hosts
+    # Mac/Linux의 경우: /etc/hosts
+    
+    # 아래 내용을 hosts 파일에 추가
+    127.0.0.1    local.palete.me
+    ```
+
+4. 개발 서버 실행
     ```bash
     yarn turbo:dev
     ```
 
-4. 개발 서버 실행 시 오류 발생 대응
-- shared config 빌드 관련 오류
+5. 프로덕션 빌드
+    ```bash
+    yarn build
+    ```
+
+## 트러블 슈팅
+
+### shared config 빌드 관련 오류
 
   `yarn turbo:dev` 실행 시 빌드 오류가 발생하는 경우:
-    ```bash
+
+  ```bash
     # 1. koi-client 디렉토리로 이동 ( ./app/koi-client로 이동 )
     cd ../koi-client
 
@@ -60,9 +75,10 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
 
     # 4. 개발 서버 재실행
     yarn turbo:dev
-    ```
+  ```
 
-- 데이터베이스 연결 오류
+
+### 데이터베이스 연결 오류
 
   다음과 같은 에러 발생 시:
   ```bash
@@ -103,7 +119,6 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
       partyId: string;
       userId: string;
     }
-   - 응답: `Party`
     ```
 
 - **POST** `/party/leave`
