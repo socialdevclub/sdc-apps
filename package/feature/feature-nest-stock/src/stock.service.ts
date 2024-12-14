@@ -90,13 +90,13 @@ export class StockService {
 
     const companyPriceChange: string[][] = [[]];
     const newCompanies = {} as Record<stock.CompanyNames, CompanyInfo[]>;
-    const playerIdxs = [...Array(players.length).keys()];
+    const playerIdxs = Array.from({ length: players.length }, (_, idx) => idx);
 
     // 플레이어에게 줄 정보의 절반 개수
     const halfInfoCount = Math.min(Math.max(Math.floor(90 / players.length), 1), 3);
 
     // 플레이어에게 줄 정보를 랜덤하게 주기 위한 배열
-    const randomPlayers = [...Array(halfInfoCount).keys()]
+    const randomPlayers = Array.from({ length: halfInfoCount }, (_, idx) => idx)
       .map(() => playerIdxs)
       .flat()
       .sort(() => Math.random() - 0.5);
