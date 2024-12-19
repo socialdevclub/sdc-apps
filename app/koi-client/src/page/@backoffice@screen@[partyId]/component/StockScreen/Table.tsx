@@ -12,7 +12,7 @@ interface Props {
 const Table = ({ stockId }: Props) => {
   const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId, { keepPreviousData: false });
 
-  if (!stock?.companies || !timeIdx) {
+  if (!stock?.companies || timeIdx === -1) {
     return <></>;
   }
 

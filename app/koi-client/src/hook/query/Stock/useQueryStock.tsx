@@ -27,7 +27,7 @@ const useQueryStock = (stockId: string | undefined, options?: Options) => {
 
   const timeIdx = data?.startedTime
     ? Math.floor(getDateDistance(dayjs(data.startedTime).toDate(), new Date()).minutes / data.fluctuationsInterval)
-    : undefined;
+    : -1;
 
   const companiesPrice = useMemo(
     () =>
