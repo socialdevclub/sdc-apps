@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { getDateDistance } from '@toss/date';
 import { SwitchCase } from '@toss/react';
 import { QRCode } from 'antd';
@@ -25,9 +25,19 @@ export default function StockScreen({ party }: Props) {
 
   const startedTime = dayjs(stock?.startedTime).toDate();
   const isTransaction = stock?.isTransaction ?? false;
+  const [time, setTime] = useState('');
 
-  const { seconds, minutes } = getDateDistance(startedTime, new Date());
-  const time = `${prependZero(minutes, 2)}:${prependZero(seconds, 2)}`;
+  useEffect(() => {
+    const updateTimer = () => {
+      const { seconds, minutes } = getDateDistance(startedTime, new Date());
+      setTime(`${prependZero(minutes, 2)}:${prependZero(seconds, 2)}`);
+    };
+
+    updateTimer();
+    const intervalId = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [startedTime]);
 
   if (!stock?._id) {
     return <></>;
