@@ -41,6 +41,7 @@ module.exports = {
     'no-console': 0,
     'no-continue': 0,
     'no-empty-pattern': 0,
+    'no-await-in-loop': 0,
     'no-nested-ternary': 0,
     'no-new': 0,
     'no-param-reassign': 0,
