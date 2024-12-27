@@ -77,7 +77,7 @@ export default function Profile() {
           help={isDuplicatedUsername ? '이미 사용중인 닉네임입니다' : undefined}
           label="닉네임"
         >
-          <Input type="text" required value={username} onChange={(e) => setUsername(e.target.value)} />
+          <Input type="text" name="nickname" required value={username} onChange={(e) => setUsername(e.target.value)} />
         </Form.Item>
 
         <Form.Item required label="성별">
