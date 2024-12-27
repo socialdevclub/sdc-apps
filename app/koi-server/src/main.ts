@@ -18,7 +18,7 @@ async function bootstrap(): Promise<Handler> {
   commonConfig(app);
   app.enableCors({
     credentials: true,
-    origin: /^([\w:/]+)?([\w]+\.)?(palete\.me)(:\d{1,5})?$/,
+    origin: /^([\w:/]+)?([\w]+\.)?(socialdev\.club)(:\d{1,5})?$/,
   });
   await app.init();
 
