@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { ColumnDef, createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { PartySchemaWithId } from 'shared~type-party';
 import { css } from '@linaria/core';
+import BackofficePartyDetail from '../../component/BackofficePartyDetail';
 import { Query } from '../../hook';
-import PartySubTable from './component/PartySubTable';
 import PartyCreate from './component/PartyCreate';
 
 const columnHelper = createColumnHelper<PartySchemaWithId>();
@@ -107,7 +107,7 @@ const BackofficeParty = () => {
               {row.getIsExpanded() && (
                 <tr>
                   <td colSpan={row.getVisibleCells().length}>
-                    <PartySubTable row={row} key={row.original._id} />
+                    <BackofficePartyDetail party={row.original} />
                   </td>
                 </tr>
               )}

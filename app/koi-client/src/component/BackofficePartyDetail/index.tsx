@@ -1,15 +1,14 @@
-import { Row } from '@tanstack/react-table';
 import React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { getQueryKey } from 'lib-react-query';
 import { Button, Form, Input, Radio } from 'antd';
 import { PartySchemaWithId } from 'shared~type-party';
 import { SwitchCase } from '@toss/react';
-import { Query } from '../../../../hook';
-import { serverApiUrl } from '../../../../config/baseUrl';
+import { Query } from '../../hook';
+import { serverApiUrl } from '../../config/baseUrl';
 import ActivityNamePoll from './ActivityNamePoll';
 
-const PartySubTable = ({ row, className }: { row: Row<PartySchemaWithId>; className?: string }) => {
+const BackofficePartyDetail = ({ party }: { party: PartySchemaWithId }) => {
   const queryClient = useQueryClient();
   const invalidatePartyList = () =>
     queryClient.invalidateQueries(
@@ -21,11 +20,11 @@ const PartySubTable = ({ row, className }: { row: Row<PartySchemaWithId>; classN
     );
 
   const { mutateAsync: updateParty, isLoading: isLoadingUpdateParty } = Query.Party.useUpdateParty();
-  const { mutateAsync: deleteParty, isLoading: isLoadingDeleteParty } = Query.Party.useDeleteParty(row.original._id);
+  const { mutateAsync: deleteParty, isLoading: isLoadingDeleteParty } = Query.Party.useDeleteParty(party._id);
 
-  const [title, setTitle] = React.useState(row.original.title);
-  const [activityId, setActivityId] = React.useState(row.original.activityId);
-  const [activityName, setActivityName] = React.useState(row.original.activityName);
+  const [title, setTitle] = React.useState(party.title);
+  const [activityId, setActivityId] = React.useState(party.activityId);
+  const [activityName, setActivityName] = React.useState(party.activityName);
 
   const isLoading = isLoadingUpdateParty || isLoadingDeleteParty;
 
@@ -33,7 +32,7 @@ const PartySubTable = ({ row, className }: { row: Row<PartySchemaWithId>; classN
     <>
       <h2>총 참가자</h2>
       <ul>
-        {row.original.joinedUserIds.map((user) => (
+        {party.joinedUserIds.map((user) => (
           <li key={user}>{user}</li>
         ))}
       </ul>
@@ -71,7 +70,7 @@ const PartySubTable = ({ row, className }: { row: Row<PartySchemaWithId>; classN
           <Button
             onClick={async () => {
               await updateParty({
-                _id: row.original._id,
+                _id: party._id,
                 activityId,
                 activityName,
                 title,
@@ -97,4 +96,4 @@ const PartySubTable = ({ row, className }: { row: Row<PartySchemaWithId>; classN
   );
 };
 
-export default PartySubTable;
+export default BackofficePartyDetail;

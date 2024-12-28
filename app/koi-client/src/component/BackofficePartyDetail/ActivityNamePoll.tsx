@@ -1,6 +1,6 @@
 import React from 'react';
 import { Radio } from 'antd';
-import { Query } from '../../../../hook';
+import { Query } from '../../hook';
 
 interface Props {
   activityName?: string;
