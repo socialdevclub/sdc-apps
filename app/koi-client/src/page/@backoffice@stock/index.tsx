@@ -2,6 +2,7 @@ import React from 'react';
 import { ColumnDef, createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { css } from '@linaria/core';
 import { StockSchemaWithId } from 'shared~type-stock';
+import RemoveStockSessionButton from '../../component/RemoveStockSessionButton';
 import { Query } from '../../hook';
 import StockCreateForm from './component/StockCreate';
 import StockDetail from '../../component/StockDetail';
@@ -47,6 +48,13 @@ const columns = [
   columnHelper.accessor('fluctuationsInterval', {
     cell: (v) => v.getValue(),
   }),
+  {
+    cell: ({ row }) => {
+      return <RemoveStockSessionButton stockId={row.original._id} />;
+    },
+    header: () => null,
+    id: 'remove',
+  },
 ] as ColumnDef<StockSchemaWithId>[];
 
 const BackofficeStock = () => {
