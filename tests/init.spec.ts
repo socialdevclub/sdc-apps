@@ -1,6 +1,7 @@
 import { BrowserContext, Page, chromium, test } from '@playwright/test';
 
-test('TEST', async () => {
+// 로그인하고, 프로필 입력 자동화
+test('init', async () => {
   // 브라우저 인스턴스 생성
   const browser = await chromium.launch({
     headless: false, // GUI로 확인하기 위해 headless 모드 비활성화
