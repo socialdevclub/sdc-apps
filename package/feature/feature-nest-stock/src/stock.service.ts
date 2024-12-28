@@ -411,4 +411,15 @@ export class StockService {
 
     return results;
   }
+
+  async deleteStock(stockId: string): Promise<boolean> {
+    await Promise.all([
+      this.resultService.deleteResult({ stockId }),
+      this.logService.deleteAllByStock(stockId),
+      this.userService.removeAllUser(stockId),
+      this.stockRepository.deleteMany({ _id: stockId }),
+    ]);
+
+    return true;
+  }
 }
