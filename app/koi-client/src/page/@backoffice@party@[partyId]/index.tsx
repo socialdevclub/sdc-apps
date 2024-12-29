@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import BackofficePartyDetail from 'src/component/BackofficePartyDetail';
 import { Query } from '../../hook';
+import BackofficePartyDetail from '../../component/BackofficePartyDetail';
 
 const BackofficePartyDetailPage = () => {
   const { partyId } = useParams();
