@@ -110,6 +110,6 @@ module.exports = {
         vars: 'all',
         varsIgnorePattern: '^_',
       },
-    ], // 절대 경로 금지
+    ],
   },
 };
