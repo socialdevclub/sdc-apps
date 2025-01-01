@@ -5,7 +5,7 @@ import { commaizeNumber } from '@toss/utils';
 import { Button } from 'antd';
 import html2canvas from 'html2canvas';
 import saveAs from 'file-saver';
-import { css } from '@linaria/core';
+import { css } from '@emotion/react';
 import { UserStore } from '../../../../../store';
 import { Query } from '../../../../../hook';
 
@@ -125,7 +125,7 @@ const Result = ({ stockId }: Props) => {
         </Wrapper>
       </CaptureArea>
       <Button
-        className={css`
+        css={css`
           margin-bottom: 35px;
         `}
         onClick={() => handleDownload()}

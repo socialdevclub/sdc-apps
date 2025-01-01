@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { css } from '@linaria/core';
+import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../../component-presentation/Header';
 
@@ -16,7 +16,7 @@ const ProfileHeader = () => {
           onClick={() => {
             navigate(-1);
           }}
-          className={css`
+          css={css`
             &:hover {
               cursor: pointer;
             }

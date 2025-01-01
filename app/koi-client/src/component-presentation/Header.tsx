@@ -1,5 +1,4 @@
-import { css } from '@linaria/core';
-import { styled } from '@linaria/react';
+import styled from '@emotion/styled';
 import { Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import React from 'react';
@@ -28,18 +27,7 @@ const Header = ({ title, avatar = { isVisible: false }, LeftComponent, RightComp
   const { isVisible, src, onClick } = avatar;
 
   return (
-    <div
-      className={css`
-        position: relative;
-        min-height: 64px;
-        max-height: 64px;
-        background-color: #fefefe;
-        padding: 12px;
-        box-sizing: border-box;
-        display: flex;
-        align-items: center;
-      `}
-    >
+    <Container>
       <AvatarWrapper>
         {LeftComponent || (
           <Avatar
@@ -51,27 +39,34 @@ const Header = ({ title, avatar = { isVisible: false }, LeftComponent, RightComp
           />
         )}
       </AvatarWrapper>
-      <div
-        className={css`
-          flex: 1 0 auto;
-          display: flex;
-          justify-content: center;
-        `}
-      >
-        {title}
-      </div>
-      <div
-        className={css`
-          flex: 80px;
-          display: flex;
-          justify-content: flex-end;
-        `}
-      >
-        {RightComponent}
-      </div>
-    </div>
+      <Title>{title}</Title>
+      <RightComponentWrapper>{RightComponent}</RightComponentWrapper>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  position: relative;
+  min-height: 64px;
+  max-height: 64px;
+  background-color: #fefefe;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+`;
+
+const RightComponentWrapper = styled.div`
+  flex: 80px;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const Title = styled.div`
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: center;
+`;
 
 const AvatarWrapper = styled.div`
   flex: 80px;

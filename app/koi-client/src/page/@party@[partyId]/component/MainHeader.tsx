@@ -1,8 +1,7 @@
-import React from 'react';
 import { Button, Dropdown, MenuProps, message } from 'antd';
 import { ArrowLeftOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { useAtomValue } from 'jotai';
-import { css } from '@linaria/core';
+import { css } from '@emotion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../../../component-presentation/Header';
 import ProfileValidator from '../../../component/ProfileValidator';
@@ -55,7 +54,7 @@ const PartyHeader = () => {
             onClick={() => {
               navigate(-1);
             }}
-            className={css`
+            css={css`
               &:hover {
                 cursor: pointer;
               }
