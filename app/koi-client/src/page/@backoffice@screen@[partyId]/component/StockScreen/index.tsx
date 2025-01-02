@@ -14,6 +14,11 @@ interface Props {
   party: PartySchemaWithId;
 }
 
+const getTimeDistanceWithCurrent = (date: Date) => {
+  const { seconds, minutes } = getDateDistance(date, new Date());
+  return `${prependZero(minutes, 2)}:${prependZero(seconds, 2)}`;
+};
+
 // playerLength / 3
 // 29 - 10
 // 30 - 10
@@ -25,17 +30,15 @@ export default function StockScreen({ party }: Props) {
 
   const startedTime = dayjs(stock?.startedTime).toDate();
   const isTransaction = stock?.isTransaction ?? false;
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState(() => {
+    return getTimeDistanceWithCurrent(startedTime);
+  });
 
   useEffect(() => {
     const updateTimer = () => {
-      const { seconds, minutes } = getDateDistance(startedTime, new Date());
-      setTime(`${prependZero(minutes, 2)}:${prependZero(seconds, 2)}`);
+      setTime(getTimeDistanceWithCurrent(startedTime));
     };
-
-    updateTimer();
     const intervalId = setInterval(updateTimer, 1000);
-
     return () => clearInterval(intervalId);
   }, [startedTime]);
 
