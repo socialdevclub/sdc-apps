@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { getDateDistance } from '@toss/date';
 import { SwitchCase } from '@toss/react';
 import { QRCode } from 'antd';
@@ -14,6 +14,11 @@ interface Props {
   party: PartySchemaWithId;
 }
 
+const getTimeDistanceWithCurrent = (date: Date) => {
+  const { seconds, minutes } = getDateDistance(date, new Date());
+  return `${prependZero(minutes, 2)}:${prependZero(seconds, 2)}`;
+};
+
 // playerLength / 3
 // 29 - 10
 // 30 - 10
@@ -25,9 +30,17 @@ export default function StockScreen({ party }: Props) {
 
   const startedTime = dayjs(stock?.startedTime).toDate();
   const isTransaction = stock?.isTransaction ?? false;
+  const [time, setTime] = useState(() => {
+    return getTimeDistanceWithCurrent(startedTime);
+  });
 
-  const { seconds, minutes } = getDateDistance(startedTime, new Date());
-  const time = `${prependZero(minutes, 2)}:${prependZero(seconds, 2)}`;
+  useEffect(() => {
+    const updateTimer = () => {
+      setTime(getTimeDistanceWithCurrent(startedTime));
+    };
+    const intervalId = setInterval(updateTimer, 1000);
+    return () => clearInterval(intervalId);
+  }, [startedTime]);
 
   if (!stock?._id) {
     return <></>;
