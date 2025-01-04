@@ -22,6 +22,7 @@ const PartyList = () => {
         <Card key={party._id} title={party.title}>
           <Button
             type="primary"
+            data-id={party._id}
             onClick={async () => {
               await joinParty({ partyId: party._id, userId: supabaseSession.user.id });
               navigate(`/party/${party._id}`);
