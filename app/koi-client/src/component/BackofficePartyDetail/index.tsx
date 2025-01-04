@@ -62,7 +62,12 @@ const BackofficePartyDetail = ({ party }: { party: PartySchemaWithId }) => {
               POLL: <ActivityNamePoll activityName={activityName} setActivityName={setActivityName} />,
             }}
             defaultComponent={
-              <Input type="text" value={activityName} onChange={(e) => setActivityName(e.target.value)} />
+              <Input
+                type="text"
+                name="activityName"
+                value={activityName}
+                onChange={(e) => setActivityName(e.target.value)}
+              />
             }
           />
         </Form.Item>
