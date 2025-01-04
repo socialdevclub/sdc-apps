@@ -15,6 +15,7 @@ import NoSession from './component/NoSession';
 import BackofficeStock from './page/@backoffice@stock';
 import BackofficeScreen from './page/@backoffice@screen@[partyId]';
 import BackofficeStockDetail from './page/@backoffice@stock@[stockId]';
+import BackofficePartyDetailPage from './page/@backoffice@party@[partyId]';
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
   {
     element: <BackofficeParty />,
     path: '/backoffice/party',
+  },
+  {
+    element: <BackofficePartyDetailPage />,
+    path: '/backoffice/party/:partyId',
   },
   {
     element: <BackofficeStock />,
