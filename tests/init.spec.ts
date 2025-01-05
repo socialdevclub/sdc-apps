@@ -1,6 +1,10 @@
 import { BrowserContext, Page, chromium, test } from '@playwright/test';
 
-// 로그인하고, 프로필 입력 자동화
+/**
+ * test01@socialdev.club ~ test99@socialdev.club 로그인을 진행하고
+ * 프로필 생성까지 자동화 하기 위한 테스트입니다.
+ * 웬만한 경우에는 사용하지 않습니다.
+ */
 test('init', async () => {
   // 브라우저 인스턴스 생성
   const browser = await chromium.launch({
