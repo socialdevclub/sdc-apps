@@ -11618,7 +11618,7 @@ const RAW_RUNTIME_STATE =
           ["class-transformer", "npm:0.5.1"],\
           ["cross-env", "npm:7.0.3"],\
           ["dayjs", "npm:1.11.10"],\
-          ["dotenv", "npm:16.3.1"],\
+          ["dotenv", "npm:16.4.7"],\
           ["eslint", "npm:8.41.0"],\
           ["eslint-config-prettier", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:8.8.0"],\
           ["eslint-import-resolver-node", "npm:0.3.7"],\
