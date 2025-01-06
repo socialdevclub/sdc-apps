@@ -1,6 +1,5 @@
-import { styled } from '@linaria/react';
+import styled from '@emotion/styled';
 import { Auth } from '@supabase/auth-ui-react';
-import React from 'react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { Button } from 'antd';
 import authLocalization from '../../library/supabase/authLocalization';

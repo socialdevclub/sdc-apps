@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { ColumnDef, createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { PollSchemaWithId } from 'shared~type-poll';
-import { css } from '@linaria/core';
+import { css } from '@emotion/react';
 import { Query } from '../../hook';
 import PollSubTable from './component/PollSubTable';
 import PollCreateForm from './component/PollCreateForm';
@@ -71,7 +71,7 @@ const BackofficePoll = () => {
     <>
       <PollCreateForm />
       <table
-        className={cssTable}
+        css={cssTable}
         style={{
           width: table.getCenterTotalSize(),
         }}
@@ -81,7 +81,7 @@ const BackofficePoll = () => {
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
-                  className={cssTh}
+                  css={cssTh}
                   key={header.id}
                   colSpan={header.colSpan}
                   style={{ width: header.getSize() }}

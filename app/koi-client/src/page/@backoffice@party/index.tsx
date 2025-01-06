@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { ColumnDef, createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { PartySchemaWithId } from 'shared~type-party';
-import { css } from '@linaria/core';
+import { css } from '@emotion/react';
 import BackofficePartyDetail from '../../component/BackofficePartyDetail';
 import { Query } from '../../hook';
 import PartyCreate from './component/PartyCreate';
@@ -72,7 +72,7 @@ const BackofficeParty = () => {
   return (
     <>
       <table
-        className={cssTable}
+        css={cssTable}
         style={{
           width: table.getCenterTotalSize(),
         }}
@@ -82,7 +82,7 @@ const BackofficeParty = () => {
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
-                  className={cssTh}
+                  css={cssTh}
                   key={header.id}
                   colSpan={header.colSpan}
                   style={{ width: header.getSize() }}

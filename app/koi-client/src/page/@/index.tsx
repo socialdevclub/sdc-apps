@@ -1,4 +1,4 @@
-import { styled } from '@linaria/react';
+import styled from '@emotion/styled';
 import { Suspense } from 'react';
 import MobileLayout from '../../component-presentation/MobileLayout';
 import MainHeader from './component/MainHeader';
@@ -24,7 +24,6 @@ export default function Main() {
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
-
   display: flex;
   flex-direction: column;
   align-items: stretch;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ColumnDef, createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { css } from '@linaria/core';
+import { css } from '@emotion/react';
 import { StockSchemaWithId } from 'shared~type-stock';
 import RemoveStockSessionButton from '../../component/RemoveStockSessionButton';
 import { Query } from '../../hook';
@@ -73,7 +73,7 @@ const BackofficeStock = () => {
     <>
       <StockCreateForm />
       <table
-        className={cssTable}
+        css={cssTable}
         style={{
           width: table.getCenterTotalSize(),
         }}
@@ -83,7 +83,7 @@ const BackofficeStock = () => {
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
-                  className={cssTh}
+                  css={cssTh}
                   key={header.id}
                   colSpan={header.colSpan}
                   style={{ width: header.getSize() }}

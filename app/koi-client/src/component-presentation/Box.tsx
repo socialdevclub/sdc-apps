@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import { styled } from '@linaria/react';
+import styled from '@emotion/styled';
 
 interface BoxProps {
   title?: string;

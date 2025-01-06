@@ -47,6 +47,6 @@ KOI-CLIENT는 파티 게임 플랫폼의 프론트엔드 애플리케이션입�
     ```
 
 ## 스타일 가이드
-- Emotion과 Linaria를 사용한 스타일링 (Deprecated Linaria)
+- Emotion을 사용한 스타일링
 - DungGeunMo 폰트 기본 적용
 - 모바일 우선 반응형 디자인
