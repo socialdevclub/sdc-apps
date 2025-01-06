@@ -28,4 +28,8 @@ export class ResultService {
       },
     );
   }
+
+  async deleteResult(filter: FilterQuery<Result>): Promise<boolean> {
+    return !!(await this.resultModel.deleteMany(filter));
+  }
 }

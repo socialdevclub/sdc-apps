@@ -21,3 +21,7 @@ turbo-build.log
 /app/server/public/avatar
 /app/koi-server/dev/main.js
 .env
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

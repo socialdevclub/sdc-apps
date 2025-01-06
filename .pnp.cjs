@@ -94,10 +94,12 @@ const RAW_RUNTIME_STATE =
           ["@babel/core", "npm:7.23.6"],\
           ["@babel/preset-react", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:7.23.3"],\
           ["@babel/preset-typescript", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:7.23.3"],\
+          ["@playwright/test", "npm:1.49.1"],\
           ["@types/node", "npm:18.16.16"],\
           ["@typescript-eslint/eslint-plugin", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:5.59.8"],\
           ["@typescript-eslint/parser", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:5.59.8"],\
           ["cross-env", "npm:7.0.3"],\
+          ["dotenv", "npm:16.4.7"],\
           ["eslint", "npm:8.41.0"],\
           ["eslint-config-airbnb", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:19.0.4"],\
           ["eslint-config-prettier", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:8.8.0"],\
@@ -3257,6 +3259,16 @@ const RAW_RUNTIME_STATE =
           ["open", "npm:9.1.0"],\
           ["picocolors", "npm:1.0.0"],\
           ["tslib", "npm:2.6.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@playwright/test", [\
+      ["npm:1.49.1", {\
+        "packageLocation": "./.yarn/cache/@playwright-test-npm-1.49.1-6026636721-bb0d5eda58.zip/node_modules/@playwright/test/",\
+        "packageDependencies": [\
+          ["@playwright/test", "npm:1.49.1"],\
+          ["playwright", "npm:1.49.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -7559,6 +7571,13 @@ const RAW_RUNTIME_STATE =
           ["dotenv", "npm:16.3.1"]\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["npm:16.4.7", {\
+        "packageLocation": "./.yarn/cache/dotenv-npm-16.4.7-29680c94f8-f13bfe97db.zip/node_modules/dotenv/",\
+        "packageDependencies": [\
+          ["dotenv", "npm:16.4.7"]\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["dotenv-expand", [\
@@ -11599,7 +11618,7 @@ const RAW_RUNTIME_STATE =
           ["class-transformer", "npm:0.5.1"],\
           ["cross-env", "npm:7.0.3"],\
           ["dayjs", "npm:1.11.10"],\
-          ["dotenv", "npm:16.3.1"],\
+          ["dotenv", "npm:16.4.7"],\
           ["eslint", "npm:8.41.0"],\
           ["eslint-config-prettier", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:8.8.0"],\
           ["eslint-import-resolver-node", "npm:0.3.7"],\
@@ -13080,6 +13099,26 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["pkg-dir", "npm:4.2.0"],\
           ["find-up", "npm:4.1.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["playwright", [\
+      ["npm:1.49.1", {\
+        "packageLocation": "./.yarn/cache/playwright-npm-1.49.1-0a8fed5892-49fb063f4a.zip/node_modules/playwright/",\
+        "packageDependencies": [\
+          ["playwright", "npm:1.49.1"],\
+          ["fsevents", "patch:fsevents@npm%3A2.3.2#optional!builtin<compat/fsevents>::version=2.3.2&hash=df0bf1"],\
+          ["playwright-core", "npm:1.49.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["playwright-core", [\
+      ["npm:1.49.1", {\
+        "packageLocation": "./.yarn/unplugged/playwright-core-npm-1.49.1-a372dbc965/node_modules/playwright-core/",\
+        "packageDependencies": [\
+          ["playwright-core", "npm:1.49.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -15004,10 +15043,12 @@ const RAW_RUNTIME_STATE =
           ["@babel/core", "npm:7.23.6"],\
           ["@babel/preset-react", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:7.23.3"],\
           ["@babel/preset-typescript", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:7.23.3"],\
+          ["@playwright/test", "npm:1.49.1"],\
           ["@types/node", "npm:18.16.16"],\
           ["@typescript-eslint/eslint-plugin", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:5.59.8"],\
           ["@typescript-eslint/parser", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:5.59.8"],\
           ["cross-env", "npm:7.0.3"],\
+          ["dotenv", "npm:16.4.7"],\
           ["eslint", "npm:8.41.0"],\
           ["eslint-config-airbnb", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:19.0.4"],\
           ["eslint-config-prettier", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:8.8.0"],\

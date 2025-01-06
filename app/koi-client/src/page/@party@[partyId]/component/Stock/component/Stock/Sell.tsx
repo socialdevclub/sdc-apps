@@ -56,6 +56,7 @@ const Sell = ({ stockId }: Props) => {
             value={company}
             rightComponent={
               <Button
+                name="sell"
                 icon={<DollarOutlined />}
                 disabled={count === 0 || isDisabled}
                 loading={isLoading || isFreezed}

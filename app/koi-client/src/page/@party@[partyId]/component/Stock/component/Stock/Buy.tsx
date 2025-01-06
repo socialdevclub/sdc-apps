@@ -55,6 +55,7 @@ const Buy = ({ stockId }: Props) => {
             value={company}
             rightComponent={
               <Button
+                name="buy"
                 icon={<ShoppingCartOutlined />}
                 disabled={count === 0 || isDisabled}
                 loading={isLoading || isFreezed}

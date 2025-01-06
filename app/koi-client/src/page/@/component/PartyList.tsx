@@ -18,18 +18,21 @@ const PartyList = () => {
 
   return partyList.map((party) => {
     return (
-      <Card key={party._id} title={party.title}>
-        <Button
-          type="primary"
-          onClick={async () => {
-            await joinParty({ partyId: party._id, userId: supabaseSession.user.id });
-            navigate(`/party/${party._id}`);
-          }}
-          // disabled={party.publicScope !== 'PUBLIC'}
-        >
-          참가
-        </Button>
-      </Card>
+      party.activityId !== 'CLOSE' && (
+        <Card key={party._id} title={party.title}>
+          <Button
+            type="primary"
+            data-id={party._id}
+            onClick={async () => {
+              await joinParty({ partyId: party._id, userId: supabaseSession.user.id });
+              navigate(`/party/${party._id}`);
+            }}
+            // disabled={party.publicScope !== 'PUBLIC'}
+          >
+            참가
+          </Button>
+        </Card>
+      )
     );
   });
 };

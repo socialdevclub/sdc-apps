@@ -176,10 +176,10 @@ export default function StockDetail({ stockId }: Props) {
       <input
         placeholder={`활동제한주기 (${stock?.transactionInterval}초)`}
         onKeyDown={(event) => {
-          if (event.key === 'Enter' && !!+event.currentTarget.value) {
+          if (event.key === 'Enter' && !isNaN(Number(event.currentTarget.value))) {
             mutateUpdateGame({
               _id: stockId,
-              transactionInterval: +event.currentTarget.value,
+              transactionInterval: Number(event.currentTarget.value),
             });
           }
         }}
