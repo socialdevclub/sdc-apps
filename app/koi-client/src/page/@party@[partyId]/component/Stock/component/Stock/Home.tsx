@@ -119,7 +119,7 @@ const Home = ({ stockId }: Props) => {
         rightComponent={stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>}
       />
       <br />
-      <H3>내가 가진 정보 {partnerNicknames && <>({partnerNicknames.join('/')} 와 공유중)</>}</H3>
+      <H3>내가 가진 정보</H3>
       {myInfos.map(({ company, price, timeIdx }) => {
         return (
           <Box
@@ -139,6 +139,16 @@ const Home = ({ stockId }: Props) => {
           />
         );
       })}
+      <br />
+      <H3>추천 대화상대</H3>
+      <ul>
+        {partnerNicknames?.map((v) => (
+          <li key={v}>{v}</li>
+        ))}
+      </ul>
+      <br />
+      <br />
+      <br />
     </>
   );
 };
