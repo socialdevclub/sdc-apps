@@ -1,6 +1,5 @@
-import React from 'react';
-import { Button, Dropdown, MenuProps, message } from 'antd';
-import { ArrowLeftOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { Button, Dropdown, MenuProps, Space, message } from 'antd';
+import { ArrowLeftOutlined, EllipsisOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useAtomValue } from 'jotai';
 import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -63,9 +62,12 @@ const PartyHeader = () => {
           />
         }
         RightComponent={
-          <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
-            <Button shape="circle" icon={<EllipsisOutlined />} />
-          </Dropdown>
+          <Space>
+            <Button shape="circle" icon={<ReloadOutlined />} onClick={() => window.location.reload(true)} />
+            <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
+              <Button shape="circle" icon={<EllipsisOutlined />} />
+            </Dropdown>
+          </Space>
         }
       />
       {contextHolder}

@@ -2,6 +2,7 @@ import { objectEntries } from '@toss/utils';
 import { useAtomValue } from 'jotai';
 import { Button, message } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
+import styled from '@emotion/styled';
 import { UserStore } from '../../../../../../store';
 import { Query } from '../../../../../../hook';
 import Box from '../../../../../../component-presentation/Box';
@@ -54,7 +55,7 @@ const Buy = ({ stockId }: Props) => {
             key={company}
             value={company}
             rightComponent={
-              <Button
+              <BuyButton
                 name="buy"
                 icon={<ShoppingCartOutlined />}
                 disabled={count === 0 || isDisabled}
@@ -64,7 +65,7 @@ const Buy = ({ stockId }: Props) => {
                 }}
               >
                 사기
-              </Button>
+              </BuyButton>
             }
           />
         );
@@ -74,3 +75,11 @@ const Buy = ({ stockId }: Props) => {
 };
 
 export default Buy;
+
+const BuyButton = styled(Button)`
+  &:disabled {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+`;
