@@ -1,5 +1,5 @@
-import { Button, Dropdown, MenuProps, Space, message } from 'antd';
-import { ArrowLeftOutlined, EllipsisOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Button, MenuProps, Space, message } from 'antd';
+import { ArrowLeftOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useAtomValue } from 'jotai';
 import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -63,10 +63,15 @@ const PartyHeader = () => {
         }
         RightComponent={
           <Space>
-            <Button shape="circle" icon={<ReloadOutlined />} onClick={() => window.location.reload(true)} />
-            <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
+            <Button
+              shape="circle"
+              icon={<ReloadOutlined />}
+              onClick={() => (window.location as { reload: (isForceReload: boolean) => void }).reload(true)}
+            />
+            {/* 하이안: 잠깐 기능 닫아놈 */}
+            {/* <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
               <Button shape="circle" icon={<EllipsisOutlined />} />
-            </Dropdown>
+            </Dropdown> */}
           </Space>
         }
       />
