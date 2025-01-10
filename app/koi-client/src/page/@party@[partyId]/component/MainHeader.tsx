@@ -63,7 +63,7 @@ const PartyHeader = () => {
         }
         RightComponent={
           <Space>
-            <Button shape="circle" icon={<ReloadOutlined />} onClick={() => navigate(0)} />
+            <Button shape="circle" icon={<ReloadOutlined />} onClick={() => window.location.reload(true)} />
             <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
               <Button shape="circle" icon={<EllipsisOutlined />} />
             </Dropdown>
