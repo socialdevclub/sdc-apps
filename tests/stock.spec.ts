@@ -90,23 +90,34 @@ test('stock', async () => {
     partyCreateButton.click();
   });
 
-  await Promise.all(
-    sessions.map(async (session) => {
-      if (session.isAdmin) {
-        return;
-      }
+  // 세션을 그룹으로 나누어 파티 참가 처리
+  const BATCH_SIZE = 6; // 한 번에 처리할 세션 수
+  const nonAdminSessions = sessions.filter((session) => !session.isAdmin);
 
-      await session.page.reload();
-      await session.page.waitForLoadState('domcontentloaded');
+  for (let i = 0; i < nonAdminSessions.length; i += BATCH_SIZE) {
+    const sessionBatch = nonAdminSessions.slice(i, i + BATCH_SIZE);
 
-      // data-id === partyId 인 버튼 클릭
-      const partyButton = session.page.locator(`button[data-id="${partyId}"]`);
-      await partyButton.click({ timeout: 5000 });
+    await Promise.all(
+      sessionBatch.map(async (session) => {
+        await session.page.reload();
+        await session.page.waitForLoadState('domcontentloaded');
 
-      // 주소 바뀔때까지 대기
-      await session.page.waitForURL((url) => url.pathname.includes(`party`), { timeout: 5000 });
-    }),
-  );
+        // 버튼이 보일 때까지 대기
+        const partyButton = session.page.locator(`button[data-id="${partyId}"]`);
+        await partyButton.waitFor({ state: 'visible' });
+        // data-id === partyId 인 버튼 클릭
+        await partyButton.click({ timeout: 5000 });
+        // 주소 바뀔떄까지 대기
+        await session.page.waitForURL((url) => url.pathname.includes(`party`));
+      }),
+    );
+
+    // 각 배치 처리 후 잠시 대기
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+    console.log(`${i + BATCH_SIZE}명의 참가자 파티 참가 완료`);
+  }
 
   await backofficeSession.page.goto(`http://local.socialdev.club:5173/backoffice/stock`);
 
@@ -181,38 +192,55 @@ test('stock', async () => {
     // 9분이 지나면 result 버튼 클릭하고 종료
     if (elapsedTime >= gameDuration) break;
 
-    await Promise.all([
-      sessions.map(async (session, i) => {
-        if (session.isAdmin) {
-          return;
-        }
+    for (let i = 0; i < nonAdminSessions.length; i += BATCH_SIZE) {
+      const sessionBatch = nonAdminSessions.slice(i, i + BATCH_SIZE);
 
-        try {
-          await session.page.goto(`http://local.socialdev.club:5173/party/${partyId}?page=사기`);
-          await session.page.waitForLoadState('domcontentloaded');
+      await Promise.all([
+        sessionBatch.map(async (session, batchIndex) => {
+          try {
+            await session.page.goto(`http://local.socialdev.club:5173/party/${partyId}?page=사기`);
+            await session.page.waitForLoadState('domcontentloaded');
 
-          // 여러 개의 활성화된 `사기` 버튼 중 하나 클릭
-          const buyButtons = session.page.locator('button[name="buy"]');
-          await expect(buyButtons.first()).toBeVisible();
-          const buyButtonCount = await buyButtons.count();
-          await buyButtons.nth(Math.floor(Math.random() * buyButtonCount)).click();
+            // 여러 개의 활성화된 `사기` 버튼 중 하나 클릭
+            const buyButtons = session.page.locator('button[name="buy"]');
+            await expect(buyButtons.first()).toBeVisible();
+            const buyButtonCount = await buyButtons.count();
+            await buyButtons.nth(Math.floor(Math.random() * buyButtonCount)).click();
 
-          await session.page.goto(`http://local.socialdev.club:5173/party/${partyId}?page=팔기`);
-          await session.page.waitForLoadState('domcontentloaded');
+            await session.page.goto(`http://local.socialdev.club:5173/party/${partyId}?page=팔기`);
+            await session.page.waitForLoadState('domcontentloaded');
 
-          // 여러 개의 활성화된 `팔기` 버튼 중 하나 클릭
-          const sellButtons = session.page.locator('button[name="sell"]');
-          const sellButtonCount = await sellButtons.count();
-          await sellButtons.nth(Math.floor(Math.random() * sellButtonCount)).click();
-        } catch (error) {
-          console.error(`세션 ${i + 1} 사기/팔기 에러:`, error);
-        }
-      }),
-      new Promise((resolve) => {
-        setTimeout(resolve, 5000);
-      }),
-    ]);
+            // 여러 개의 활성화된 `팔기` 버튼 중 하나 클릭
+            const sellButtons = session.page.locator('button[name="sell"]');
+            const sellButtonCount = await sellButtons.count();
+            await sellButtons.nth(Math.floor(Math.random() * sellButtonCount)).click();
+          } catch (error) {
+            console.error(`세션 ${i + batchIndex + 1} 사기/팔기 에러:`, error);
+          }
+        }),
+        new Promise((resolve) => {
+          setTimeout(resolve, 5000);
+        }),
+      ]);
+
+      // 각 배치 처리 후 잠시 대기
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+    }
   }
+
+  // `주식 종료 및 정산` 버튼 클릭
+  const finishButton = backofficeSession.page.locator('button:has-text("주식 종료 및 정산")');
+  await finishButton.click();
+
+  // 잠시 대기 후 result 버튼 클릭
+  await new Promise((resolve) => {
+    setTimeout(resolve, 2000);
+  });
+
+  const resultButton = backofficeSession.page.locator('button:has-text("RESULT")');
+  await resultButton.click();
 
   // 모든 세션이 유지되도록 대기
   await new Promise((resolve) => {
