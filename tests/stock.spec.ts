@@ -170,7 +170,17 @@ test('stock', async () => {
   const stockTradeActivateButton = backofficeSession.page.locator('button:has-text("주식 거래 활성화")');
   await stockTradeActivateButton.click();
 
+  // 게임 시간 설정
+  const startTime = new Date();
+  const gameDuration = 9 * 60 * 1000; // 9분
+
   while (true) {
+    const currentTime = new Date();
+    const elapsedTime = currentTime.getTime() - startTime.getTime();
+
+    // 9분이 지나면 result 버튼 클릭하고 종료
+    if (elapsedTime >= gameDuration) break;
+
     await Promise.all([
       sessions.map(async (session, i) => {
         if (session.isAdmin) {
