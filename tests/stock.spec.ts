@@ -1,6 +1,7 @@
 import test, { BrowserContext, Page, Response, chromium, expect } from '@playwright/test';
 
 const playerLength = Number(process.env.TEST_STOCK_PLAYER_LENGTH);
+const fluctuationsInterval = Number(process.env.TEST_STOCK_FLUCTUATIONS_INTERVAL);
 
 test('stock', async () => {
   // 브라우저 인스턴스 생성
@@ -174,7 +175,7 @@ test('stock', async () => {
 
   // 시세변동주기 1분으로 설정
   const fluctuationsIntervalInput = backofficeSession.page.locator('input[placeholder*="시세변동주기"]');
-  await fluctuationsIntervalInput.fill('1');
+  await fluctuationsIntervalInput.fill(`${fluctuationsInterval}`);
   await fluctuationsIntervalInput.press('Enter');
 
   // `주식 거래 활성화` 버튼 클릭
@@ -183,7 +184,7 @@ test('stock', async () => {
 
   // 게임 시간 설정
   const startTime = new Date();
-  const gameDuration = 9 * 60 * 1000; // 9분
+  const gameDuration = 9 * fluctuationsInterval * 60 * 1000; // 9라운드 총 게임 시간
 
   while (true) {
     const currentTime = new Date();
