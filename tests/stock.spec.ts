@@ -72,6 +72,7 @@ test('stock', async () => {
   const limitAllCountInput = backofficeSession.page.locator('input[name="limitAllCount"]');
   await limitAllCountInput.fill('100');
 
+  // 네트워크 응답 받아와서 id 추출
   const partyId = await new Promise<string>((resolve) => {
     const handlerResponse = async (response: Response): Promise<void> => {
       if (response.url().endsWith('/party') && response.request().method() === 'POST') {
@@ -109,6 +110,7 @@ test('stock', async () => {
 
   await backofficeSession.page.goto(`http://local.socialdev.club:5173/backoffice/stock`);
 
+  // 주식 게임 세션 생성
   const stockId = await new Promise<string>((resolve) => {
     const handlerResponse = async (response: Response): Promise<void> => {
       if (response.url().endsWith('/stock/create') && response.request().method() === 'POST') {
@@ -158,6 +160,11 @@ test('stock', async () => {
   await new Promise((resolve) => {
     setTimeout(resolve, 2000);
   });
+
+  // 시세변동주기 1분으로 설정
+  const fluctuationsIntervalInput = backofficeSession.page.locator('input[placeholder*="시세변동주기"]');
+  await fluctuationsIntervalInput.fill('1');
+  await fluctuationsIntervalInput.press('Enter');
 
   // `주식 거래 활성화` 버튼 클릭
   const stockTradeActivateButton = backofficeSession.page.locator('button:has-text("주식 거래 활성화")');
