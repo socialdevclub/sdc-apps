@@ -183,6 +183,7 @@ const Poll = () => {
             },
           })
             .then(() => {
+              message.destroy();
               messageApi.open({
                 content: `투표가 완료되었습니다.`,
                 duration: 2,
@@ -190,6 +191,7 @@ const Poll = () => {
               });
             })
             .catch((e: Error) => {
+              message.destroy();
               messageApi.open({
                 content: `${e.message}`,
                 duration: 2,
