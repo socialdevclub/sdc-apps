@@ -29,6 +29,7 @@ const Buy = ({ stockId }: Props) => {
   const onClickBuy = (company: string) => {
     buyStock({ amount: 1, company, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
+        messageApi.destroy();
         messageApi.open({
           content: '주식을 구매하였습니다.',
           duration: 2,
@@ -36,6 +37,7 @@ const Buy = ({ stockId }: Props) => {
         });
       })
       .catch((reason: Error) => {
+        messageApi.destroy();
         messageApi.open({
           content: `${reason.message}`,
           duration: 2,
