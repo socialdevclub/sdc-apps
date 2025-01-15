@@ -265,6 +265,94 @@ export class StockService {
     return result;
   }
 
+  async drawStockInfo(stockId: string, body: Request.PostDrawStockInfo): Promise<Stock> {
+    const { userId } = body;
+    console.debug('drawStockInfo', { userId });
+    let result: Stock;
+
+    const session = await this.connection.startSession();
+    await session.withTransaction(async () => {
+      const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
+      const user = await this.userRepository.findOne({ stockId, userId }, undefined, { session });
+
+      if (!stock.isTransaction) {
+        throw new HttpException('지금은 거래할 수 없습니다', HttpStatus.CONFLICT);
+      }
+
+      if (!user) {
+        throw new HttpException('유저 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
+      }
+
+      // 현재 라운드에 해당하는 시점의 idx
+      const timeIdx = Math.min(
+        Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
+        9,
+      );
+
+      const nextTimeIdx = timeIdx + 1;
+
+      const DEFAULT_DRAW_COST = 1;
+
+      if (user.money < DEFAULT_DRAW_COST) {
+        throw new HttpException('잔액이 부족합니다', HttpStatus.CONFLICT);
+      }
+
+      const companies = stock.companies as unknown as Map<string, Array<{ 가격: number; 정보: string[] }>>;
+      // ? 초기 init하는 시점에 제공하는 정보의 양은 정해져 있음, 그러면 정보 배열의 길이가 0인 애들도 걸러야 하는가?
+      // 이미 정보를 가지고 있지 않은 회사들 중에서만 선택
+      const availableCompanies = Array.from(companies.entries())
+        .filter(([company]) => {
+          // 해당 회사의 현재 시점 정보를 가지고 있는지 확인
+          const companyInfos = companies.get(company);
+          return !companyInfos[nextTimeIdx].정보.includes(userId);
+        })
+        .map(([company]) => company);
+
+      if (availableCompanies.length === 0) {
+        throw new HttpException('더 이상 뽑을 수 있는 정보가 없습니다', HttpStatus.CONFLICT);
+      }
+
+      // 랜덤으로 회사 선택
+      const randomIndex = Math.floor(Math.random() * availableCompanies.length);
+      const selectedCompany = availableCompanies[randomIndex];
+
+      // 선택된 회사의 정보 업데이트
+      const companyInfos = [...companies.get(selectedCompany)]; // 배열 복사
+      companyInfos[nextTimeIdx] = {
+        ...companyInfos[nextTimeIdx],
+        정보: [...companyInfos[nextTimeIdx].정보, userId],
+      };
+
+      // stock 객체 직접 업데이트 (Record 형식으로 변환)
+      // ! companies의 set 메소드가 동작을 안함
+      const updatedCompanies = Object.fromEntries(companies.entries());
+      updatedCompanies[selectedCompany] = companyInfos;
+      stock.companies = updatedCompanies;
+
+      console.debug('Updated company info:', {
+        nextTimeIdx,
+        selectedCompany,
+        updatedInfo: companyInfos[nextTimeIdx].정보,
+        기격: companyInfos[nextTimeIdx].가격,
+      });
+
+      user.money -= DEFAULT_DRAW_COST;
+      user.lastActivityTime = new Date();
+
+      await user.save({
+        session,
+      });
+
+      result = await stock.save({
+        session,
+      });
+      // TODO: 로그를 심고 싶으면 좀 더 범용적으로 설계를 해야할 것만 같은 기분이 듬
+    });
+    await session.endSession();
+
+    return result;
+  }
+
   async sellStock(stockId: string, body: Request.PostSellStock): Promise<Stock> {
     const { userId, company, amount, unitPrice } = body;
     console.debug('🚀 ~ StockService ~ sellStock ~ body:', body);

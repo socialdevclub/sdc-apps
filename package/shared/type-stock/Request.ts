@@ -16,6 +16,11 @@ export type PostBuyStock = {
   unitPrice: number;
 };
 
+export type PostDrawStockInfo = {
+  stockId: string;
+  userId: string;
+};
+
 export type PostSellStock = {
   stockId: string;
   userId: string;
