@@ -314,11 +314,22 @@ export class StockService {
       const randomIndex = Math.floor(Math.random() * availableCompanies.length);
       const selectedCompany = availableCompanies[randomIndex];
 
-      // 랜덤으로 시점 선택
-      const randomTimeIndex = Math.floor(Math.random() * companies.get(selectedCompany).length);
+      // 랜덤으로 시점 선택 (정보를 가지고 있는 시점만 선택)
+      let randomTimeIndex =
+        Math.floor(Math.random() * (companies.get(selectedCompany).length - nextTimeIdx)) + nextTimeIdx;
 
       // 선택된 회사의 정보 업데이트
       const companyInfos = [...companies.get(selectedCompany)]; // 배열 복사
+
+      // 해당 배열안에 이미 user Id가 있는지 확인
+      let isExistUser = companyInfos[randomTimeIndex].정보.find((v) => v === userId);
+      // user Id가 있는 때는 randomTimeIndex를 다시 생성
+      while (isExistUser) {
+        randomTimeIndex =
+          Math.floor(Math.random() * (companies.get(selectedCompany).length - nextTimeIdx)) + nextTimeIdx;
+        isExistUser = companyInfos[randomTimeIndex].정보.find((v) => v === userId);
+      }
+
       companyInfos[randomTimeIndex] = {
         ...companyInfos[randomTimeIndex],
         정보: [...companyInfos[randomTimeIndex].정보, userId],
