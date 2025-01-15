@@ -1,15 +1,39 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useAtomValue } from 'jotai';
 import { commaizeNumber, objectEntries } from '@toss/utils';
 import { getDateDistance } from '@toss/date';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import dayjs from 'dayjs';
+import { Flex } from 'antd';
 import { UserStore } from '../../../../../../store';
 import { Query } from '../../../../../../hook';
 import Box from '../../../../../../component-presentation/Box';
 import prependZero from '../../../../../../service/prependZero';
 import { colorDown, colorUp } from '../../../../../../config/color';
+import DrawStockInfo from './DrawInfo';
+
+// ================================================================================
+
+const convertIndexToTime = (idx: number, fluctuationsInterval: number) => {
+  return prependZero(idx * fluctuationsInterval, 2);
+};
+
+const convertTimeToIndex = (time: string, fluctuationsInterval: number) => {
+  return Math.floor(parseInt(time, 10) / fluctuationsInterval);
+};
+
+const getSecondsTime = (startTime: string) => {
+  return prependZero(getDateDistance(dayjs(startTime).toDate(), new Date()).seconds, 2);
+};
+
+const getMinutesTime = (startTime: string) => {
+  return prependZero(getDateDistance(dayjs(startTime).toDate(), new Date()).minutes, 2);
+};
+
+const getProfitRatio = (v: number) => ((v / 1000000) * 100 - 100).toFixed(2);
+
+// =================================================================================
 
 interface Props {
   stockId: string;
@@ -23,13 +47,17 @@ const Home = ({ stockId }: Props) => {
   const { data: users } = Query.Stock.useUserList(stockId);
   const { data: profiles } = Query.Supabase.useQueryProfileById(users.map((v) => v.userId));
   const { user } = Query.Stock.useUser({ stockId, userId });
+
   const { allSellPrice, allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId, userId });
+
+  const currentTimeIndex = useMemo(() => {
+    if (!stock) return 0;
+    return convertTimeToIndex(getMinutesTime(stock.startedTime), stock.fluctuationsInterval);
+  }, [stock]);
 
   if (!user || !stock) {
     return <div>불러오는 중.</div>;
   }
-
-  const getProfitRatio = (v: number) => ((v / 1000000) * 100 - 100).toFixed(2);
 
   const allProfitDesc = allUserSellPriceDesc()
     .map(({ userId, allSellPrice }) => {
@@ -70,6 +98,7 @@ const Home = ({ stockId }: Props) => {
     },
     [[], []] as [Array<string>, Array<{ company: string; timeIdx: number; price: number }>],
   );
+
   const partnerNicknames = profiles?.data
     ?.map((v) => {
       if (partnerIds.some((partnerId) => partnerId === v.id)) {
@@ -83,13 +112,7 @@ const Home = ({ stockId }: Props) => {
   return (
     <>
       <H3>홈</H3>
-      <Box
-        title="진행 시간"
-        value={`${prependZero(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes, 2)}:${prependZero(
-          getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).seconds,
-          2,
-        )}`}
-      />
+      <Box title="진행 시간" value={`${getMinutesTime(stock.startedTime)}:${getSecondsTime(stock.startedTime)}`} />
       <Box
         title="잔액"
         value={`${commaizeNumber(user.money)}원`}
@@ -119,7 +142,10 @@ const Home = ({ stockId }: Props) => {
         rightComponent={stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>}
       />
       <br />
-      <H3>내가 가진 정보</H3>
+      <Flex align="center" justify="space-between" gap={4} css={{ width: '100%' }}>
+        <H3>내가 가진 정보</H3>
+        {currentTimeIndex < 8 && <DrawStockInfo stockId={stockId} />}
+      </Flex>
       {myInfos.map(({ company, price, timeIdx }) => {
         return (
           <Box
@@ -133,7 +159,7 @@ const Home = ({ stockId }: Props) => {
                   font-size: 18px;
                 `}
               >
-                {prependZero(timeIdx * stock.fluctuationsInterval, 2)}:00
+                {convertIndexToTime(timeIdx, stock.fluctuationsInterval)}:00
               </div>
             }
           />
