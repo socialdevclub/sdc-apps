@@ -298,13 +298,11 @@ export class StockService {
       }
 
       const companies = stock.companies as unknown as Map<string, Array<{ 가격: number; 정보: string[] }>>;
-      // ? 초기 init하는 시점에 제공하는 정보의 양은 정해져 있음, 그러면 정보 배열의 길이가 0인 애들도 걸러야 하는가?
       // 이미 정보를 가지고 있지 않은 회사들 중에서만 선택
       const availableCompanies = Array.from(companies.entries())
-        .filter(([company]) => {
-          // 해당 회사의 현재 시점 정보를 가지고 있는지 확인
-          const companyInfos = companies.get(company);
-          return !companyInfos[nextTimeIdx].정보.includes(userId);
+        .filter(([_, companyInfos]) => {
+          // nextTimeIdx 이후의 모든 시점에서 정보를 가지고 있지 않은 회사만 선택
+          return companyInfos.slice(nextTimeIdx).some((info) => !info.정보.includes(userId));
         })
         .map(([company]) => company);
 
@@ -316,11 +314,14 @@ export class StockService {
       const randomIndex = Math.floor(Math.random() * availableCompanies.length);
       const selectedCompany = availableCompanies[randomIndex];
 
+      // 랜덤으로 시점 선택
+      const randomTimeIndex = Math.floor(Math.random() * companies.get(selectedCompany).length);
+
       // 선택된 회사의 정보 업데이트
       const companyInfos = [...companies.get(selectedCompany)]; // 배열 복사
-      companyInfos[nextTimeIdx] = {
-        ...companyInfos[nextTimeIdx],
-        정보: [...companyInfos[nextTimeIdx].정보, userId],
+      companyInfos[randomTimeIndex] = {
+        ...companyInfos[randomTimeIndex],
+        정보: [...companyInfos[randomTimeIndex].정보, userId],
       };
 
       // stock 객체 직접 업데이트 (Record 형식으로 변환)
@@ -330,10 +331,10 @@ export class StockService {
       stock.companies = updatedCompanies;
 
       console.debug('Updated company info:', {
-        nextTimeIdx,
+        randomTimeIndex,
         selectedCompany,
-        updatedInfo: companyInfos[nextTimeIdx].정보,
-        기격: companyInfos[nextTimeIdx].가격,
+        updatedInfo: companyInfos[randomTimeIndex].정보,
+        기격: companyInfos[randomTimeIndex].가격,
       });
 
       user.money -= DEFAULT_DRAW_COST;
