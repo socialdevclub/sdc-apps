@@ -1,6 +1,6 @@
-import { UserOutlined } from '@ant-design/icons';
-import { Avatar, List, Modal } from 'antd';
+import { Modal } from 'antd';
 import { ReactElement, cloneElement, useReducer } from 'react';
+import styled from '@emotion/styled';
 import { useRecommendedPartners } from '../../../../../../hook/query/Stock/useRecommendedPartners';
 
 interface ButtonProps {
@@ -28,18 +28,24 @@ const RecommendedPartnersModal = ({ trigger, stockId }: Props) => {
         footer={null}
       >
         <p>흥미로운 대화 상대를 발견했어요 ✨</p>
-        <List
-          itemLayout="horizontal"
-          dataSource={partnerNicknames}
-          renderItem={(name) => (
-            <List.Item>
-              <List.Item.Meta avatar={<Avatar icon={<UserOutlined />} />} title={name} />
-            </List.Item>
-          )}
-        />
+        <PartnerList>
+          {partnerNicknames.map((name) => (
+            <li key={name}>{name}</li>
+          ))}
+        </PartnerList>
       </Modal>
     </>
   );
 };
 
 export default RecommendedPartnersModal;
+
+const PartnerList = styled.ul`
+  list-style-type: disc;
+  padding-left: 20px;
+  font-size: 16px;
+
+  li {
+    margin: 8px 0;
+  }
+`;
