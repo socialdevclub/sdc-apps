@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAtomValue } from 'jotai';
 import { commaizeNumber, objectEntries } from '@toss/utils';
 import { getDateDistance } from '@toss/date';
@@ -21,7 +20,6 @@ const Home = ({ stockId }: Props) => {
 
   const { data: stock } = Query.Stock.useQueryStock(stockId);
   const { data: users } = Query.Stock.useUserList(stockId);
-  const { data: profiles } = Query.Supabase.useQueryProfileById(users.map((v) => v.userId));
   const { user } = Query.Stock.useUser({ stockId, userId });
   const { allSellPrice, allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId, userId });
 
@@ -48,38 +46,21 @@ const Home = ({ stockId }: Props) => {
     })
     .sort((a, b) => b.profit - a.profit);
 
-  const [partnerIds, myInfos] = objectEntries(stock.companies).reduce(
-    (reducer, [company, companyInfos]) => {
-      const [partnerIds, myInfos] = reducer;
+  const myInfos = objectEntries(stock.companies).reduce((reducer, [company, companyInfos]) => {
+    const myInfos = reducer;
 
-      companyInfos.forEach((companyInfo, idx) => {
-        if (companyInfos[idx].정보.some((name) => name === userId)) {
-          const partner = companyInfos[idx].정보.find((name) => name !== userId);
-          if (partner && !partnerIds.some((v) => v === partner)) {
-            partnerIds.push(partner);
-          }
-          myInfos.push({
-            company,
-            price: companyInfo.가격 - companyInfos[idx - 1].가격,
-            timeIdx: idx,
-          });
-        }
-      });
-
-      return reducer;
-    },
-    [[], []] as [Array<string>, Array<{ company: string; timeIdx: number; price: number }>],
-  );
-  const partnerNicknames = profiles?.data
-    ?.map((v) => {
-      if (partnerIds.some((partnerId) => partnerId === v.id)) {
-        return v.username;
+    companyInfos.forEach((companyInfo, idx) => {
+      if (companyInfos[idx].정보.some((name) => name === userId)) {
+        myInfos.push({
+          company,
+          price: companyInfo.가격 - companyInfos[idx - 1].가격,
+          timeIdx: idx,
+        });
       }
+    });
 
-      return undefined;
-    })
-    .filter((v) => !!v);
-
+    return reducer;
+  }, [] as Array<{ company: string; timeIdx: number; price: number }>);
   return (
     <>
       <H3>홈</H3>
@@ -139,13 +120,6 @@ const Home = ({ stockId }: Props) => {
           />
         );
       })}
-      <br />
-      <H3>추천 대화상대</H3>
-      <ul>
-        {partnerNicknames?.map((v) => (
-          <li key={v}>{v}</li>
-        ))}
-      </ul>
       <br />
       <br />
       <br />
