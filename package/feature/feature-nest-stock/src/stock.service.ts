@@ -291,7 +291,7 @@ export class StockService {
 
       const nextTimeIdx = timeIdx + 1;
 
-      const DEFAULT_DRAW_COST = 1;
+      const DEFAULT_DRAW_COST = 300_000;
 
       if (user.money < DEFAULT_DRAW_COST) {
         throw new HttpException('잔액이 부족합니다', HttpStatus.CONFLICT);
