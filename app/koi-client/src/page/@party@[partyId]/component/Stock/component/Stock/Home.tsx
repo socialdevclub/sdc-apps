@@ -11,6 +11,32 @@ import Box from '../../../../../../component-presentation/Box';
 import prependZero from '../../../../../../service/prependZero';
 import { colorDown, colorUp } from '../../../../../../config/color';
 
+const DEFAULT_FLUCTUATION_INTERVAL = 5;
+const REMAINING_STOCK_THRESHOLD = 0.9;
+const STOCK_PER_USER = 3;
+const TOTAL_ROUND_COUNT = 10;
+
+const getCurrentRoundIndex = (startTime?: string, interval: number = DEFAULT_FLUCTUATION_INTERVAL) => {
+  if (startTime === undefined) return -1;
+  const distance = getDateDistance(dayjs(startTime).toDate(), new Date());
+  return Math.floor(distance.minutes / interval);
+};
+
+const getLowSalesCompanies = (
+  remainingStocks: Record<string, number>,
+  userCount: number,
+  stockPerUser = STOCK_PER_USER,
+) => {
+  const maxQuantity = (userCount ?? 1) * stockPerUser;
+  return objectEntries(remainingStocks)
+    .filter(([, remaining]) => remaining > maxQuantity * REMAINING_STOCK_THRESHOLD)
+    .map(([company]) => company);
+};
+
+const generateNumberFromString = (str: string): number => {
+  return str.split('').reduce((acc, char, index) => acc + char.charCodeAt(0) * (index + 1), 0);
+};
+
 interface Props {
   stockId: string;
 }
@@ -70,6 +96,7 @@ const Home = ({ stockId }: Props) => {
     },
     [[], []] as [Array<string>, Array<{ company: string; timeIdx: number; price: number }>],
   );
+
   const partnerNicknames = profiles?.data
     ?.map((v) => {
       if (partnerIds.some((partnerId) => partnerId === v.id)) {
@@ -79,6 +106,29 @@ const Home = ({ stockId }: Props) => {
       return undefined;
     })
     .filter((v) => !!v);
+
+  const roundIndex = getCurrentRoundIndex(stock.startedTime, stock.fluctuationsInterval);
+  const lowSalesCompanies = getLowSalesCompanies(stock.remainingStocks, profiles?.data?.length ?? 1);
+
+  const getPredictedStockInfo = () => {
+    if (roundIndex < 0 || roundIndex >= TOTAL_ROUND_COUNT - 1 || lowSalesCompanies.length === 0) {
+      return null;
+    }
+
+    const randomIndex = generateNumberFromString(`${stockId}-${roundIndex}-${userId}`) % lowSalesCompanies.length;
+    const companyName = lowSalesCompanies[randomIndex];
+
+    return {
+      companyName,
+      predictTime: prependZero((roundIndex + 1) * stock.fluctuationsInterval, 2),
+      priceVariation: Math.abs(
+        (stock.companies?.[companyName]?.[roundIndex + 1]?.가격 ?? 0) -
+          (stock.companies?.[companyName]?.[roundIndex]?.가격 ?? 0),
+      ),
+    };
+  };
+
+  const nextRoundPredict = getPredictedStockInfo();
 
   return (
     <>
@@ -147,6 +197,25 @@ const Home = ({ stockId }: Props) => {
         ))}
       </ul>
       <br />
+      {nextRoundPredict && (
+        <>
+          <H3>변동 예정 정보</H3>
+          <Box
+            key={`${nextRoundPredict.companyName}`}
+            title={nextRoundPredict.companyName}
+            value={`?? ${commaizeNumber(nextRoundPredict.priceVariation)}`}
+            rightComponent={
+              <div
+                css={css`
+                  font-size: 18px;
+                `}
+              >
+                {nextRoundPredict.predictTime}:00
+              </div>
+            }
+          />
+        </>
+      )}
       <br />
       <br />
     </>
