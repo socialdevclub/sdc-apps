@@ -52,7 +52,7 @@ const DrawStockInfo = ({ stockId }: Props) => {
     return <>불러오는 중</>;
   }
 
-  const isDisabled = timeIdx === undefined || timeIdx >= 9 || !stock.isTransaction;
+  const isDisabled = timeIdx === undefined || timeIdx >= 7 || !stock.isTransaction;
 
   return (
     <>

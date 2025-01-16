@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useAtomValue } from 'jotai';
 import { commaizeNumber, objectEntries } from '@toss/utils';
 import { getDateDistance } from '@toss/date';
@@ -17,10 +17,6 @@ import DrawStockInfo from './DrawInfo';
 
 const convertIndexToTime = (idx: number, fluctuationsInterval: number) => {
   return prependZero(idx * fluctuationsInterval, 2);
-};
-
-const convertTimeToIndex = (time: string, fluctuationsInterval: number) => {
-  return Math.floor(parseInt(time, 10) / fluctuationsInterval);
 };
 
 const getSecondsTime = (startTime: string) => {
@@ -49,11 +45,6 @@ const Home = ({ stockId }: Props) => {
   const { user } = Query.Stock.useUser({ stockId, userId });
 
   const { allSellPrice, allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId, userId });
-
-  const currentTimeIndex = useMemo(() => {
-    if (!stock) return 0;
-    return convertTimeToIndex(getMinutesTime(stock.startedTime), stock.fluctuationsInterval);
-  }, [stock]);
 
   if (!user || !stock) {
     return <div>불러오는 중.</div>;
@@ -144,7 +135,7 @@ const Home = ({ stockId }: Props) => {
       <br />
       <Flex align="center" justify="space-between" gap={4} css={{ width: '100%' }}>
         <H3>내가 가진 정보</H3>
-        {currentTimeIndex < 8 && <DrawStockInfo stockId={stockId} />}
+        <DrawStockInfo stockId={stockId} />
       </Flex>
       {myInfos.map(({ company, price, timeIdx }) => {
         return (
