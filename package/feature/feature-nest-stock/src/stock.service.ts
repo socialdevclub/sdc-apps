@@ -288,10 +288,10 @@ export class StockService {
         Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
         9,
       );
-
-      const nextTimeIdx = timeIdx + 1;
-
       const DEFAULT_DRAW_COST = 300_000;
+      const ROUND_SKIP_STEP = 2;
+
+      const nextTimeIdx = timeIdx + ROUND_SKIP_STEP;
 
       if (user.money < DEFAULT_DRAW_COST) {
         throw new HttpException('잔액이 부족합니다', HttpStatus.CONFLICT);
