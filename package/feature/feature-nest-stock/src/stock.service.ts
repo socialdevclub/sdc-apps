@@ -15,6 +15,7 @@ import { ResultService } from './result/result.service';
 import { Result } from './result/result.schema';
 import { StockRepository } from './stock.repository';
 import { UserRepository } from './user/user.repository';
+import { DEFAULT_DRAW_COST, ROUND_SKIP_STEP } from './sotck.constants';
 
 @Injectable()
 export class StockService {
@@ -288,8 +289,6 @@ export class StockService {
         Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
         9,
       );
-      const DEFAULT_DRAW_COST = 300_000;
-      const ROUND_SKIP_STEP = 2;
 
       const nextTimeIdx = timeIdx + ROUND_SKIP_STEP;
 
