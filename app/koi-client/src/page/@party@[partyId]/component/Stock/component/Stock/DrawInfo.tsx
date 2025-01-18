@@ -76,7 +76,7 @@ const DrawStockInfo = ({ stockId }: Props) => {
           onOk={onClickDrawStockInfo}
         >
           <div ref={modalRef} tabIndex={-1}>
-            <p>1회 뽑는 데 30원의 금액이 들어요.</p>
+            <p>1회 뽑는 데 30만원의 금액이 필요해요.</p>
           </div>
         </Modal>
       </div>
