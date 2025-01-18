@@ -12,8 +12,9 @@ const DrawStockInfo = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
+  const { user } = Query.Stock.useUser({ stockId, userId });
   const { mutateAsync: drawStockInfo, isLoading } = Query.Stock.useDrawStockInfo();
-  const { allSellPrice, allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId, userId });
+  const { allSellPrice } = Query.Stock.useAllSellPrice({ stockId, userId });
 
   const [open, setOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -55,7 +56,8 @@ const DrawStockInfo = ({ stockId }: Props) => {
     return <>불러오는 중</>;
   }
 
-  const isDisabled = timeIdx === undefined || timeIdx >= 7 || !stock.isTransaction || allSellPrice < 1000000;
+  const allPrice = allSellPrice + (user?.money ?? 0);
+  const isDisabled = timeIdx === undefined || timeIdx >= 7 || !stock.isTransaction || allPrice < 1000000;
 
   return (
     <>
