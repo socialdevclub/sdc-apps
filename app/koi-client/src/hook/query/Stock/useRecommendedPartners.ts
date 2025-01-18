@@ -21,10 +21,12 @@ export const useRecommendedPartners = (stockId: string | undefined): { partnerNi
 
         companyInfos.forEach((_, idx) => {
           if (companyInfos[idx].정보.some((name) => name === userId)) {
-            const partner = companyInfos[idx].정보.find((name) => name !== userId);
-            if (partner && !partnerIds.some((v) => v === partner)) {
-              partnerIds.push(partner);
-            }
+            const partners = companyInfos[idx].정보.filter((name) => name !== userId);
+            partners.forEach((partner) => {
+              if (partner && !partnerIds.some((v) => v === partner)) {
+                partnerIds.push(partner);
+              }
+            });
           }
         });
 
