@@ -11,9 +11,12 @@ type Props = {
 const DrawStockInfo = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
+
+  const { mutateAsync: drawStockInfo, isLoading } = Query.Stock.useDrawStockInfo();
+  const { allSellPrice, allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId, userId });
+
   const [open, setOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
-  const { mutateAsync: drawStockInfo, isLoading } = Query.Stock.useDrawStockInfo();
   const [messageApi, contextHolder] = message.useMessage();
   const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId);
 
@@ -52,7 +55,7 @@ const DrawStockInfo = ({ stockId }: Props) => {
     return <>불러오는 중</>;
   }
 
-  const isDisabled = timeIdx === undefined || timeIdx >= 7 || !stock.isTransaction;
+  const isDisabled = timeIdx === undefined || timeIdx >= 7 || !stock.isTransaction || allSellPrice < 1000000;
 
   return (
     <>
@@ -77,6 +80,7 @@ const DrawStockInfo = ({ stockId }: Props) => {
         >
           <div ref={modalRef} tabIndex={-1}>
             <p>1회 뽑는 데 30만원의 금액이 필요해요.</p>
+            <p>수익률 0% 이상일 때만 뽑기를 할 수 있어요.</p>
           </div>
         </Modal>
       </div>
