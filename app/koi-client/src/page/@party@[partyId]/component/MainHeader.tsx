@@ -1,10 +1,11 @@
 import { Button, Space } from 'antd';
-import { ArrowLeftOutlined, ReloadOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, BulbOutlined, ReloadOutlined } from '@ant-design/icons';
 import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../../../component-presentation/Header';
 import ProfileValidator from '../../../component/ProfileValidator';
 import { Query } from '../../../hook';
+import RecommendedPartnersModal from './Stock/component/Stock/RecommendedPartnersModal';
 
 const PartyHeader = () => {
   const { partyId } = useParams();
@@ -61,6 +62,12 @@ const PartyHeader = () => {
         }
         RightComponent={
           <Space>
+            {/* 대화 추천 상대 리스트 모달 버튼 */}
+            <RecommendedPartnersModal
+              stockId={party?.activityName}
+              trigger={<Button shape="circle" icon={<BulbOutlined />} />}
+            />
+            {/* 페이지 새로고침 버튼 */}
             <Button
               shape="circle"
               icon={<ReloadOutlined />}
