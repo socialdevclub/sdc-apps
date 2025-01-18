@@ -60,6 +60,11 @@ export class StockController {
     return this.stockService.buyStock(body.stockId, body);
   }
 
+  @Post('/draw-info')
+  buyStockInfo(@Body() body: Request.PostDrawStockInfo): Promise<StockSchema> {
+    return this.stockService.drawStockInfo(body.stockId, body);
+  }
+
   @Post('/sell')
   sellStock(@Body() body: Request.PostSellStock): Promise<StockSchema> {
     return this.stockService.sellStock(body.stockId, body);
