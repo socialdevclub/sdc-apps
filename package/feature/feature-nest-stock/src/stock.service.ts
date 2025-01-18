@@ -15,6 +15,7 @@ import { ResultService } from './result/result.service';
 import { Result } from './result/result.schema';
 import { StockRepository } from './stock.repository';
 import { UserRepository } from './user/user.repository';
+import { DEFAULT_DRAW_COST, ROUND_SKIP_STEP } from './sotck.constants';
 
 @Injectable()
 export class StockService {
@@ -259,6 +260,104 @@ export class StockService {
           userId,
         }),
       );
+    });
+    await session.endSession();
+
+    return result;
+  }
+
+  async drawStockInfo(stockId: string, body: Request.PostDrawStockInfo): Promise<Stock> {
+    const { userId } = body;
+    console.debug('drawStockInfo', { userId });
+    let result: Stock;
+
+    const session = await this.connection.startSession();
+    await session.withTransaction(async () => {
+      const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
+      const user = await this.userRepository.findOne({ stockId, userId }, undefined, { session });
+
+      if (!stock.isTransaction) {
+        throw new HttpException('지금은 거래할 수 없습니다', HttpStatus.CONFLICT);
+      }
+
+      if (!user) {
+        throw new HttpException('유저 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
+      }
+
+      // 현재 라운드에 해당하는 시점의 idx
+      const timeIdx = Math.min(
+        Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
+        9,
+      );
+
+      const nextTimeIdx = timeIdx + ROUND_SKIP_STEP;
+
+      if (user.money < DEFAULT_DRAW_COST) {
+        throw new HttpException('잔액이 부족합니다', HttpStatus.CONFLICT);
+      }
+
+      const companies = stock.companies as unknown as Map<string, Array<{ 가격: number; 정보: string[] }>>;
+      // 이미 정보를 가지고 있지 않은 회사들 중에서만 선택
+      const availableCompanies = Array.from(companies.entries())
+        .filter(([_, companyInfos]) => {
+          // nextTimeIdx 이후의 모든 시점에서 정보를 가지고 있지 않은 회사만 선택
+          return companyInfos.slice(nextTimeIdx).some((info) => !info.정보.includes(userId));
+        })
+        .map(([company]) => company);
+
+      if (availableCompanies.length === 0) {
+        throw new HttpException('더 이상 뽑을 수 있는 정보가 없습니다', HttpStatus.CONFLICT);
+      }
+
+      // 랜덤으로 회사 선택
+      const randomIndex = Math.floor(Math.random() * availableCompanies.length);
+      const selectedCompany = availableCompanies[randomIndex];
+
+      // 랜덤으로 시점 선택 (정보를 가지고 있는 시점만 선택)
+      let randomTimeIndex =
+        Math.floor(Math.random() * (companies.get(selectedCompany).length - nextTimeIdx)) + nextTimeIdx;
+
+      // 선택된 회사의 정보 업데이트
+      const companyInfos = [...companies.get(selectedCompany)]; // 배열 복사
+
+      // 해당 배열안에 이미 user Id가 있는지 확인
+      let isExistUser = companyInfos[randomTimeIndex].정보.find((v) => v === userId);
+      // user Id가 있는 때는 randomTimeIndex를 다시 생성
+      while (isExistUser) {
+        randomTimeIndex =
+          Math.floor(Math.random() * (companies.get(selectedCompany).length - nextTimeIdx)) + nextTimeIdx;
+        isExistUser = companyInfos[randomTimeIndex].정보.find((v) => v === userId);
+      }
+
+      companyInfos[randomTimeIndex] = {
+        ...companyInfos[randomTimeIndex],
+        정보: [...companyInfos[randomTimeIndex].정보, userId],
+      };
+
+      // stock 객체 직접 업데이트 (Record 형식으로 변환)
+      // ! companies의 set 메소드가 동작을 안함
+      const updatedCompanies = Object.fromEntries(companies.entries());
+      updatedCompanies[selectedCompany] = companyInfos;
+      stock.companies = updatedCompanies;
+
+      console.debug('Updated company info:', {
+        randomTimeIndex,
+        selectedCompany,
+        updatedInfo: companyInfos[randomTimeIndex].정보,
+        기격: companyInfos[randomTimeIndex].가격,
+      });
+
+      user.money -= DEFAULT_DRAW_COST;
+      user.lastActivityTime = new Date();
+
+      await user.save({
+        session,
+      });
+
+      result = await stock.save({
+        session,
+      });
+      // TODO: 로그를 심고 싶으면 좀 더 범용적으로 설계를 해야할 것만 같은 기분이 듬
     });
     await session.endSession();
 
