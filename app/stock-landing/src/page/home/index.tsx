@@ -1,6 +1,5 @@
-/** @jsxImportSource @emotion/react */
-import { useState, useEffect } from 'react';
 import { Style } from './index.style';
+import useSlideText from '../../hook/useSlideText';
 
 const features = [
   '소셜게임 혜택으로 재미와 성장을 동시에 누리세요.',
@@ -10,15 +9,7 @@ const features = [
 ];
 
 const Home = () => {
-  const [currentFeature, setCurrentFeature] = useState<number>(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentFeature((prev) => (prev + 1) % features.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const feature = useSlideText(features);
 
   return (
     <Style.Container>
@@ -33,7 +24,7 @@ const Home = () => {
       </Style.Header>
 
       <Style.FeatureBox>
-        <Style.FeatureText key={currentFeature}>{features[currentFeature]}</Style.FeatureText>
+        <Style.FeatureText key={feature}>{feature}</Style.FeatureText>
       </Style.FeatureBox>
     </Style.Container>
   );
