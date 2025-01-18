@@ -1,14 +1,15 @@
 import { useAtomValue } from 'jotai';
 import { commaizeNumber, objectEntries } from '@toss/utils';
-import { getDateDistance } from '@toss/date';
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
-import dayjs from 'dayjs';
+import { Flex } from 'antd';
 import { UserStore } from '../../../../../../store';
 import { Query } from '../../../../../../hook';
 import Box from '../../../../../../component-presentation/Box';
-import prependZero from '../../../../../../service/prependZero';
-import { colorDown, colorUp } from '../../../../../../config/color';
+import DrawStockInfo from './DrawInfo';
+import MyInfosContent from './MyInfosContent';
+import RunningTimeDisplay from './RunningTimeDisplay';
+
+const getProfitRatio = (v: number) => ((v / 1000000) * 100 - 100).toFixed(2);
 
 interface Props {
   stockId: string;
@@ -21,13 +22,12 @@ const Home = ({ stockId }: Props) => {
   const { data: stock } = Query.Stock.useQueryStock(stockId);
   const { data: users } = Query.Stock.useUserList(stockId);
   const { user } = Query.Stock.useUser({ stockId, userId });
+
   const { allSellPrice, allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId, userId });
 
   if (!user || !stock) {
     return <div>불러오는 중.</div>;
   }
-
-  const getProfitRatio = (v: number) => ((v / 1000000) * 100 - 100).toFixed(2);
 
   const allProfitDesc = allUserSellPriceDesc()
     .map(({ userId, allSellPrice }) => {
@@ -64,13 +64,7 @@ const Home = ({ stockId }: Props) => {
   return (
     <>
       <H3>홈</H3>
-      <Box
-        title="진행 시간"
-        value={`${prependZero(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes, 2)}:${prependZero(
-          getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).seconds,
-          2,
-        )}`}
-      />
+      <RunningTimeDisplay startTime={stock.startedTime} />
       <Box
         title="잔액"
         value={`${commaizeNumber(user.money)}원`}
@@ -100,26 +94,11 @@ const Home = ({ stockId }: Props) => {
         rightComponent={stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>}
       />
       <br />
-      <H3>내가 가진 정보</H3>
-      {myInfos.map(({ company, price, timeIdx }) => {
-        return (
-          <Box
-            key={`${company}_${timeIdx}`}
-            title={`${company}`}
-            value={`${price >= 0 ? '▲' : '▼'}${commaizeNumber(Math.abs(price))}`}
-            valueColor={price >= 0 ? colorUp : colorDown}
-            rightComponent={
-              <div
-                css={css`
-                  font-size: 18px;
-                `}
-              >
-                {prependZero(timeIdx * stock.fluctuationsInterval, 2)}:00
-              </div>
-            }
-          />
-        );
-      })}
+      <Flex align="center" justify="space-between" gap={4} css={{ width: '100%' }}>
+        <H3>내가 가진 정보</H3>
+        <DrawStockInfo stockId={stockId} />
+      </Flex>
+      <MyInfosContent myInfos={myInfos} fluctuationsInterval={stock.fluctuationsInterval} />
       <br />
       <br />
       <br />
