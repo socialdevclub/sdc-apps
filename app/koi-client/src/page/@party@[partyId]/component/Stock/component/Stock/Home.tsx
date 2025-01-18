@@ -161,7 +161,7 @@ const Home = ({ stockId }: Props) => {
           <Box
             key={`${nextRoundPredict.companyName}`}
             title={nextRoundPredict.companyName}
-            value={`${nextRoundPredict.priceVariation / 100}억 규모의 투자 협상중`}
+            value={`${nextRoundPredict.priceVariation / 100}억 규모 투자 협상중`}
             rightComponent={
               <div
                 css={css`
