@@ -1,0 +1,45 @@
+@font-face {
+  font-family: 'DungGeunMo';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  font-family: 'DungGeunMo';
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: linear-gradient(123deg, #4413bf 0%, rgba(125,44,195,1) 20%, rgba(235,29,253,1) 48%, rgba(255,199,121,1) 80%, #ffefb4 100%);
+  background-size: 400% 400%;
+  background-position: 0% 50%;
+  animation: smoothGradient 15s ease infinite;
+}
+
+h1 {
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes smoothGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
