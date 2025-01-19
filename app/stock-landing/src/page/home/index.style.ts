@@ -1,17 +1,13 @@
 import styled from '@emotion/styled';
 
-const Container = styled.div`s
+const Container = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
-`;
-
-const Header = styled.header`
+  padding: 0rem 1.5rem;
   text-align: center;
-  margin-bottom: 3rem;
 `;
 
 const Title = styled.h1`
@@ -20,28 +16,33 @@ const Title = styled.h1`
 `;
 
 const Subtitle = styled.p`
-  font-size: 1.2rem;
   margin-bottom: 1.5rem;
+  font-size: 1.2rem;
 `;
 
 const Button = styled.button`
-  background: linear-gradient(90deg, #4413bf, #29d3ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  margin-top: 3rem;
+  background: rgba(0, 103, 224, 1);
+  color: #fff;
   border: none;
   border-radius: 24px;
+  cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
-  padding: 12px 24px;
-  cursor: pointer;
 
   &:hover {
-    opacity: 0.9;
+    opacity: 0.8;
   }
 `;
 
 export const Style = {
   Button,
   Container,
-  Header,
   Subtitle,
   Title,
 };
