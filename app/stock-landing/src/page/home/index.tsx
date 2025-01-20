@@ -8,7 +8,9 @@ const Home = () => {
   return (
     <Style.Container>
       <Style.Title>소셜데브클럽</Style.Title>
-      <Style.Subtitle>사람과 사람을 연결시켜주는 소셜 게임을 함께 만들고 즐겨요 👾</Style.Subtitle>
+      <Style.Subtitle>
+        사람과 사람을 연결시켜주는 <span>소셜 게임을 함께 만들고 즐겨요 👾</span>
+      </Style.Subtitle>
       <Style.Button onClick={() => window.open(DISCORD_INVITE_LINK, '_blank')}>
         <img src={DiscordIcon} alt="Discord Icon" width="24" height="24" />
         <span>디스코드 입장하기</span>

@@ -18,6 +18,12 @@ const Title = styled.h1`
 const Subtitle = styled.p`
   margin-bottom: 1.5rem;
   font-size: 1.2rem;
+
+  @media (max-width: 800px) {
+    span {
+      display: block;
+    }
+  }
 `;
 
 const Button = styled.button`
@@ -27,7 +33,7 @@ const Button = styled.button`
   gap: 8px;
   padding: 12px 24px;
   margin-top: 3rem;
-  background: rgba(0, 103, 224, 1);
+  background: rgb(88, 101, 242);
   color: #fff;
   border: none;
   border-radius: 24px;
