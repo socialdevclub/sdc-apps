@@ -14,7 +14,7 @@ const Splash = ({ onAuthDetail }: Props) => {
   return (
     <Layout>
       <Content>
-        <Title>파레트,</Title>
+        <Title>소데클,</Title>
         <Description>일상에 색을 더하자</Description>
       </Content>
       <Footer>
