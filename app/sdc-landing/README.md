@@ -1,50 +1,52 @@
-# React + TypeScript + Vite
+# 소셜데브클럽 랜딩페이지 기획안
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 1. 히어로 섹션 (First View)
+### 메인 카피
+"회사에서 권태감을 느끼기 시작한 당신,
+진짜 좋아하는 일을 함께 해봐요"
 
-Currently, two official plugins are available:
+### 서브 카피
+"소셜게임을 만들며 성장하는 커뮤니티, 소셜데브클럽"
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### CTA 버튼
+"소셜데브클럽 합류하기" 
 
-## Expanding the ESLint configuration
+## 2. 문제 제시 섹션
+### "이런 고민하고 계신가요?"
+- 회사일만으로는 뭔가 부족하다는 느낌
+- 사이드 프로젝트, 혼자서는 시작하기 어려워요
+- 새로운 사람들과 친해지고 싶은데 어색해요
+- 취미로 끝내기엔 아까운 내 아이디어들
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## 3. 솔루션 섹션
+### "소셜데브클럽에서는"
+- 게임 개발이라는 재미있는 도전
+- 자연스럽게 친해지는 소셜 게임 모임
+- 도파민 터지는 다양한 분야의 사람들과 네트워킹
 
-- Configure the top-level `parserOptions` property like this:
+## 4. 프로젝트 쇼케이스
+### 주식게임 프로젝트 성공사례
+- 참여 팀원들의 생생한 후기
+- 프로젝트 진행 과정 타임라인
+- 실제 플레이 영상/사진
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## 5. 팀원 혜택 섹션
+### "소셜데브클럽 팀원이 되면"
+- 실제 서비스 개발/운영 경험
+- 자신만의 소셜게임을 만들어서 소소한 용돈 벌이
+- 도파민 터지는 다양한 분야의 사람들과 네트워킹
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## 6. 팀원 후기 섹션
+### 현재 활동 중인 팀원들의 testimonial
+- 팀원들의 실제 후기
+- 성장 스토리와 변화된 일상
+- 실제 팀원들의 얼굴과 이름 (동의 시)
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## 7. FAQ 섹션
+- 시간 투자는 어느 정도인가요?
+- 실제 수익은 어떻게 나나요?
+- 경험이 없어도 지원할 수 있나요?
+- 현재 직장과 병행 가능한가요?
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## 8. 마지막 CTA 섹션
+### "일상에서 벗어나 새로운 경험을 시작해보세요"
