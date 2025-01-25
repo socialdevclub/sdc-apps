@@ -72,7 +72,7 @@ export class StockService {
             round: 0,
             startedTime: new Date(),
             stockPhase: 'CROWDING',
-            transactionInterval: 2,
+            transactionInterval: 0,
           },
         },
         { session },
@@ -170,7 +170,7 @@ export class StockService {
         remainingStocks,
         startedTime: new Date(),
         stockPhase: 'PLAYING',
-        transactionInterval: 2,
+        transactionInterval: 0,
       },
     });
 

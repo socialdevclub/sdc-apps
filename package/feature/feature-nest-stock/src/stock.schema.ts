@@ -38,7 +38,7 @@ export class Stock implements StockSchema {
     this.companies = {};
     this.isVisibleRank = false;
     this.isTransaction = false;
-    this.transactionInterval = 5;
+    this.transactionInterval = 0;
     this.fluctuationsInterval = 5;
     this.round = 0;
   }
