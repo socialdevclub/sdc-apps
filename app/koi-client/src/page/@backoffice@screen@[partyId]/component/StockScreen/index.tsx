@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getDateDistance } from '@toss/date';
 import { SwitchCase } from '@toss/react';
 import { QRCode } from 'antd';
@@ -28,7 +28,7 @@ export default function StockScreen({ party }: Props) {
     refetchInterval: 500,
   });
 
-  const startedTime = dayjs(stock?.startedTime).toDate();
+  const startedTime = useMemo(() => dayjs(stock?.startedTime).toDate(), [stock?.startedTime]);
   const isTransaction = stock?.isTransaction ?? false;
   const [time, setTime] = useState(() => {
     return getTimeDistanceWithCurrent(startedTime);
