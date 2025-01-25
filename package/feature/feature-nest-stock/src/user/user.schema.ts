@@ -19,6 +19,9 @@ export class StockUser implements StockUserSchema {
   @Prop({ type: SchemaTypes.Date })
   lastActivityTime: Date;
 
+  @Prop({ default: 0 })
+  loanCount: number;
+
   constructor(required: Pick<StockUserSchema, StockUserRequired>, partial: StockUserForm) {
     this.userId = required.userId;
     this.stockId = required.stockId;
@@ -26,6 +29,7 @@ export class StockUser implements StockUserSchema {
     this.money = partial.money ?? 1000000;
     this.inventory = partial.inventory ?? {};
     this.lastActivityTime = new Date();
+    this.loanCount = partial.loanCount ?? 0;
   }
 }
 
