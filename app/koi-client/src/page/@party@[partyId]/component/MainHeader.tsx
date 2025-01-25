@@ -67,7 +67,7 @@ const PartyHeader = () => {
             <SwitchCase
               value={party?.activityId ?? ''}
               caseBy={{
-                stock: (
+                STOCK: (
                   <RecommendedPartnersModal
                     stockId={party?.activityName}
                     trigger={<Button shape="circle" icon={<BulbOutlined />} />}
