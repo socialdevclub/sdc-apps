@@ -19,13 +19,13 @@ export class UserController {
   }
 
   @Post('loan')
-  async startLoan(@Body('userId') userId: string): Promise<Response.Common> {
-    return this.userService.startLoan(userId);
+  async startLoan(@Body() body: Request.PostLoan): Promise<Response.Common> {
+    return this.userService.startLoan(body.stockId, body.userId);
   }
 
   @Post('loan/settle')
-  async settleLoan(@Body('userId') userId: string): Promise<Response.Common> {
-    return this.userService.settleLoan(userId);
+  async settleLoan(@Body() body: Request.PostSettleLoan): Promise<Response.Common> {
+    return this.userService.settleLoan(body.stockId, body.userId);
   }
 
   @Delete()

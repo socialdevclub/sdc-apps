@@ -29,6 +29,16 @@ export type PostSellStock = {
   unitPrice: number;
 };
 
+export type PostLoan = {
+  stockId: string;
+  userId: string;
+};
+
+export type PostSettleLoan = {
+  stockId: string;
+  userId: string;
+};
+
 export type RemoveStockUser = {
   stockId: string;
   userId: string;

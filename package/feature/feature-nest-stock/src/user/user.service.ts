@@ -1,17 +1,20 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import mongoose, { MongooseQueryOptions } from 'mongoose';
 import { UpdateOptions } from 'mongodb';
-import { Response } from 'shared~type-stock';
+import { CompanyInfo, Response } from 'shared~type-stock';
 import dayjs from 'dayjs';
 import { InjectConnection } from '@nestjs/mongoose';
+import { getDateDistance } from '@toss/date';
 import { StockUser, UserDocument } from './user.schema';
 import { UserRepository } from './user.repository';
+import { StockRepository } from '../stock.repository';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly userRepository: UserRepository,
+    private readonly stockRepository: StockRepository,
   ) {}
 
   transStockUserToDto(stockUser: UserDocument): Response.GetStockUser {
@@ -61,27 +64,50 @@ export class UserService {
     }
   }
 
-  async startLoan(userId: string): Promise<Response.Common> {
+  async startLoan(stockId: string, userId: string): Promise<Response.Common> {
     const session = await this.connection.startSession();
     try {
       session.startTransaction();
 
-      const user = await this.userRepository.findOne({ userId });
+      const user = await this.userRepository.findOne({ stockId, userId }, null, { session });
       if (!user) {
         throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
       }
 
-      // 현재 자산이 100만원 미만인지 확인
+      // 현재 매수 가능 금액이 100만원 미만인지 확인
       if (user.money >= 1_000_000) {
         throw new HttpException('보유 금액이 100만원 이상인 경우 대출이 불가능합니다.', HttpStatus.BAD_REQUEST);
       }
 
+      const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
+      const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
+
+      const idx = Math.min(
+        Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
+        9,
+      );
+
+      const inventory = user.inventory as unknown as Map<string, number>;
+
+      const allCompaniesPrice = Array.from(inventory.entries()).reduce((acc, [name, amount]) => {
+        const companyInfo = companies.get(name);
+        const price = companyInfo[idx]?.가격;
+        return acc + price * amount;
+      }, 0);
+
+      const totalMoney = allCompaniesPrice + user.money;
+
+      // 매수 가능 금액 + 보유 주식 가치가 100만원 미만인 경우 대출 이 불가능합니다.
+      if (totalMoney >= 1_000_000) {
+        throw new HttpException('예상 수익 금액이 100만원 이상인 경우 대출이 불가능합니다.', HttpStatus.BAD_REQUEST);
+      }
+
       // 대출 실행
       await this.userRepository.updateMany(
-        { userId },
+        { stockId, userId },
         {
           $inc: {
-            // 200만원 대출
+            // 100만원 대출
             loanCount: 1,
             money: 1_000_000, // 대출 횟수 증가
           },
@@ -95,16 +121,16 @@ export class UserService {
       await session.abortTransaction();
       throw error;
     } finally {
-      await session.endSession();
+      session.endSession();
     }
   }
 
-  async settleLoan(userId: string): Promise<Response.Common> {
+  async settleLoan(stockId: string, userId: string): Promise<Response.Common> {
     const session = await this.connection.startSession();
     try {
       session.startTransaction();
 
-      const user = await this.userRepository.findOne({ userId });
+      const user = await this.userRepository.findOne({ stockId, userId }, null, { session });
       if (!user) {
         throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
       }
@@ -115,7 +141,7 @@ export class UserService {
 
       // 대출금 회수 및 대출 횟수 초기화
       await this.userRepository.updateMany(
-        { userId },
+        { stockId, userId },
         {
           $set: {
             loanCount: 0,
@@ -135,7 +161,7 @@ export class UserService {
       await session.abortTransaction();
       throw error;
     } finally {
-      await session.endSession();
+      session.endSession();
     }
   }
 }

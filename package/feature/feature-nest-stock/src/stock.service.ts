@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
 import { CompanyInfo, Request, Response } from 'shared~type-stock';
 import { Config, stock } from 'shared~config';
 import { getDateDistance } from '@toss/date';
@@ -22,7 +22,9 @@ export class StockService {
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly stockRepository: StockRepository,
+    @Inject(forwardRef(() => UserRepository))
     private readonly userRepository: UserRepository,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly logService: LogService,
     private readonly resultService: ResultService,
