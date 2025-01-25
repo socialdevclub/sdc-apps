@@ -12,9 +12,7 @@ const StartLoan = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { user } = Query.Stock.useUser({ stockId, userId });
   const { mutateAsync: startLoan, isLoading } = Query.Stock.useStartLoan();
-  const { allSellPrice } = Query.Stock.useAllSellPrice({ stockId, userId });
 
   const [open, setOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -27,10 +25,10 @@ const StartLoan = ({ stockId }: Props) => {
       stockId,
       userId,
     })
-      .then(() => {
+      .then((res) => {
         messageApi.destroy();
         messageApi.open({
-          content: '뽑기에 성공하였습니다',
+          content: res.message,
           duration: 2,
           type: 'success',
         });
@@ -56,8 +54,7 @@ const StartLoan = ({ stockId }: Props) => {
     return <>불러오는 중</>;
   }
 
-  const allPrice = allSellPrice + (user?.money ?? 0);
-  const isDisabled = timeIdx === undefined || timeIdx >= 7 || !stock.isTransaction || allPrice < 1000000;
+  const isDisabled = timeIdx === undefined || !stock.isTransaction;
 
   return (
     <>
@@ -83,6 +80,7 @@ const StartLoan = ({ stockId }: Props) => {
           <div ref={modalRef} tabIndex={-1}>
             <p>1회 대출시 100만원을 받을 수 있어요</p>
             <p>[매수 가능 금액]이나 [매수 가능 금액 + 주식가치]의 합이 100만원 이상일 경우 대출을 받을 수 없어요</p>
+            <p>게임이 종료되면 [대출 횟수 * 200만원]만큼 회수를 해요</p>
           </div>
         </Modal>
       </div>
