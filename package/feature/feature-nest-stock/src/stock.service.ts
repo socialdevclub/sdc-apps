@@ -470,6 +470,10 @@ export class StockService {
           inventory.set(company, 0);
         });
 
+        const loanMoney = user.loanCount * 2_000_000;
+        user.money -= loanMoney;
+        user.loanCount = 0;
+
         await user.save({ session });
       }
       result = await stock.save({ session });
