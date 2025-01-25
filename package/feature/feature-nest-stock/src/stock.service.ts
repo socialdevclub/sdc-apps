@@ -7,6 +7,7 @@ import mongoose, { ProjectionType, QueryOptions } from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
 import dayjs from 'dayjs';
 import { INIT_STOCK_PRICE } from 'shared~config/dist/stock';
+import { DEFAULT_DRAW_COST, ROUND_SKIP_STEP, SETTLE_LOAN_PRICE } from 'shared~config/src/stock';
 import { Stock, StockDocument } from './stock.schema';
 import { UserService } from './user/user.service';
 import { LogService } from './log/log.service';
@@ -15,7 +16,6 @@ import { ResultService } from './result/result.service';
 import { Result } from './result/result.schema';
 import { StockRepository } from './stock.repository';
 import { UserRepository } from './user/user.repository';
-import { DEFAULT_DRAW_COST, ROUND_SKIP_STEP } from './sotck.constants';
 
 @Injectable()
 export class StockService {
@@ -470,7 +470,7 @@ export class StockService {
           inventory.set(company, 0);
         });
 
-        const loanMoney = user.loanCount * 2_000_000;
+        const loanMoney = user.loanCount * SETTLE_LOAN_PRICE;
         user.money -= loanMoney;
         user.loanCount = 0;
 
