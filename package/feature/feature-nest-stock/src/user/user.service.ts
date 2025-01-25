@@ -95,11 +95,14 @@ export class UserService {
         return acc + price * amount;
       }, 0);
 
-      const totalMoney = allCompaniesPrice + user.money;
+      const estimatedAllMoney = allCompaniesPrice + user.money;
 
       // 매수 가능 금액 + 보유 주식 가치가 100만원 미만인 경우 대출 이 불가능합니다.
-      if (totalMoney >= 1_000_000) {
-        throw new HttpException('예상 수익 금액이 100만원 이상인 경우 대출이 불가능합니다.', HttpStatus.BAD_REQUEST);
+      if (estimatedAllMoney >= 1_000_000) {
+        throw new HttpException(
+          '[매수 가능 금액 + 보유 주식 가치]가 100만원 이상인 경우 대출이 불가능합니다.',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // 대출 실행

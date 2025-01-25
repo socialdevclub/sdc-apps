@@ -12,6 +12,7 @@ import DrawStockInfo from './DrawInfo';
 import MyInfosContent from './MyInfosContent';
 import RunningTimeDisplay from './RunningTimeDisplay';
 import prependZero from '../../../../../../service/prependZero';
+import StartLoan from './StartLoan';
 
 const getProfitRatio = (v: number) => ((v / 1000000) * 100 - 100).toFixed(2);
 
@@ -118,7 +119,10 @@ const Home = ({ stockId }: Props) => {
 
   return (
     <>
-      <H3>홈</H3>
+      <Flex align="center" justify="space-between" gap={4} css={{ width: '100%' }}>
+        <H3>홈</H3>
+        <StartLoan stockId={stockId} />
+      </Flex>
       <RunningTimeDisplay startTime={stock.startedTime} />
       <Box
         title="잔액"
