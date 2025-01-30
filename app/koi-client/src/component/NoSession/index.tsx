@@ -20,7 +20,7 @@ const NoSession = () => {
             <Auth
               supabaseClient={supabase}
               appearance={{ theme: ThemeSupa }}
-              providers={[]}
+              providers={['google']}
               localization={authLocalization}
             />
           </MobileLayout>

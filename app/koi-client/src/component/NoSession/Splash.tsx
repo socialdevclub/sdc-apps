@@ -21,7 +21,7 @@ const Splash = ({ onAuthDetail }: Props) => {
         <Auth
           supabaseClient={supabase}
           appearance={{ theme: ThemeSupa }}
-          providers={['google']}
+          providers={['discord']}
           localization={authLocalization}
           onlyThirdPartyProviders
         />
