@@ -4687,33 +4687,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["@supabase/auth-ui-react", [\
-      ["npm:0.4.6", {\
-        "packageLocation": "./.yarn/cache/@supabase-auth-ui-react-npm-0.4.6-c4f3183b6f-bade665018.zip/node_modules/@supabase/auth-ui-react/",\
-        "packageDependencies": [\
-          ["@supabase/auth-ui-react", "npm:0.4.6"]\
-        ],\
-        "linkType": "SOFT"\
-      }],\
-      ["virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:0.4.6", {\
-        "packageLocation": "./.yarn/__virtual__/@supabase-auth-ui-react-virtual-3d923f019f/0/cache/@supabase-auth-ui-react-npm-0.4.6-c4f3183b6f-bade665018.zip/node_modules/@supabase/auth-ui-react/",\
-        "packageDependencies": [\
-          ["@supabase/auth-ui-react", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:0.4.6"],\
-          ["@stitches/core", "npm:1.2.8"],\
-          ["@supabase/auth-ui-shared", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:0.1.8"],\
-          ["@supabase/supabase-js", "npm:2.39.0"],\
-          ["@types/supabase__supabase-js", null],\
-          ["prop-types", "npm:15.8.1"],\
-          ["react", "npm:18.2.0"],\
-          ["react-dom", "virtual:3d923f019f86d43bbd1888155c8cb6df32894d1c15ccae7ec732ce3fcd2b31ecd75f5ddb03770f2684a5a177e49861dcc9edb22b1a24f7bae52c85a134c78f63#npm:18.2.0"]\
-        ],\
-        "packagePeers": [\
-          "@supabase/supabase-js",\
-          "@types/supabase__supabase-js"\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["@supabase/auth-ui-shared", [\
       ["npm:0.1.8", {\
         "packageLocation": "./.yarn/cache/@supabase-auth-ui-shared-npm-0.1.8-a902c3d2d9-372fbbfb02.zip/node_modules/@supabase/auth-ui-shared/",\
@@ -13006,7 +12979,7 @@ const RAW_RUNTIME_STATE =
           ["@linaria/core", "npm:6.0.0"],\
           ["@linaria/react", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:6.0.0"],\
           ["@radix-ui/react-scroll-area", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:1.2.1"],\
-          ["@supabase/auth-ui-react", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:0.4.6"],\
+          ["@stitches/core", "npm:1.2.8"],\
           ["@supabase/auth-ui-shared", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:0.1.8"],\
           ["@supabase/supabase-js", "npm:2.39.0"],\
           ["@swc/plugin-emotion", "npm:2.5.86"],\
@@ -16010,21 +15983,6 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["react-dom", "virtual:26c7e0b3641a794a76ed0ce1aa5b9688c9d422541f80c729df4415bfd37e15cf639602c60281ac066c5ecd6bcdb8822cc4ef679e583e0c3aaffd02dfbaa55884#npm:18.2.0"],\
           ["@types/react", "npm:18.2.22"],\
-          ["loose-envify", "npm:1.4.0"],\
-          ["react", "npm:18.2.0"],\
-          ["scheduler", "npm:0.23.0"]\
-        ],\
-        "packagePeers": [\
-          "@types/react",\
-          "react"\
-        ],\
-        "linkType": "HARD"\
-      }],\
-      ["virtual:3d923f019f86d43bbd1888155c8cb6df32894d1c15ccae7ec732ce3fcd2b31ecd75f5ddb03770f2684a5a177e49861dcc9edb22b1a24f7bae52c85a134c78f63#npm:18.2.0", {\
-        "packageLocation": "./.yarn/__virtual__/react-dom-virtual-f378662252/0/cache/react-dom-npm-18.2.0-dd675bca1c-ca5e7762ec.zip/node_modules/react-dom/",\
-        "packageDependencies": [\
-          ["react-dom", "virtual:3d923f019f86d43bbd1888155c8cb6df32894d1c15ccae7ec732ce3fcd2b31ecd75f5ddb03770f2684a5a177e49861dcc9edb22b1a24f7bae52c85a134c78f63#npm:18.2.0"],\
-          ["@types/react", null],\
           ["loose-envify", "npm:1.4.0"],\
           ["react", "npm:18.2.0"],\
           ["scheduler", "npm:0.23.0"]\

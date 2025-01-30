@@ -2948,22 +2948,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/auth-ui-react@npm:^0.4.6":
-  version: 0.4.6
-  resolution: "@supabase/auth-ui-react@npm:0.4.6"
-  dependencies:
-    "@stitches/core": "npm:^1.2.8"
-    "@supabase/auth-ui-shared": "npm:0.1.8"
-    prop-types: "npm:^15.7.2"
-    react: "npm:^18.2.0"
-    react-dom: "npm:^18.2.0"
-  peerDependencies:
-    "@supabase/supabase-js": ^2.21.0
-  checksum: bade665018c1ba0e591592e7ba61bbfda5fefafe812a08f00ef8a6f0c0e508c567476a8f8860d62761f098ec7bd74d88dbce07e65d118ab55812e8307ee6e0f2
-  languageName: node
-  linkType: hard
-
-"@supabase/auth-ui-shared@npm:0.1.8, @supabase/auth-ui-shared@npm:^0.1.8":
+"@supabase/auth-ui-shared@npm:^0.1.8":
   version: 0.1.8
   resolution: "@supabase/auth-ui-shared@npm:0.1.8"
   peerDependencies:
@@ -9499,7 +9484,7 @@ __metadata:
     "@linaria/core": "npm:^6.0.0"
     "@linaria/react": "npm:^6.0.0"
     "@radix-ui/react-scroll-area": "npm:^1.2.1"
-    "@supabase/auth-ui-react": "npm:^0.4.6"
+    "@stitches/core": "npm:^1.2.8"
     "@supabase/auth-ui-shared": "npm:^0.1.8"
     "@supabase/supabase-js": "npm:^2.39.0"
     "@swc/plugin-emotion": "npm:^2.5.86"
