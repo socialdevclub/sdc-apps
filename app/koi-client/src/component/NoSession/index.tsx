@@ -22,6 +22,7 @@ const NoSession = () => {
               appearance={{ theme: ThemeSupa }}
               providers={['google']}
               localization={authLocalization}
+              redirectTo={window.location.origin}
             />
           </MobileLayout>
         ),

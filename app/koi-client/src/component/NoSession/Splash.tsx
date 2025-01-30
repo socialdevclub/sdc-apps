@@ -23,6 +23,7 @@ const Splash = ({ onAuthDetail }: Props) => {
           appearance={{ theme: ThemeSupa }}
           providers={['discord']}
           localization={authLocalization}
+          redirectTo={window.location.origin}
           onlyThirdPartyProviders
         />
         <Button type="text" style={{ color: '#fff' }} onClick={() => onAuthDetail()}>
