@@ -25,3 +25,5 @@ turbo-build.log
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+.windsurfrules
