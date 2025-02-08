@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import mongoose, { MongooseQueryOptions } from 'mongoose';
 import { DeleteOptions, UpdateOptions } from 'mongodb';
-import { Response } from 'shared~type-stock';
+import { CompanyInfo, Response } from 'shared~type-stock';
 import dayjs from 'dayjs';
 import { InjectConnection } from '@nestjs/mongoose';
 import { getDateDistance } from '@toss/date';
