@@ -20,7 +20,7 @@ export class PartyRepository {
   }
 
   find(
-    filter: mongoose.FilterQuery<Party>,
+    filter?: mongoose.FilterQuery<Party>,
     projection?: mongoose.ProjectionType<Party>,
     options?: mongoose.QueryOptions<Party>,
   ): Promise<PartyDocument[]> {

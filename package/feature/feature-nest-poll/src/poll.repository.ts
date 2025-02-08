@@ -61,64 +61,70 @@ export class PollRepository {
     let poll: PollDocument;
 
     const session = await this.pollModel.startSession();
-    await session.withTransaction(async () => {
-      poll = await this.findById(pollId, undefined, { session });
+    try {
+      await session.withTransaction(async () => {
+        poll = await this.findById(pollId, undefined, { session });
 
-      if (!poll) {
-        throw new HttpException('poll not found', HttpStatus.NOT_FOUND);
-      }
+        if (!poll) {
+          throw new HttpException('poll not found', HttpStatus.NOT_FOUND);
+        }
 
-      if (poll.isWhitelist && !poll.whitelistUserIds.some((v) => v === user.userId)) {
-        throw new HttpException('user is not whitelist', HttpStatus.FORBIDDEN);
-      }
+        if (poll.isWhitelist && !poll.whitelistUserIds.some((v) => v === user.userId)) {
+          throw new HttpException('user is not whitelist', HttpStatus.FORBIDDEN);
+        }
 
-      if (poll.status !== 'OPEN') {
-        throw new HttpException('poll is not open', HttpStatus.FORBIDDEN);
-      }
+        if (poll.status !== 'OPEN') {
+          throw new HttpException('poll is not open', HttpStatus.FORBIDDEN);
+        }
 
-      poll.votes.forEach((vote) => {
-        const isJoinedVote = (): boolean => vote.userIds.some((v) => v === user.userId);
-        if (joinVoteTitles?.some((v) => v === vote.title) && !isJoinedVote()) {
-          // TODO: 성별 별로 투표 제한
-          if (vote.limitAllCount && vote.limitAllCount <= vote.userIds.length) {
-            throw new HttpException('poll is full', HttpStatus.FORBIDDEN);
+        poll.votes.forEach((vote) => {
+          const isJoinedVote = (): boolean => vote.userIds.some((v) => v === user.userId);
+          if (joinVoteTitles?.some((v) => v === vote.title) && !isJoinedVote()) {
+            // TODO: 성별 별로 투표 제한
+            if (vote.limitAllCount && vote.limitAllCount <= vote.userIds.length) {
+              throw new HttpException('poll is full', HttpStatus.FORBIDDEN);
+            }
+            vote.userIds.push(user.userId);
           }
-          vote.userIds.push(user.userId);
+          if (exitVoteTitles?.some((v) => v === vote.title) && isJoinedVote()) {
+            vote.userIds = vote.userIds.filter((v) => v !== user.userId);
+          }
+        });
+
+        let isJoinedPoll = false;
+        for (const vote of poll.votes) {
+          const isJoinedVote = vote.userIds.some((v) => v === user.userId);
+          if (isJoinedVote) {
+            isJoinedPoll = true;
+            break;
+          }
         }
-        if (exitVoteTitles?.some((v) => v === vote.title) && isJoinedVote()) {
-          vote.userIds = vote.userIds.filter((v) => v !== user.userId);
+
+        if (isJoinedPoll) {
+          const pollUser = poll.users.find((v) => v.userId === user.userId);
+          if (!pollUser) {
+            poll.users.push(user);
+          } else if (!isEqual(pollUser, user)) {
+            pollUser.nickname = user.nickname;
+            pollUser.gender = user.gender;
+            pollUser.avatarUrl = user.avatarUrl;
+            pollUser.age = user.age;
+            pollUser.mbti = user.mbti;
+          }
+        } else {
+          poll.users = poll.users.filter((v) => v.userId !== user.userId);
         }
+
+        poll.markModified('votes');
+        poll.markModified('users');
+        await poll.save({ session });
       });
-
-      let isJoinedPoll = false;
-      for (const vote of poll.votes) {
-        const isJoinedVote = vote.userIds.some((v) => v === user.userId);
-        if (isJoinedVote) {
-          isJoinedPoll = true;
-          break;
-        }
-      }
-
-      if (isJoinedPoll) {
-        const pollUser = poll.users.find((v) => v.userId === user.userId);
-        if (!pollUser) {
-          poll.users.push(user);
-        } else if (!isEqual(pollUser, user)) {
-          pollUser.nickname = user.nickname;
-          pollUser.gender = user.gender;
-          pollUser.avatarUrl = user.avatarUrl;
-          pollUser.age = user.age;
-          pollUser.mbti = user.mbti;
-        }
-      } else {
-        poll.users = poll.users.filter((v) => v.userId !== user.userId);
-      }
-
-      poll.markModified('votes');
-      poll.markModified('users');
-      await poll.save({ session });
-    });
-    await session.endSession();
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } finally {
+      await session.endSession();
+    }
 
     return poll;
   }

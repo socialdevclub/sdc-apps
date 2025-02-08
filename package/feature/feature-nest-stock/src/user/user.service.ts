@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import mongoose, { MongooseQueryOptions } from 'mongoose';
-import { UpdateOptions } from 'mongodb';
-import { CompanyInfo, Response } from 'shared~type-stock';
+import { DeleteOptions, UpdateOptions } from 'mongodb';
+import { Response } from 'shared~type-stock';
 import dayjs from 'dayjs';
 import { InjectConnection } from '@nestjs/mongoose';
 import { getDateDistance } from '@toss/date';
@@ -45,11 +45,15 @@ export class UserService {
     }
   }
 
-  async removeAllUser(stockId: string): Promise<boolean> {
+  async removeAllUser(
+    stockId: string,
+    options?: DeleteOptions & Omit<MongooseQueryOptions<StockUser>, 'lean' | 'timestamps'>,
+  ): Promise<boolean> {
     try {
-      return this.userRepository.deleteMany({ stockId });
+      return this.userRepository.deleteMany({ stockId }, options);
     } catch (e: unknown) {
-      throw new Error(e as string);
+      console.error(e);
+      throw e;
     }
   }
 
