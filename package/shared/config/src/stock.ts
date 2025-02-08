@@ -25,3 +25,10 @@ export const getRandomCompanyNames = (length?: number): string[] => {
 };
 
 export const INIT_STOCK_PRICE = 100000;
+
+export const LOAN_PRICE = 1_000_000;
+export const BOUNDARY_LOAN_PRICE = 1_000_000;
+export const SETTLE_LOAN_PRICE = 2_000_000;
+
+export const DEFAULT_DRAW_COST = 300_000;
+export const ROUND_SKIP_STEP = 2;

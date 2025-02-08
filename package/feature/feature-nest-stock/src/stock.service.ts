@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
 import { CompanyInfo, Request, Response } from 'shared~type-stock';
 import { Config, stock } from 'shared~config';
 import { getDateDistance } from '@toss/date';
@@ -7,6 +7,7 @@ import mongoose, { ProjectionType, QueryOptions } from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
 import dayjs from 'dayjs';
 import { INIT_STOCK_PRICE } from 'shared~config/dist/stock';
+import { DEFAULT_DRAW_COST, ROUND_SKIP_STEP, SETTLE_LOAN_PRICE } from 'shared~config/src/stock';
 import { Stock, StockDocument } from './stock.schema';
 import { UserService } from './user/user.service';
 import { LogService } from './log/log.service';
@@ -15,14 +16,15 @@ import { ResultService } from './result/result.service';
 import { Result } from './result/result.schema';
 import { StockRepository } from './stock.repository';
 import { UserRepository } from './user/user.repository';
-import { DEFAULT_DRAW_COST, ROUND_SKIP_STEP } from './sotck.constants';
 
 @Injectable()
 export class StockService {
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly stockRepository: StockRepository,
+    @Inject(forwardRef(() => UserRepository))
     private readonly userRepository: UserRepository,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly logService: LogService,
     private readonly resultService: ResultService,
@@ -484,10 +486,13 @@ export class StockService {
             remainingStocks.set(company, remainingStocks.get(company) + amount);
             inventory.set(company, 0);
           });
+          
+          const loanMoney = user.loanCount * SETTLE_LOAN_PRICE;
+          user.money -= loanMoney;
+          user.loanCount = 0;
 
           await user.save({ session });
         }
-
         result = await stock.save({ session });
       });
     } catch (error) {

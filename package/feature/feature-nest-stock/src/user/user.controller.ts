@@ -18,6 +18,16 @@ export class UserController {
     return this.userService.setUser(body);
   }
 
+  @Post('loan')
+  async startLoan(@Body() body: Request.PostLoan): Promise<Response.Common> {
+    return this.userService.startLoan(body.stockId, body.userId);
+  }
+
+  @Post('loan/settle')
+  async settleLoan(@Body() body: Request.PostSettleLoan): Promise<Response.Common> {
+    return this.userService.settleLoan(body.stockId, body.userId);
+  }
+
   @Delete()
   async removeUser(@Body() body: Request.RemoveStockUser): Promise<{ result: boolean }> {
     return { result: !!(await this.userService.removeUser(body.stockId, body.userId)) };

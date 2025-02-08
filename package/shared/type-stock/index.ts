@@ -11,6 +11,7 @@ export type StockUserSchema = {
   money: number;
   inventory: Record<string, number>;
   lastActivityTime: Date;
+  loanCount: number;
 };
 
 const StockPhase = {
