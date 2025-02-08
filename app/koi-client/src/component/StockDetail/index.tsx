@@ -5,7 +5,7 @@ import { RadioGroup } from '@headlessui/react';
 import { css } from '@emotion/react';
 import { objectKeys } from '@toss/utils';
 import { getDateDistance } from '@toss/date';
-import { getRandomCompanyNames } from 'shared~config/dist/stock';
+import { StockConfig } from 'shared~config';
 import dayjs from 'dayjs';
 import { Query } from '../../hook';
 import { POV } from '../../type';
@@ -35,7 +35,7 @@ export default function StockDetail({ stockId }: Props) {
   const { data: profiles } = Query.Supabase.useQueryProfileById(users.map((v) => v.userId));
 
   const companies = stock?.companies ?? {};
-  const companyNames = objectKeys(companies).length > 0 ? objectKeys(companies) : getRandomCompanyNames();
+  const companyNames = objectKeys(companies).length > 0 ? objectKeys(companies) : StockConfig.getRandomCompanyNames();
   const startedTime = dayjs(stock?.startedTime).toDate();
   const currentPriceIdx = Math.floor(
     getDateDistance(startedTime, new Date()).minutes / (stock?.fluctuationsInterval ?? 5),

@@ -5,7 +5,7 @@ import { CompanyInfo, Response } from 'shared~type-stock';
 import dayjs from 'dayjs';
 import { InjectConnection } from '@nestjs/mongoose';
 import { getDateDistance } from '@toss/date';
-import { BOUNDARY_LOAN_PRICE, LOAN_PRICE } from 'shared~config/src/stock';
+import { StockConfig } from 'shared~config';
 import { StockUser, UserDocument } from './user.schema';
 import { UserRepository } from './user.repository';
 import { StockRepository } from '../stock.repository';
@@ -80,7 +80,7 @@ export class UserService {
       }
 
       // 현재 매수 가능 금액이 100만원 미만인지 확인
-      if (user.money >= BOUNDARY_LOAN_PRICE) {
+      if (user.money >= StockConfig.BOUNDARY_LOAN_PRICE) {
         throw new HttpException('보유 금액이 100만원 이상인 경우 대출이 불가능합니다.', HttpStatus.BAD_REQUEST);
       }
 
@@ -103,7 +103,7 @@ export class UserService {
       const estimatedAllMoney = allCompaniesPrice + user.money;
 
       // 매수 가능 금액 + 보유 주식 가치가 100만원 미만인 경우 대출 이 불가능합니다.
-      if (estimatedAllMoney >= BOUNDARY_LOAN_PRICE) {
+      if (estimatedAllMoney >= StockConfig.BOUNDARY_LOAN_PRICE) {
         throw new HttpException(
           '[매수 가능 금액 + 보유 주식 가치]가 100만원 이상인 경우 대출이 불가능합니다.',
           HttpStatus.BAD_REQUEST,
@@ -117,7 +117,7 @@ export class UserService {
           $inc: {
             // 100만원 대출
             loanCount: 1,
-            money: LOAN_PRICE, // 대출 횟수 증가
+            money: StockConfig.LOAN_PRICE, // 대출 횟수 증가
           },
         },
         { session },

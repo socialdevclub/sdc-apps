@@ -1,13 +1,11 @@
 import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
 import { CompanyInfo, Request, Response } from 'shared~type-stock';
-import { Config, stock } from 'shared~config';
 import { getDateDistance } from '@toss/date';
 import { ceilToUnit } from '@toss/utils';
 import mongoose, { ProjectionType, QueryOptions } from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
 import dayjs from 'dayjs';
-import { INIT_STOCK_PRICE } from 'shared~config/dist/stock';
-import { DEFAULT_DRAW_COST, ROUND_SKIP_STEP, SETTLE_LOAN_PRICE } from 'shared~config/src/stock';
+import { StockConfig } from 'shared~config';
 import { Stock, StockDocument } from './stock.schema';
 import { UserService } from './user/user.service';
 import { LogService } from './log/log.service';
@@ -98,7 +96,7 @@ export class StockService {
     const players = await this.userService.getUserList(stockId);
 
     const companyPriceChange: string[][] = [[]];
-    const newCompanies = {} as Record<stock.CompanyNames, CompanyInfo[]>;
+    const newCompanies = {} as Record<StockConfig.CompanyNames, CompanyInfo[]>;
     const playerIdxs = Array.from({ length: players.length }, (_, idx) => idx);
 
     // 플레이어에게 줄 정보의 절반 개수
@@ -118,12 +116,12 @@ export class StockService {
       // 라운드당 (플레이어 수의 1/3) 만큼의 회사가 선정되며, 최대 10개로 제한됩니다 (전체 회사가 10개라서)
       const companyCount = Math.ceil(players.length / 3);
       const limitedCompanyCount = companyCount > 10 ? 10 : companyCount;
-      companyPriceChange[round] = [...Config.Stock.getRandomCompanyNames(limitedCompanyCount)];
+      companyPriceChange[round] = [...StockConfig.getRandomCompanyNames(limitedCompanyCount)];
     }
 
     // 라운드별 주식의 가격을 설정하고, 플레이어에게 정보 제공
-    Config.Stock.getRandomCompanyNames().forEach((key) => {
-      const company = key as stock.CompanyNames;
+    StockConfig.getRandomCompanyNames().forEach((key) => {
+      const company = key as StockConfig.CompanyNames;
       for (let round = 0; round < 10; round++) {
         if (!newCompanies[company]) {
           newCompanies[company] = [];
@@ -131,7 +129,7 @@ export class StockService {
 
         if (round === 0) {
           newCompanies[company][0] = {
-            가격: INIT_STOCK_PRICE,
+            가격: StockConfig.INIT_STOCK_PRICE,
             정보: [],
           };
           continue;
@@ -141,7 +139,7 @@ export class StockService {
         const prevPrice = newCompanies[company][round - 1].가격;
 
         const calc1 = Math.floor(Math.random() * prevPrice - prevPrice / 2);
-        const calc2 = Math.floor(Math.random() * INIT_STOCK_PRICE - INIT_STOCK_PRICE / 2);
+        const calc2 = Math.floor(Math.random() * StockConfig.INIT_STOCK_PRICE - StockConfig.INIT_STOCK_PRICE / 2);
 
         const frunc = Math.abs(calc1) >= Math.abs(calc2) ? calc1 : prevPrice + calc2 <= 0 ? calc1 : calc2;
         const price = ceilToUnit(prevPrice + frunc, 100);
@@ -302,9 +300,9 @@ export class StockService {
           9,
         );
 
-        const nextTimeIdx = timeIdx + ROUND_SKIP_STEP;
+        const nextTimeIdx = timeIdx + StockConfig.ROUND_SKIP_STEP;
 
-        if (user.money < DEFAULT_DRAW_COST) {
+        if (user.money < StockConfig.DEFAULT_DRAW_COST) {
           throw new HttpException('잔액이 부족합니다', HttpStatus.CONFLICT);
         }
 
@@ -352,7 +350,7 @@ export class StockService {
         updatedCompanies[selectedCompany] = companyInfos;
         stock.companies = updatedCompanies;
 
-        user.money -= DEFAULT_DRAW_COST;
+        user.money -= StockConfig.DEFAULT_DRAW_COST;
         user.lastActivityTime = new Date();
 
         await user.save({
@@ -486,8 +484,8 @@ export class StockService {
             remainingStocks.set(company, remainingStocks.get(company) + amount);
             inventory.set(company, 0);
           });
-          
-          const loanMoney = user.loanCount * SETTLE_LOAN_PRICE;
+
+          const loanMoney = user.loanCount * StockConfig.SETTLE_LOAN_PRICE;
           user.money -= loanMoney;
           user.loanCount = 0;
 

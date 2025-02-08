@@ -1,4 +1,4 @@
-import { stock } from 'shared~config';
+import { StockConfig } from 'shared~config';
 import React, { CSSProperties } from 'react';
 import styled from '@emotion/styled';
 import { commaizeNumber } from '@toss/utils';
@@ -17,7 +17,7 @@ const Table = ({ stockId }: Props) => {
   }
 
   const { companies } = stock;
-  const companyNames = Object.keys(companies) as stock.CompanyNames[];
+  const companyNames = Object.keys(companies) as StockConfig.CompanyNames[];
 
   return (
     <Wrapper>

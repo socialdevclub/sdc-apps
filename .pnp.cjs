@@ -13037,6 +13037,7 @@ const RAW_RUNTIME_STATE =
           ["shared~type-stock", "workspace:package/shared/type-stock"],\
           ["socket.io-client", "npm:4.7.2"],\
           ["sort-by", "npm:1.2.0"],\
+          ["turbo", "npm:1.11.2"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"],\
           ["vite", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:4.4.9"],\
           ["vite-plugin-commonjs", "npm:0.9.0"]\
