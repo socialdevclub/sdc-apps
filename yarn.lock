@@ -4047,7 +4047,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/utils@npm:5.59.8, @typescript-eslint/utils@npm:^5.10.0, @typescript-eslint/utils@npm:^5.58.0":
+"@typescript-eslint/utils@npm:5.59.8, @typescript-eslint/utils@npm:^5.58.0":
   version: 5.59.8
   resolution: "@typescript-eslint/utils@npm:5.59.8"
   dependencies:
@@ -6682,23 +6682,6 @@ __metadata:
   peerDependencies:
     eslint: ^2 || ^3 || ^4 || ^5 || ^6 || ^7.2.0 || ^8
   checksum: b8ab9521bd47acdad959309cbb5635069cebd0f1dfd14b5f6ad24f609dfda82c604b029c7366cafce1d359845300957ec246587cd5e4b237a0378118a9d3dfa7
-  languageName: node
-  linkType: hard
-
-"eslint-plugin-jest@npm:^26.1.3":
-  version: 26.9.0
-  resolution: "eslint-plugin-jest@npm:26.9.0"
-  dependencies:
-    "@typescript-eslint/utils": "npm:^5.10.0"
-  peerDependencies:
-    "@typescript-eslint/eslint-plugin": ^5.0.0
-    eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
-  peerDependenciesMeta:
-    "@typescript-eslint/eslint-plugin":
-      optional: true
-    jest:
-      optional: true
-  checksum: 6ef994dc4c336e04d6ae3dbc83e526b4b889286c996ebb9bc3c71bb3d40957693fcda94198ae0dc516afc3799a97b5769f2f10ab1b4b9e0b7e735262ea22a5ff
   languageName: node
   linkType: hard
 
@@ -9511,7 +9494,6 @@ __metadata:
     eslint-import-resolver-node: "npm:^0.3.7"
     eslint-import-resolver-typescript: "npm:^3.5.5"
     eslint-plugin-import: "npm:^2.27.5"
-    eslint-plugin-jest: "npm:^26.1.3"
     eslint-plugin-json: "npm:^3.1.0"
     eslint-plugin-jsx-a11y: "npm:^6.5.1"
     eslint-plugin-prettier: "npm:^4.0.0"
@@ -12380,7 +12362,6 @@ __metadata:
     eslint-import-resolver-node: "npm:^0.3.7"
     eslint-import-resolver-typescript: "npm:^3.5.5"
     eslint-plugin-import: "npm:^2.27.5"
-    eslint-plugin-jest: "npm:^26.1.3"
     eslint-plugin-json: "npm:^3.1.0"
     eslint-plugin-jsx-a11y: "npm:^6.5.1"
     eslint-plugin-prettier: "npm:^4.0.0"
@@ -12515,7 +12496,6 @@ __metadata:
     eslint-import-resolver-node: "npm:^0.3.7"
     eslint-import-resolver-typescript: "npm:^3.5.5"
     eslint-plugin-import: "npm:^2.27.5"
-    eslint-plugin-jest: "npm:^26.1.3"
     eslint-plugin-json: "npm:^3.1.0"
     eslint-plugin-jsx-a11y: "npm:^6.5.1"
     eslint-plugin-prettier: "npm:^4.0.0"
@@ -12541,7 +12521,6 @@ __metadata:
     eslint-import-resolver-node: "npm:^0.3.7"
     eslint-import-resolver-typescript: "npm:^3.5.5"
     eslint-plugin-import: "npm:^2.27.5"
-    eslint-plugin-jest: "npm:^26.1.3"
     eslint-plugin-json: "npm:^3.1.0"
     eslint-plugin-jsx-a11y: "npm:^6.5.1"
     eslint-plugin-prettier: "npm:^4.0.0"
@@ -12568,7 +12547,6 @@ __metadata:
     eslint-import-resolver-node: "npm:^0.3.7"
     eslint-import-resolver-typescript: "npm:^3.5.5"
     eslint-plugin-import: "npm:^2.27.5"
-    eslint-plugin-jest: "npm:^26.1.3"
     eslint-plugin-json: "npm:^3.1.0"
     eslint-plugin-jsx-a11y: "npm:^6.5.1"
     eslint-plugin-prettier: "npm:^4.0.0"
@@ -12595,7 +12573,6 @@ __metadata:
     eslint-import-resolver-node: "npm:^0.3.7"
     eslint-import-resolver-typescript: "npm:^3.5.5"
     eslint-plugin-import: "npm:^2.27.5"
-    eslint-plugin-jest: "npm:^26.1.3"
     eslint-plugin-json: "npm:^3.1.0"
     eslint-plugin-jsx-a11y: "npm:^6.5.1"
     eslint-plugin-prettier: "npm:^4.0.0"
@@ -12622,7 +12599,6 @@ __metadata:
     eslint-import-resolver-node: "npm:^0.3.7"
     eslint-import-resolver-typescript: "npm:^3.5.5"
     eslint-plugin-import: "npm:^2.27.5"
-    eslint-plugin-jest: "npm:^26.1.3"
     eslint-plugin-json: "npm:^3.1.0"
     eslint-plugin-jsx-a11y: "npm:^6.5.1"
     eslint-plugin-prettier: "npm:^4.0.0"
@@ -12649,7 +12625,6 @@ __metadata:
     eslint-import-resolver-node: "npm:^0.3.7"
     eslint-import-resolver-typescript: "npm:^3.5.5"
     eslint-plugin-import: "npm:^2.27.5"
-    eslint-plugin-jest: "npm:^26.1.3"
     eslint-plugin-json: "npm:^3.1.0"
     eslint-plugin-jsx-a11y: "npm:^6.5.1"
     eslint-plugin-prettier: "npm:^4.0.0"
