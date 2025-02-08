@@ -12,7 +12,7 @@ export class PartyService {
   }
 
   queryParties(): Promise<PartyDocument[]> {
-    return this.partyRepository.find(undefined);
+    return this.partyRepository.find();
   }
 
   createParty(party: Party): Promise<PartyDocument> {
