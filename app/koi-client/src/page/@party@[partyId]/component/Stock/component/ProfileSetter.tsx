@@ -10,7 +10,7 @@ const ProfileSetter = ({ userId, stockId }: Props) => {
   const { mutateAsync } = Query.Stock.useSetUser();
 
   useEffect(() => {
-    mutateAsync({ inventory: {}, lastActivityTime: new Date(), money: 1000000, stockId, userId });
+    mutateAsync({ inventory: {}, lastActivityTime: new Date(), loanCount: 0, money: 1000000, stockId, userId });
   }, [mutateAsync, stockId, userId]);
 
   return <></>;
