@@ -61,47 +61,58 @@ export default function StockDetail({ stockId }: Props) {
     <Container>
       <UserList stockId={stockId} />
       <Table stockId={stockId} elapsedTime={elapsedTime} pov={pov} />
-      <hr />
-      <button
-        onClick={() => {
-          mutateUpdateGame({
-            _id: stockId,
-            stockPhase: 'CROWDING',
-          });
-        }}
-      >
-        CRAWDING
-      </button>
-      <button
-        onClick={() => {
-          mutateUpdateGame({
-            _id: stockId,
-            stockPhase: 'WAITING',
-          });
-        }}
-      >
-        WAITING
-      </button>
-      <button
-        onClick={() => {
-          mutateUpdateGame({
-            _id: stockId,
-            stockPhase: 'PLAYING',
-          });
-        }}
-      >
-        PLAYING
-      </button>
-      <button
-        onClick={() => {
-          mutateUpdateGame({
-            _id: stockId,
-            stockPhase: 'RESULT',
-          });
-        }}
-      >
-        RESULT
-      </button>
+      <div>
+        <button
+          onClick={() => {
+            mutateUpdateGame({
+              _id: stockId,
+              stockPhase: 'CROWDING',
+            });
+          }}
+        >
+          CRAWDING
+        </button>
+        <button
+          onClick={() => {
+            mutateUpdateGame({
+              _id: stockId,
+              stockPhase: 'INTRODUCE',
+            });
+          }}
+        >
+          INTRODUCE
+        </button>
+        <button
+          onClick={() => {
+            mutateUpdateGame({
+              _id: stockId,
+              stockPhase: 'WAITING',
+            });
+          }}
+        >
+          WAITING
+        </button>
+        <button
+          onClick={() => {
+            mutateUpdateGame({
+              _id: stockId,
+              stockPhase: 'PLAYING',
+            });
+          }}
+        >
+          PLAYING
+        </button>
+        <button
+          onClick={() => {
+            mutateUpdateGame({
+              _id: stockId,
+              stockPhase: 'RESULT',
+            });
+          }}
+        >
+          RESULT
+        </button>
+      </div>
       <button
         onClick={() => {
           mutateResetGame({});
