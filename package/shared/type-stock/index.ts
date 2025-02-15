@@ -1,13 +1,22 @@
 export type * as Request from './Request';
 export type * as Response from './Response';
 
-export type StockUserRequired = 'stockId' | 'userId';
+export type StockUserRequired = 'stockId' | 'userId' | 'userInfo';
 export type StockUserOmitted = 'lastActivityTime';
 export type StockUserForm = Pick<StockUserSchema, StockUserRequired> &
   Partial<Omit<StockUserSchema, StockUserRequired | StockUserOmitted>>;
+
+export type StockUserInfoSchema = {
+  gender: string;
+  nickname: string;
+  introduction?: string;
+};
+
 export type StockUserSchema = {
   stockId: string;
   userId: string;
+  userInfo: StockUserInfoSchema;
+  index: number;
   money: number;
   inventory: Record<string, number>;
   lastActivityTime: Date;
@@ -16,6 +25,8 @@ export type StockUserSchema = {
 
 const StockPhase = {
   CROWDING: 'CROWDING',
+  INTRO_INPUT: 'INTRO_INPUT',
+  INTRO_RESULT: 'INTRO_RESULT',
   PLAYING: 'PLAYING',
   RESULT: 'RESULT',
   WAITING: 'WAITING',

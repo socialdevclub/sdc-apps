@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
-import { CompanyInfo, Request, Response } from 'shared~type-stock';
+import { CompanyInfo, Request, Response, StockPhase } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
 import { ceilToUnit } from '@toss/utils';
 import mongoose, { ProjectionType, QueryOptions } from 'mongoose';
@@ -560,5 +560,12 @@ export class StockService {
     }
 
     return true;
+  }
+
+  async setStockPhase(stockId: string, phase: StockPhase): Promise<Stock> {
+    if (phase === 'INTRO_RESULT') {
+      await this.userService.alignIndex(stockId);
+    }
+    return this.stockRepository.findOneAndUpdate(stockId, { $set: { stockPhase: phase } });
   }
 }

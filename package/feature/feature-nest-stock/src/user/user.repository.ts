@@ -16,7 +16,7 @@ export class UserRepository {
     projection?: ProjectionType<StockUser>,
     options?: QueryOptions<StockUser>,
   ): Promise<UserDocument[]> {
-    return this.userModel.find(filter, projection, options);
+    return this.userModel.find(filter, projection, { sort: { index: 1 }, ...options });
   }
 
   findOne(
@@ -29,7 +29,7 @@ export class UserRepository {
 
   findOneAndUpdate(
     filter: FilterQuery<StockUser>,
-    update: StockUser,
+    update: UpdateQuery<StockUser>,
     options?: QueryOptions<StockUser>,
   ): Promise<UserDocument> {
     return this.userModel.findOneAndUpdate(filter, update, { returnDocument: 'after', ...options });

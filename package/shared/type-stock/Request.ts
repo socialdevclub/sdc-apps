@@ -1,5 +1,5 @@
 import type { ProjectionType, QueryOptions } from 'mongoose';
-import type { StockSchema, StockSchemaWithId } from '.';
+import type { StockPhase, StockSchema, StockSchemaWithId } from '.';
 
 export type GetStock = {
   stockId: string;
@@ -45,3 +45,14 @@ export type RemoveStockUser = {
 };
 
 export type GetStockList = QueryOptions<StockSchema>;
+
+export type PostIntroduce = {
+  stockId: string;
+  userId: string;
+  introduction: string;
+};
+
+export type PostSetStockPhase = {
+  stockId: string;
+  phase: StockPhase;
+};

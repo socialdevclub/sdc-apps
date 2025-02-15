@@ -37,6 +37,42 @@ export class UserService {
     return this.userRepository.findOneAndUpdate({ stockId: user.stockId, userId: user.userId }, user, { upsert: true });
   }
 
+  async alignIndex(stockId: string): Promise<void> {
+    // 해당 주식방의 모든 사용자 목록을 가져옵니다
+    const allUsers = await this.getUserList(stockId);
+
+    // 성별로 사용자 분류
+    const maleUsers = allUsers.filter((user) => user.userInfo.gender === 'M');
+    const femaleUsers = allUsers.filter((user) => user.userInfo.gender === 'F');
+
+    // 남녀 교차로 배치할 최종 순서 생성
+    const alignedUsers = [];
+    const maxLength = Math.max(femaleUsers.length, maleUsers.length);
+
+    for (let i = 0; i < maxLength; i++) {
+      // 남성 배치
+      if (i < maleUsers.length) {
+        alignedUsers.push(maleUsers[i]);
+      }
+      // 여성 배치
+      if (i < femaleUsers.length) {
+        alignedUsers.push(femaleUsers[i]);
+      }
+    }
+
+    // 인덱스 업데이트
+    for (let i = 0; i < alignedUsers.length; i++) {
+      await this.userRepository.findOneAndUpdate({ stockId, userId: alignedUsers[i].userId }, { $set: { index: i } });
+    }
+  }
+
+  async setIntroduce(stockId: string, userId: string, introduction: string): Promise<StockUser> {
+    return this.userRepository.findOneAndUpdate(
+      { stockId, userId },
+      { $set: { 'userInfo.introduction': introduction } },
+    );
+  }
+
   removeUser(stockId: string, userId: string): Promise<boolean> {
     try {
       return this.userRepository.deleteOne({ stockId, userId });

@@ -23,6 +23,7 @@ interface Props {
 // 30 - 10
 export default function StockDetail({ stockId }: Props) {
   const { mutateAsync: mutateUpdateGame } = Query.Stock.useUpdateStock();
+  const { mutateAsync: mutateSetPhase } = Query.Stock.useSetPhase();
   const { mutateAsync: mutateInitStock } = Query.Stock.useInitStock(stockId);
   const { mutateAsync: mutateResetGame } = Query.Stock.useResetStock(stockId);
   const { mutateAsync: mutateBuyStock } = Query.Stock.useBuyStock();
@@ -32,7 +33,6 @@ export default function StockDetail({ stockId }: Props) {
 
   const { data: users } = Query.Stock.useUserList(stockId);
   const { data: stock } = Query.Stock.useQueryStock(stockId);
-  const { data: profiles } = Query.Supabase.useQueryProfileById(users.map((v) => v.userId));
 
   const companies = stock?.companies ?? {};
   const companyNames = objectKeys(companies).length > 0 ? objectKeys(companies) : StockConfig.getRandomCompanyNames();
@@ -64,50 +64,42 @@ export default function StockDetail({ stockId }: Props) {
       <div>
         <button
           onClick={() => {
-            mutateUpdateGame({
-              _id: stockId,
-              stockPhase: 'CROWDING',
-            });
+            mutateSetPhase({ phase: 'CROWDING', stockId });
           }}
         >
           CRAWDING
         </button>
         <button
           onClick={() => {
-            mutateUpdateGame({
-              _id: stockId,
-              stockPhase: 'INTRODUCE',
-            });
+            mutateSetPhase({ phase: 'INTRO_INPUT', stockId });
           }}
         >
-          INTRODUCE
+          INTRO_INPUT
         </button>
         <button
           onClick={() => {
-            mutateUpdateGame({
-              _id: stockId,
-              stockPhase: 'WAITING',
-            });
+            mutateSetPhase({ phase: 'INTRO_RESULT', stockId });
+          }}
+        >
+          INTRO_RESULT
+        </button>
+        <button
+          onClick={() => {
+            mutateSetPhase({ phase: 'WAITING', stockId });
           }}
         >
           WAITING
         </button>
         <button
           onClick={() => {
-            mutateUpdateGame({
-              _id: stockId,
-              stockPhase: 'PLAYING',
-            });
+            mutateSetPhase({ phase: 'PLAYING', stockId });
           }}
         >
           PLAYING
         </button>
         <button
           onClick={() => {
-            mutateUpdateGame({
-              _id: stockId,
-              stockPhase: 'RESULT',
-            });
+            mutateSetPhase({ phase: 'RESULT', stockId });
           }}
         >
           RESULT
@@ -258,11 +250,7 @@ export default function StockDetail({ stockId }: Props) {
         >
           {users.map((user) => (
             <RadioGroup.Option key={user.userId} value={user.userId}>
-              {({ checked }) => (
-                <span style={{ color: checked ? 'red' : 'black' }}>
-                  {profiles?.data?.find((v) => v.id === user.userId)?.username}
-                </span>
-              )}
+              {({ checked }) => <span style={{ color: checked ? 'red' : 'black' }}>{user.userInfo.nickname}</span>}
             </RadioGroup.Option>
           ))}
         </div>
