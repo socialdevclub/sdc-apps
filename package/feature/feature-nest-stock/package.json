@@ -19,6 +19,7 @@
     "dayjs": "^1.11.10",
     "lodash": "^4.17.21",
     "mongoose": "^8.1.0",
+    "openai": "^4.85.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "shared~config": "workspace:*"
