@@ -564,7 +564,7 @@ export class StockService {
 
   async setStockPhase(stockId: string, phase: StockPhase): Promise<Stock> {
     if (phase === 'INTRO_RESULT') {
-      await this.userService.alignIndex(stockId);
+      await this.userService.alignIndexByOpenAI(stockId);
     }
     return this.stockRepository.findOneAndUpdate(stockId, { $set: { stockPhase: phase } });
   }

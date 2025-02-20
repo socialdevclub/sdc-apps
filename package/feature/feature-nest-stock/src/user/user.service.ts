@@ -6,17 +6,24 @@ import dayjs from 'dayjs';
 import { InjectConnection } from '@nestjs/mongoose';
 import { getDateDistance } from '@toss/date';
 import { StockConfig } from 'shared~config';
+import { OpenAI } from 'openai';
 import { StockUser, UserDocument } from './user.schema';
 import { UserRepository } from './user.repository';
 import { StockRepository } from '../stock.repository';
 
 @Injectable()
 export class UserService {
+  private openai: OpenAI;
+
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly userRepository: UserRepository,
     private readonly stockRepository: StockRepository,
-  ) {}
+  ) {
+    this.openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
 
   transStockUserToDto(stockUser: UserDocument): Response.GetStockUser {
     return {
@@ -63,6 +70,72 @@ export class UserService {
     // 인덱스 업데이트
     for (let i = 0; i < alignedUsers.length; i++) {
       await this.userRepository.findOneAndUpdate({ stockId, userId: alignedUsers[i].userId }, { $set: { index: i } });
+    }
+  }
+
+  async alignIndexByOpenAI(stockId: string): Promise<void> {
+    try {
+      // 주어진 주식방의 모든 사용자 목록을 가져옵니다.
+      const allUsers = await this.getUserList(stockId);
+
+      // 사용자 정보에서 userId와 소개글(introduction) 추출 (없을 경우 빈 문자열로 대체)
+      const userData = allUsers.map((user) => ({
+        gender: user.userInfo.gender,
+        introduction: user.userInfo.introduction || '',
+        nickname: user.userInfo.nickname,
+      }));
+
+      // OpenAI API에 전달할 프롬프트 작성
+      const prompt = `다음 사용자들의 소개글을 확인하고, 친한 친구 혹은 연인이 될 수 있을 것 같은 사람들끼리 인접하도록 정렬해줘.
+- gender: 사용자의 성별. 남성은 M, 여성은 F
+- introduction: 사용자의 소개글
+- nickname: 사용자의 닉네임
+사용자 목록:
+${JSON.stringify(userData)}`;
+
+      // OpenAI ChatCompletion API 호출
+      const response = await this.openai.chat.completions.create({
+        messages: [{ content: prompt, role: 'user' }],
+        model: 'gpt-4o-mini',
+        response_format: {
+          json_schema: {
+            name: 'nicknames',
+            schema: {
+              additionalProperties: false,
+              properties: {
+                nicknames: {
+                  description: 'A nickname or a list of nicknames.',
+                  items: {
+                    description: 'A single nickname.',
+                    type: 'string',
+                  },
+                  type: 'array',
+                },
+              },
+              required: ['nicknames'],
+              type: 'object',
+            },
+            strict: true,
+          },
+          type: 'json_schema',
+        },
+        temperature: 0.2,
+        top_p: 0.1,
+      });
+
+      const { content } = response.choices[0].message;
+      const sortedNicknames = JSON.parse(content).nicknames;
+
+      if (sortedNicknames.length !== allUsers.length) {
+        throw new Error('정렬된 닉네임 수가 사용자 수와 다릅니다.');
+      }
+
+      for (let i = 0; i < sortedNicknames.length; i++) {
+        await this.userRepository.findOneAndUpdate({ stockId, userId: sortedNicknames[i] }, { $set: { index: i } });
+      }
+    } catch (e) {
+      console.error(e);
+      await this.alignIndex(stockId);
     }
   }
 
