@@ -53,7 +53,7 @@ export class UserService {
     const femaleUsers = allUsers.filter((user) => user.userInfo.gender === 'F');
 
     // 남녀 교차로 배치할 최종 순서 생성
-    const alignedUsers = [];
+    const alignedUsers: UserDocument[] = [];
     const maxLength = Math.max(femaleUsers.length, maleUsers.length);
 
     for (let i = 0; i < maxLength; i++) {
@@ -87,10 +87,32 @@ export class UserService {
 
       // OpenAI API에 전달할 프롬프트 작성
       const prompt = `다음 사용자들의 소개글을 확인하고, 친한 친구 혹은 연인이 될 수 있을 것 같은 사람들끼리 인접하도록 정렬해줘.
+# 사용자 목록 schema
 - gender: 사용자의 성별. 남성은 M, 여성은 F
 - introduction: 사용자의 소개글
 - nickname: 사용자의 닉네임
-사용자 목록:
+# 인접 기준 (우선순위 순)
+0. **첫 번째 사용자는 반드시 남성으로 시작해야 한다**
+1. 성별 교차 배치
+   - 남녀 교차 배치를 최대한 유지
+   - 성비 불균형 시 마지막에 다수 성별 배치
+2. 나이대 매칭
+   - 소개글에서 언급된 나이/나이대가 ±3세 이내인 사용자끼리 인접
+   - 20대끼리, 30대끼리 등 비슷한 연령대로 그룹화
+3. MBTI 성향 매칭
+   - N은 N끼리, S는 S끼리 성향이 동일한 사용자를 우선 인접.
+   - E/I, T/F, J/P도 고려하여 2개 이상 일치하는 경우 우선 배치
+4. 공통 관심사/취미
+   - 음악, 영화, 운동 등 공통 취미가 있는 경우 인접 배치
+   - 투자 스타일이나 관심 종목이 유사한 경우 고려
+5. 대화 스타일
+   - 적극적/소극적 성향이 상호 보완되도록 배치
+   - 말투나 대화 스타일이 유사한 사용자끼리 그룹화
+# 사용자 목록 schema
+- gender: 사용자의 성별. 남성은 M, 여성은 F
+- introduction: 사용자의 소개글
+- nickname: 사용자의 닉네임
+# 사용자 목록
 ${JSON.stringify(userData)}`;
 
       // OpenAI ChatCompletion API 호출
@@ -131,7 +153,7 @@ ${JSON.stringify(userData)}`;
       }
 
       for (let i = 0; i < sortedNicknames.length; i++) {
-        await this.userRepository.findOneAndUpdate({ stockId, userId: sortedNicknames[i] }, { index: i });
+        await this.userRepository.findOneAndUpdate({ stockId, 'userInfo.nickname': sortedNicknames[i] }, { index: i });
       }
     } catch (e) {
       console.error(e);
