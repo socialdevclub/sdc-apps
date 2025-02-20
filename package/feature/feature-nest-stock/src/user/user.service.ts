@@ -69,7 +69,7 @@ export class UserService {
 
     // 인덱스 업데이트
     for (let i = 0; i < alignedUsers.length; i++) {
-      await this.userRepository.findOneAndUpdate({ stockId, userId: alignedUsers[i].userId }, { $set: { index: i } });
+      await this.userRepository.findOneAndUpdate({ stockId, userId: alignedUsers[i].userId }, { index: i });
     }
   }
 
@@ -131,7 +131,7 @@ ${JSON.stringify(userData)}`;
       }
 
       for (let i = 0; i < sortedNicknames.length; i++) {
-        await this.userRepository.findOneAndUpdate({ stockId, userId: sortedNicknames[i] }, { $set: { index: i } });
+        await this.userRepository.findOneAndUpdate({ stockId, userId: sortedNicknames[i] }, { index: i });
       }
     } catch (e) {
       console.error(e);
