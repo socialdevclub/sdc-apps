@@ -92,7 +92,6 @@ export class StockService {
   }
 
   async initStock(stockId: string): Promise<Stock> {
-    const stock = await this.stockRepository.findOneById(stockId);
     const players = await this.userService.getUserList(stockId);
 
     const companyPriceChange: string[][] = [[]];
@@ -149,7 +148,7 @@ export class StockService {
         if (isChangePrice) {
           const infoPlayerIdx = randomPlayers.pop();
           if (infoPlayerIdx !== undefined) {
-            const partnerPlayerIdx = (infoPlayerIdx + stock.round + 1) % players.length;
+            const partnerPlayerIdx = (infoPlayerIdx + 1) % players.length;
             info.push(players[infoPlayerIdx].userId, players[partnerPlayerIdx].userId);
           }
         }
