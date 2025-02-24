@@ -9525,6 +9525,7 @@ __metadata:
     jotai: "npm:^2.4.2"
     lib-react-query: "workspace:*"
     localforage: "npm:^1.10.0"
+    lucide-react: "npm:^0.475.0"
     match-sorter: "npm:^6.3.1"
     prettier: "npm:^2.6.1"
     qrcode.react: "npm:^3.1.0"
@@ -9872,6 +9873,15 @@ __metadata:
   version: 10.1.0
   resolution: "lru-cache@npm:10.1.0"
   checksum: 207278d6fa711fb1f94a0835d4d4737441d2475302482a14785b10515e4c906a57ebf9f35bf060740c9560e91c7c1ad5a04fd7ed030972a9ba18bce2a228e95b
+  languageName: node
+  linkType: hard
+
+"lucide-react@npm:^0.475.0":
+  version: 0.475.0
+  resolution: "lucide-react@npm:0.475.0"
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: a6a9504b1596dfee3a2a5196d785332dc51f9046dbfc47d73a22eb0b718553244187261b3e11184e6b563483330cb95a846ed213150151b6c0aedd2a1048d638
   languageName: node
   linkType: hard
 
