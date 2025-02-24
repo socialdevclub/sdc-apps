@@ -1,8 +1,8 @@
 import { Button, Space } from 'antd';
-import { ArrowLeftOutlined, BulbOutlined, ReloadOutlined } from '@ant-design/icons';
 import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { SwitchCase } from '@toss/react';
+import { ChevronLeft, RefreshCcw, Lightbulb } from 'lucide-react';
 import Header from '../../../component-presentation/Header';
 import ProfileValidator from '../../../component/ProfileValidator';
 import { Query } from '../../../hook';
@@ -49,12 +49,14 @@ const PartyHeader = () => {
       <Header
         title={party?.title}
         LeftComponent={
-          <ArrowLeftOutlined
-            size={60}
+          <ChevronLeft
+            size={32}
             onClick={() => {
               navigate(-1);
             }}
             className={css`
+              color: white;
+              font-size: 32px;
               &:hover {
                 cursor: pointer;
               }
@@ -70,15 +72,16 @@ const PartyHeader = () => {
                 STOCK: (
                   <RecommendedPartnersModal
                     stockId={party?.activityName}
-                    trigger={<Button shape="circle" icon={<BulbOutlined />} />}
+                    trigger={<Button style={{ border: 'none' }} ghost icon={<Lightbulb color="white" />} />}
                   />
                 ),
               }}
             />
             {/* 페이지 새로고침 버튼 */}
             <Button
-              shape="circle"
-              icon={<ReloadOutlined />}
+              ghost
+              style={{ border: 'none' }}
+              icon={<RefreshCcw color="white" />}
               onClick={() => (window.location as { reload: (isForceReload: boolean) => void }).reload(true)}
             />
             {/* 하이안: 잠깐 기능 닫아놈 */}

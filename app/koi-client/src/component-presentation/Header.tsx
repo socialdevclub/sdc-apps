@@ -1,4 +1,3 @@
-import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 import { Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
@@ -28,50 +27,51 @@ const Header = ({ title, avatar = { isVisible: false }, LeftComponent, RightComp
   const { isVisible, src, onClick } = avatar;
 
   return (
-    <div
-      className={css`
-        position: relative;
-        min-height: 64px;
-        max-height: 64px;
-        background-color: #fefefe;
-        padding: 12px;
-        box-sizing: border-box;
-        display: flex;
-        align-items: center;
-      `}
-    >
-      <AvatarWrapper>
-        {LeftComponent || (
-          <Avatar
-            size="large"
-            style={{ cursor: onClick ? 'pointer' : 'default', visibility: isVisible ? 'visible' : 'hidden' }}
-            icon={<UserOutlined />}
-            src={src}
-            onClick={onClick}
-          />
-        )}
-      </AvatarWrapper>
-      <div
-        className={css`
-          flex: 1 0 auto;
-          display: flex;
-          justify-content: center;
-        `}
-      >
-        {title}
-      </div>
-      <div
-        className={css`
-          flex: 80px;
-          display: flex;
-          justify-content: flex-end;
-        `}
-      >
-        {RightComponent}
-      </div>
-    </div>
+    <Container>
+      <LeftSection>
+        <AvatarWrapper>
+          {LeftComponent || (
+            <Avatar
+              size="large"
+              style={{ cursor: onClick ? 'pointer' : 'default', visibility: isVisible ? 'visible' : 'hidden' }}
+              icon={<UserOutlined />}
+              src={src}
+              onClick={onClick}
+            />
+          )}
+        </AvatarWrapper>
+        <Title>{title}</Title>
+      </LeftSection>
+      <RIghtSection>{RightComponent}</RIghtSection>
+    </Container>
   );
 };
+
+const Title = styled.div`
+  color: white;
+  flex: 1 0 auto;
+  font-size: 24px;
+`;
+
+const LeftSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+const RIghtSection = styled.div`
+  flex: 80px;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const Container = styled.div`
+  position: relative;
+  padding: 24px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+`;
 
 const AvatarWrapper = styled.div`
   flex: 80px;
