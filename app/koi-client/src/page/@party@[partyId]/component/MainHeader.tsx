@@ -1,12 +1,12 @@
 import { Button, Space } from 'antd';
-import { ArrowLeftOutlined, BulbOutlined, ReloadOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ReloadOutlined } from '@ant-design/icons';
 import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { SwitchCase } from '@toss/react';
 import Header from '../../../component-presentation/Header';
 import ProfileValidator from '../../../component/ProfileValidator';
 import { Query } from '../../../hook';
-import RecommendedPartnersModal from './Stock/component/Stock/RecommendedPartnersModal';
+import StockHeader from './Stock/StockHeader';
 
 const PartyHeader = () => {
   const { partyId } = useParams();
@@ -67,12 +67,7 @@ const PartyHeader = () => {
             <SwitchCase
               value={party?.activityId ?? ''}
               caseBy={{
-                STOCK: (
-                  <RecommendedPartnersModal
-                    stockId={party?.activityName}
-                    trigger={<Button shape="circle" icon={<BulbOutlined />} />}
-                  />
-                ),
+                STOCK: party?.activityName ? <StockHeader stockId={party.activityName} /> : <></>,
               }}
             />
             {/* 페이지 새로고침 버튼 */}

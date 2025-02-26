@@ -30,6 +30,11 @@ export class StockController {
     return { stockPhase: stock.stockPhase };
   }
 
+  @Post('/phase')
+  async setStockPhase(@Body() body: Request.PostSetStockPhase): Promise<StockSchema> {
+    return this.stockService.setStockPhase(body.stockId, body.phase);
+  }
+
   @Post('/create')
   createStock(): Promise<StockSchema> {
     return this.stockService.createStock();

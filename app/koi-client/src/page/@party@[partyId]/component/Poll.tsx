@@ -1,24 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Checkbox, Dropdown, List, MenuProps, Progress, Radio, message } from 'antd';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { CaretDownFilled } from '@ant-design/icons';
 import { Query } from '../../../hook';
-import { UiStore, UserStore } from '../../../store';
+import { UserStore } from '../../../store';
+import { useDisableScrollView } from '../hook/useDisableScrollView';
 
 const Poll = () => {
   const { partyId } = useParams();
   const [messageApi, contextHolder] = message.useMessage();
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
 
-  const setIsScrollView = useSetAtom(UiStore.isScrollView);
-
-  useEffect(() => {
-    setIsScrollView(false);
-    return () => {
-      setIsScrollView(true);
-    };
-  }, [setIsScrollView]);
+  useDisableScrollView();
 
   const { data: profile } = Query.Supabase.useMyProfile({ supabaseSession });
   const { data: party } = Query.Party.useQueryParty(partyId);

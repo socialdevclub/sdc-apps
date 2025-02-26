@@ -18,3 +18,5 @@ export { default as useAllSellPrice } from './useAllSellPrice';
 export { default as useQueryStockPhase } from './useQueryStockPhase';
 export { default as useRemoveStockSession } from './useRemoveStockSession';
 export { default as useDrawStockInfo } from './useDrawStockInfo';
+export { default as useStartLoan } from './useStartLoan';
+export { default as useSetPhase } from './useSetPhase';
