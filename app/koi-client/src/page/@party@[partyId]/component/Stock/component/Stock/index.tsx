@@ -6,6 +6,7 @@ import { Tabs, TabsProps } from 'antd';
 import { css } from '@emotion/react';
 import Home from './Home';
 import Buy from './Buy';
+import Information from './Information';
 import Sell from './Sell';
 import Rule from './Rule';
 
@@ -17,6 +18,11 @@ const items: TabsProps['items'] = [
     children: <></>,
     key: '홈',
     label: '홈',
+  },
+  {
+    children: <></>,
+    key: '정보',
+    label: '정보',
   },
   {
     children: <></>,
@@ -52,6 +58,9 @@ const Stock = ({ stockId }: Props) => {
       switch (key) {
         case '홈':
           setSearchParams({ page: '홈' }, { replace: true });
+          break;
+        case '정보':
+          setSearchParams({ page: '정보' }, { replace: true });
           break;
         case '사기':
           setSearchParams({ page: '사기' }, { replace: true });
@@ -103,6 +112,7 @@ const Stock = ({ stockId }: Props) => {
                 // 기록: <History stockId={stockId} />,
                 룰: <Rule stockId={stockId} />,
                 사기: <Buy stockId={stockId} />,
+                정보: <Information stockId={stockId} />,
                 팔기: <Sell stockId={stockId} />,
                 홈: <Home stockId={stockId} />,
               }}
