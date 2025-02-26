@@ -7,6 +7,8 @@ import { LogModule } from './log/log.module';
 import { ResultModule } from './result/result.module';
 import { StockRepository } from './stock.repository';
 import { UserModule } from './user/user.module';
+import { KafkaModule } from './kafka/kafka.module';
+import { OutboxModule } from './outbox/outbox.module';
 
 @Module({
   controllers: [StockController],
@@ -16,6 +18,8 @@ import { UserModule } from './user/user.module';
     forwardRef(() => UserModule),
     LogModule,
     ResultModule,
+    KafkaModule,
+    OutboxModule,
   ],
   providers: [StockService, StockRepository],
 })

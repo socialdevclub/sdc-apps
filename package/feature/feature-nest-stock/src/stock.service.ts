@@ -14,6 +14,8 @@ import { ResultService } from './result/result.service';
 import { Result } from './result/result.schema';
 import { StockRepository } from './stock.repository';
 import { UserRepository } from './user/user.repository';
+import { OutboxService } from './outbox/outbox.service';
+import { OutboxEventType } from './outbox/outbox.schema';
 
 @Injectable()
 export class StockService {
@@ -26,6 +28,7 @@ export class StockService {
     private readonly userService: UserService,
     private readonly logService: LogService,
     private readonly resultService: ResultService,
+    private readonly outboxService: OutboxService,
   ) {}
 
   transStockToDto(stock: StockDocument): Response.GetStock {
@@ -253,6 +256,7 @@ export class StockService {
         await user.save({ session });
         result = await stock.save({ session });
 
+        // 로그 생성
         stockLog = new StockLog({
           action: 'BUY',
           company,
@@ -262,6 +266,22 @@ export class StockService {
           stockId,
           userId,
         });
+
+        // 아웃박스 메시지 생성 (트랜잭션 내에서)
+        await this.outboxService.createOutboxMessage(
+          OutboxEventType.STOCK_PURCHASED,
+          {
+            amount,
+            company,
+            stockId,
+            timestamp: new Date().toISOString(),
+            totalPrice,
+            unitPrice: companyPrice,
+            userId,
+          },
+          'stock-transactions',
+          { session },
+        );
       });
     } catch (error) {
       console.error(error);
@@ -270,6 +290,7 @@ export class StockService {
       await session.endSession();
     }
 
+    // 트랜잭션 외부에서 로그 저장
     await this.logService.addLog(stockLog);
 
     return result;
@@ -440,6 +461,22 @@ export class StockService {
           stockId,
           userId,
         });
+
+        // 아웃박스 메시지 생성 (트랜잭션 내에서)
+        await this.outboxService.createOutboxMessage(
+          OutboxEventType.STOCK_SOLD,
+          {
+            amount,
+            company,
+            stockId,
+            timestamp: new Date().toISOString(),
+            totalPrice,
+            unitPrice: companyPrice,
+            userId,
+          },
+          'stock-transactions',
+          { session },
+        );
       });
     } catch (error) {
       console.error(error);
@@ -475,13 +512,26 @@ export class StockService {
             Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
             9,
           );
-          inventory.forEach((amount, company) => {
-            const companyPrice = companies.get(company)[idx]?.가격;
-            const totalPrice = companyPrice * amount;
 
-            user.money += totalPrice;
-            remainingStocks.set(company, remainingStocks.get(company) + amount);
-            inventory.set(company, 0);
+          // 각 회사별 주식 판매 처리
+          const sellTransactions = [];
+          inventory.forEach((amount, company) => {
+            if (amount > 0) {
+              const companyPrice = companies.get(company)[idx]?.가격;
+              const totalPrice = companyPrice * amount;
+
+              user.money += totalPrice;
+              remainingStocks.set(company, remainingStocks.get(company) + amount);
+              inventory.set(company, 0);
+
+              // 판매 트랜잭션 정보 저장
+              sellTransactions.push({
+                amount,
+                company,
+                totalPrice,
+                unitPrice: companyPrice,
+              });
+            }
           });
 
           const loanMoney = user.loanCount * StockConfig.SETTLE_LOAN_PRICE;
@@ -489,6 +539,22 @@ export class StockService {
           user.loanCount = 0;
 
           await user.save({ session });
+
+          // 사용자별로 아웃박스 메시지 생성 (모든 판매 트랜잭션 정보 포함)
+          if (sellTransactions.length > 0) {
+            await this.outboxService.createOutboxMessage(
+              OutboxEventType.STOCK_SOLD,
+              {
+                isAllSell: true,
+                stockId,
+                timestamp: new Date().toISOString(),
+                transactions: sellTransactions,
+                userId: user.userId,
+              },
+              'stock-transactions',
+              { session },
+            );
+          }
         }
         result = await stock.save({ session });
       });
@@ -563,7 +629,7 @@ export class StockService {
 
   async setStockPhase(stockId: string, phase: StockPhase): Promise<Stock> {
     if (phase === 'INTRO_RESULT') {
-      await this.userService.alignIndexByOpenAI(stockId);
+      await this.userService.alignIndex(stockId);
     }
     return this.stockRepository.findOneAndUpdate(stockId, { $set: { stockPhase: phase } });
   }
