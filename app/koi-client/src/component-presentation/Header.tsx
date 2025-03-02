@@ -67,7 +67,7 @@ const RIghtSection = styled.div`
 
 const Container = styled.div`
   position: relative;
-  padding: 24px;
+  padding: 24px 12px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
