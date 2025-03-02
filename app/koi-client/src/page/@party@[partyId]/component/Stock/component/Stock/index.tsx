@@ -43,24 +43,22 @@ const Stock = ({ stockId }: Props) => {
   );
 
   return (
-    <>
-      <Container>
-        <Tabs defaultActiveKey={searchParams.get('page') ?? '홈'} items={items} onChange={onClickTab} />
-        <ContentContainer>
-          <Suspense fallback={<></>}>
-            <SwitchCase
-              value={searchParams.get('page') ?? '홈'}
-              caseBy={{
-                룰: <Rule stockId={stockId} />,
-                주식: <Buy stockId={stockId} />,
-                홈: <Home stockId={stockId} />,
-              }}
-              defaultComponent={<Home stockId={stockId} />}
-            />
-          </Suspense>
-        </ContentContainer>
-      </Container>
-    </>
+    <Container>
+      <Tabs defaultActiveKey={searchParams.get('page') ?? '홈'} items={items} onChange={onClickTab} />
+      <ContentContainer>
+        <Suspense fallback={<></>}>
+          <SwitchCase
+            value={searchParams.get('page') ?? '홈'}
+            caseBy={{
+              룰: <Rule stockId={stockId} />,
+              주식: <Buy stockId={stockId} />,
+              홈: <Home stockId={stockId} />,
+            }}
+            defaultComponent={<Home stockId={stockId} />}
+          />
+        </Suspense>
+      </ContentContainer>
+    </Container>
   );
 };
 
