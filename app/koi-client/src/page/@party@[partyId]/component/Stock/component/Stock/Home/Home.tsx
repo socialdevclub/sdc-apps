@@ -5,14 +5,15 @@ import { getDateDistance } from '@toss/date';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import dayjs from 'dayjs';
-import { UserStore } from '../../../../../../store';
-import { Query } from '../../../../../../hook';
-import Box from '../../../../../../component-presentation/Box';
-import DrawStockInfo from './DrawInfo';
-import MyInfosContent from './MyInfosContent';
-import RunningTimeDisplay from './RunningTimeDisplay';
-import prependZero from '../../../../../../service/prependZero';
-import StartLoan from './StartLoan';
+import { UserStore } from '../../../../../../../store';
+import { Query } from '../../../../../../../hook';
+import Box from '../../../../../../../component-presentation/Box';
+import DrawStockInfo from '../DrawInfo';
+import MyInfosContent from '../MyInfosContent';
+import RunningTimeDisplay from '../RunningTimeDisplay';
+import prependZero from '../../../../../../../service/prependZero';
+import StartLoan from '../StartLoan';
+import { MyLevel } from './MyLevel';
 
 const getProfitRatio = (v: number) => ((v / 1000000) * 100 - 100).toFixed(2);
 
@@ -117,12 +118,15 @@ const Home = ({ stockId }: Props) => {
 
   const nextRoundPredict = getPredictedStockInfo();
 
+  const moneyRatio = getProfitRatio(user.money + allSellPrice);
+
   return (
     <>
       <Flex align="center" justify="space-between" gap={4} css={{ width: '100%' }}>
         <H3>홈</H3>
         <StartLoan stockId={stockId} />
       </Flex>
+      <MyLevel moneyRatio={moneyRatio} initialMoney={1000000} />
       <RunningTimeDisplay startTime={stock.startedTime} />
       <Box
         title="잔액"
@@ -149,7 +153,7 @@ const Home = ({ stockId }: Props) => {
       />
       <Box
         title="모두 팔고 난 뒤의 순이익"
-        value={`${getProfitRatio(user.money + allSellPrice)}%`}
+        value={`${moneyRatio}%`}
         rightComponent={stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>}
       />
       <br />

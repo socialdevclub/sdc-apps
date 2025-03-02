@@ -2,11 +2,10 @@ import React, { Suspense, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { useSearchParams } from 'react-router-dom';
 import { SwitchCase } from '@toss/react';
-import Home from './Home';
 import Buy from './Buy';
-import Sell from './Sell';
 import Rule from './Rule';
 import { Tabs, type TabsProps } from './Tabs';
+import Home from './Home/Home';
 
 const items: TabsProps['items'] = [
   {
@@ -14,16 +13,8 @@ const items: TabsProps['items'] = [
     label: '홈',
   },
   {
-    key: '사기',
-    label: '사기',
-  },
-  {
-    key: '팔기',
-    label: '팔기',
-  },
-  {
-    key: '룰',
-    label: '룰',
+    key: '주식',
+    label: '주식',
   },
 ];
 
@@ -40,14 +31,8 @@ const Stock = ({ stockId }: Props) => {
         case '홈':
           setSearchParams({ page: '홈' }, { replace: true });
           break;
-        case '사기':
-          setSearchParams({ page: '사기' }, { replace: true });
-          break;
-        case '팔기':
-          setSearchParams({ page: '팔기' }, { replace: true });
-          break;
-        case '룰':
-          setSearchParams({ page: '룰' }, { replace: true });
+        case '주식':
+          setSearchParams({ page: '주식' }, { replace: true });
           break;
         default:
           setSearchParams({ page: '홈' }, { replace: true });
@@ -67,8 +52,7 @@ const Stock = ({ stockId }: Props) => {
               value={searchParams.get('page') ?? '홈'}
               caseBy={{
                 룰: <Rule stockId={stockId} />,
-                사기: <Buy stockId={stockId} />,
-                팔기: <Sell stockId={stockId} />,
+                주식: <Buy stockId={stockId} />,
                 홈: <Home stockId={stockId} />,
               }}
               defaultComponent={<Home stockId={stockId} />}
