@@ -153,6 +153,7 @@ const TopSection = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   margin-bottom: 8px;
 `;
 
@@ -163,6 +164,7 @@ const LevelInfo = styled.div`
 
 const LevelLabel = styled.div`
   font-size: 24px;
+  word-break: keep-all;
   font-weight: 700;
   margin-right: 8px;
 `;
@@ -170,7 +172,8 @@ const LevelLabel = styled.div`
 const NextLevel = styled.div`
   font-size: 12px;
   color: #a1a1aa;
-
+  flex: auto;
+  white-space: nowrap;
   span {
     font-weight: 600;
   }

@@ -56,7 +56,7 @@ const Home = ({ stockId }: Props) => {
         <H3>홈</H3>
 
       </Flex> */}
-        <MyLevel moneyRatio={moneyRatio} initialMoney={1000000} />
+        <MyLevel moneyRatio={300} initialMoney={1000000} />
         <Flex gap={12} css={{ width: '100%' }}>
           <Card
             title="잔액"
