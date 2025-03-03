@@ -201,7 +201,7 @@ export default function StockDetail({ stockId }: Props) {
           timeZone: 'Asia/Seoul',
         })}
       </div>
-      <div>
+      <div data-testid="time-box">
         경과된 시간 : {`${prependZero(elapsedTime.getMinutes(), 2)}:${prependZero(elapsedTime.getSeconds(), 2)}`}
       </div>
       <button
