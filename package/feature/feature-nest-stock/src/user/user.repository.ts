@@ -1,15 +1,48 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, MongooseQueryOptions, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import mongoose, {
+  FilterQuery,
+  Model,
+  MongooseQueryOptions,
+  ProjectionType,
+  QueryOptions,
+  UpdateQuery,
+} from 'mongoose';
 import { DeleteOptions, UpdateOptions } from 'mongodb';
+import { Response } from 'shared~type-stock';
 import { StockUser, UserDocument } from './user.schema';
 
 @Injectable()
 export class UserRepository {
   constructor(
+    @InjectConnection() private readonly connection: mongoose.Connection,
     @InjectModel(StockUser.name)
     private readonly userModel: Model<StockUser>,
   ) {}
+
+  async create(user: StockUser): Promise<Response.GetCreateUser> {
+    const session = await this.connection.startSession();
+
+    try {
+      return session.withTransaction(async () => {
+        const doc = await this.findOne({ stockId: user.stockId, userId: user.userId }, null, {
+          session,
+        });
+        if (!doc) {
+          const newStockUser = new StockUser(user, user);
+          const newDoc = new this.userModel(newStockUser);
+          const updatedDoc = await newDoc.save({ session });
+          return { isAlreadyExists: false, user: updatedDoc };
+        }
+        return { isAlreadyExists: true, user: doc };
+      });
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      await session.endSession();
+    }
+  }
 
   find(
     filter?: FilterQuery<StockUser>,

@@ -46,6 +46,10 @@ export class UserService {
     return this.userRepository.findOneAndUpdate({ stockId: user.stockId, userId: user.userId }, user, { upsert: true });
   }
 
+  async registerUser(user: StockUser): Promise<Response.GetCreateUser> {
+    return this.userRepository.create(user);
+  }
+
   async alignIndex(stockId: string): Promise<void> {
     // 해당 주식방의 모든 사용자 목록을 가져옵니다
     const allUsers = await this.getUserList(stockId);

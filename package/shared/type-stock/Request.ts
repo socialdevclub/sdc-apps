@@ -1,5 +1,5 @@
 import type { ProjectionType, QueryOptions } from 'mongoose';
-import type { StockPhase, StockSchema, StockSchemaWithId } from '.';
+import type { StockPhase, StockSchema, StockSchemaWithId, StockUserRequired, StockUserSchema } from '.';
 
 export type GetStock = {
   stockId: string;
@@ -56,3 +56,6 @@ export type PostSetStockPhase = {
   stockId: string;
   phase: StockPhase;
 };
+
+export type PostCreateUser = Pick<StockUserSchema, StockUserRequired> &
+  Omit<Partial<StockUserSchema>, StockUserRequired>;

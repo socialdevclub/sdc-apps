@@ -18,6 +18,11 @@ export class UserController {
     return this.userService.setUser(body);
   }
 
+  @Post('/register')
+  async registerUser(@Body() body: StockUser): Promise<Response.GetCreateUser> {
+    return this.userService.registerUser(body);
+  }
+
   @Post('/introduce')
   async setIntroduce(@Body() body: Request.PostIntroduce): Promise<Response.SetIntroduce> {
     return this.userService.setIntroduce(body.stockId, body.userId, body.introduction);

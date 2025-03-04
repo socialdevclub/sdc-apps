@@ -38,6 +38,7 @@ module.exports = {
     'import/no-unresolved': 0,
     'import/prefer-default-export': 0,
     'max-classes-per-file': 0,
+    'new-cap': 0,
     'no-alert': 0,
     'no-await-in-loop': 0,
     'no-console': 0,
