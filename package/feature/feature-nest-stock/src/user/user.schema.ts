@@ -47,7 +47,7 @@ export class StockUser implements StockUserSchema {
     this.userInfo = required.userInfo;
 
     this.index = partial.index ?? 0;
-    this.money = partial.money ?? StockConfig.INIT_STOCK_PRICE;
+    this.money = partial.money ?? StockConfig.INIT_USER_MONEY;
     this.inventory = partial.inventory ?? {};
     this.lastActivityTime = new Date();
     this.loanCount = partial.loanCount ?? 0;
