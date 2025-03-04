@@ -82,6 +82,14 @@ export class UserRepository {
     return !!(await this.userModel.deleteMany(filter, options));
   }
 
+  async updateOne(
+    filter: FilterQuery<StockUser>,
+    update: UpdateQuery<StockUser>,
+    options?: UpdateOptions & Omit<MongooseQueryOptions<StockUser>, 'lean'>,
+  ): Promise<boolean> {
+    return !!(await this.userModel.updateOne(filter, update, options));
+  }
+
   async updateMany(
     filter: FilterQuery<StockUser>,
     update: UpdateQuery<StockUser>,

@@ -42,8 +42,8 @@ export class UserService {
     return this.userRepository.findOne({ stockId, userId }, null, options);
   }
 
-  setUser(user: StockUser): Promise<StockUser> {
-    return this.userRepository.findOneAndUpdate({ stockId: user.stockId, userId: user.userId }, user, { upsert: true });
+  setUser(user: StockUser): Promise<boolean> {
+    return this.userRepository.updateOne({ stockId: user.stockId, userId: user.userId }, user);
   }
 
   async registerUser(user: StockUser): Promise<Response.GetCreateUser> {

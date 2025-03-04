@@ -14,7 +14,7 @@ export class UserController {
   }
 
   @Post()
-  setUser(@Body() body: StockUser): Promise<StockUser> {
+  setUser(@Body() body: StockUser): Promise<boolean> {
     return this.userService.setUser(body);
   }
 
