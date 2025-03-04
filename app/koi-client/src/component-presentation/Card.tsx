@@ -1,14 +1,14 @@
 import React, { CSSProperties } from 'react';
-import { styled } from '@linaria/react';
+import styled from '@emotion/styled';
 
-interface BoxProps {
+interface Props {
   title?: string;
   value: string;
   valueColor?: CSSProperties['color'];
   rightComponent?: React.ReactNode;
 }
 
-const Card: React.FC<BoxProps> = ({ title, value, valueColor, rightComponent }) => {
+const Card = ({ title, value, valueColor, rightComponent }: Props) => {
   return (
     <Container>
       <div>
