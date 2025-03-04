@@ -11,7 +11,7 @@ const ProfileSetter = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
 
   const { data: user } = Query.Supabase.useMyProfile({ supabaseSession });
-  const { mutateAsync } = Query.Stock.useCreateUser();
+  const { mutateAsync } = Query.Stock.useRegisterUser();
 
   const userId = user?.data?.id;
   const gender = user?.data?.gender;

@@ -20,4 +20,4 @@ export { default as useRemoveStockSession } from './useRemoveStockSession';
 export { default as useDrawStockInfo } from './useDrawStockInfo';
 export { default as useStartLoan } from './useStartLoan';
 export { default as useSetPhase } from './useSetPhase';
-export { default as useCreateUser } from './useCreateUser';
+export { default as useRegisterUser } from './useRegisterUser';

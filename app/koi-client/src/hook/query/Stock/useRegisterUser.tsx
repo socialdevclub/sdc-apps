@@ -2,14 +2,14 @@ import { useMutation } from 'lib-react-query';
 import { Request, Response } from 'shared~type-stock';
 import { serverApiUrl } from '../../../config/baseUrl';
 
-const useCreateUser = () => {
+const useRegisterUser = () => {
   return useMutation<Request.PostCreateUser, Response.GetCreateUser>({
     api: {
       hostname: serverApiUrl,
       method: 'POST',
-      pathname: '/stock/user',
+      pathname: '/stock/user/register',
     },
   });
 };
 
-export default useCreateUser;
+export default useRegisterUser;
