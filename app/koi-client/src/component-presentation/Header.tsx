@@ -79,6 +79,7 @@ const CenterSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 `;
 
 const RightSection = styled.div`
