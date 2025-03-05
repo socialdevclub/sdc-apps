@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAtomValue } from 'jotai';
-import { Button, Modal, message } from 'antd';
+import { Modal, message } from 'antd';
 import styled from '@emotion/styled';
 import { UserStore } from '../../../../../../store';
 import { Query } from '../../../../../../hook';
@@ -61,7 +61,7 @@ const StartLoan = ({ stockId }: Props) => {
   return (
     <>
       {contextHolder}
-      <LoanButton onClick={() => setOpen(true)} disabled={isDisabled}>
+      <LoanButton onClick={() => setOpen(true)} disabled>
         대출하기
       </LoanButton>
       <div
@@ -90,8 +90,9 @@ const StartLoan = ({ stockId }: Props) => {
   );
 };
 
-const LoanButton = styled(Button)`
+const LoanButton = styled.button`
   width: 100%;
+  font-family: 'DungGeunMo';
   padding: 16px;
   height: 56px;
   border-radius: 4px;
@@ -101,6 +102,10 @@ const LoanButton = styled(Button)`
   border: none;
   &:hover > span {
     color: white;
+  }
+  &:disabled {
+    opacity: 50%;
+    cursor: not-allowed;
   }
 `;
 
