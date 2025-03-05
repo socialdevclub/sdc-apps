@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { Button, Modal, message } from 'antd';
+import styled from '@emotion/styled';
 import { UserStore } from '../../../../../../store';
 import { Query } from '../../../../../../hook';
+import * as COLOR from '../../../../../../config/color';
 
 type Props = {
   stockId: string;
@@ -59,9 +61,9 @@ const StartLoan = ({ stockId }: Props) => {
   return (
     <>
       {contextHolder}
-      <Button size="small" onClick={() => setOpen(true)} disabled={isDisabled}>
+      <LoanButton onClick={() => setOpen(true)} disabled={isDisabled}>
         대출하기
-      </Button>
+      </LoanButton>
       <div
         css={{
           position: 'absolute',
@@ -87,5 +89,19 @@ const StartLoan = ({ stockId }: Props) => {
     </>
   );
 };
+
+const LoanButton = styled(Button)`
+  width: 100%;
+  padding: 16px;
+  height: 56px;
+  border-radius: 4px;
+  background-color: ${COLOR.violetLight};
+  color: white;
+  font-size: 14px;
+  border: none;
+  &:hover > span {
+    color: white;
+  }
+`;
 
 export default StartLoan;
