@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import { getDateDistance } from '@toss/date';
 import { commaizeNumber, objectEntries } from '@toss/utils';
 
+import { useEffect, useRef, useState } from 'react';
 import InfoBox from '../../../../../../component-presentation/InfoBox';
 import { colorDown, colorUp } from '../../../../../../config/color';
 import { Query } from '../../../../../../hook';
@@ -15,20 +16,51 @@ interface Props {
   stockId: string;
 }
 
+const getFormattedGameTime = (startTime?: string) => {
+  if (!startTime) return '00:00';
+
+  return `${prependZero(getDateDistance(dayjs(startTime).toDate(), new Date()).minutes, 2)}:${prependZero(
+    getDateDistance(dayjs(startTime).toDate(), new Date()).seconds,
+    2,
+  )}`;
+};
+
 const Information = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
-  const { data: stock } = Query.Stock.useQueryStock(stockId);
+  const { data: stock, refetch } = Query.Stock.useQueryStock(stockId);
   const { user } = Query.Stock.useUser({ stockId, userId });
+  const [gameTime, setGameTime] = useState(getFormattedGameTime(stock?.startedTime));
+  const gameTimeRef = useRef(gameTime);
+
+  useEffect(() => {
+    if (!stock?.startedTime) return () => {};
+
+    const interval = setInterval(() => {
+      const newGameTime = getFormattedGameTime(stock.startedTime);
+
+      if (newGameTime !== gameTimeRef.current) {
+        const newGameMinute = parseInt(newGameTime.split(':')[0], 10);
+        const lastGameMinute = parseInt(gameTimeRef.current.split(':')[0], 10);
+
+        gameTimeRef.current = newGameTime;
+        setGameTime(newGameTime);
+
+        if (newGameMinute !== lastGameMinute) {
+          refetch();
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [stock?.startedTime, refetch]);
 
   if (!user || !stock) {
     return <div>불러오는 중.</div>;
   }
 
-  const gameTime = `${prependZero(
-    getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes,
-    2,
-  )}:${prependZero(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).seconds, 2)}`;
+  const gameTimeInSeconds = parseInt(gameTime.split(':')[0], 10) * 60 + parseInt(gameTime.split(':')[1], 10);
+  const gameTimeInMinutes = Math.ceil(parseInt(gameTime.split(':')[0], 10));
 
   const myInfos = objectEntries(stock.companies).reduce((myInfos, [company, companyInfos]) => {
     companyInfos.forEach((companyInfo, idx) => {
@@ -42,8 +74,6 @@ const Information = ({ stockId }: Props) => {
     });
     return myInfos;
   }, [] as Array<{ company: string; timeIdx: number; price: number }>);
-
-  const gameTimeInSeconds = parseInt(gameTime.split(':')[0], 10) * 60 + parseInt(gameTime.split(':')[1], 10);
 
   const { futureInfos, pastInfos } = myInfos.reduce(
     (acc, info) => {
@@ -67,8 +97,6 @@ const Information = ({ stockId }: Props) => {
     },
   );
 
-  const gameTimeInMinutes = Math.ceil(parseInt(gameTime.split(':')[0], 10) / 5) * 5;
-
   return (
     <Container>
       <TitleWrapper>
@@ -77,7 +105,7 @@ const Information = ({ stockId }: Props) => {
       </TitleWrapper>
       {futureInfos.map(({ company, price, timeIdx }) => {
         const infoTimeInMinutes = timeIdx * stock.fluctuationsInterval;
-        const remainingTime = Math.ceil((infoTimeInMinutes - gameTimeInMinutes) / 5) * 5;
+        const remainingTime = infoTimeInMinutes - gameTimeInMinutes;
 
         return (
           <InfoBox
@@ -94,7 +122,7 @@ const Information = ({ stockId }: Props) => {
                   letter-spacing: 0.5px;
                 `}
               >
-                {remainingTime < 3 ? `🚨 임박` : `${Math.abs(remainingTime)}분 후`}
+                {remainingTime <= 1 ? `🚨 임박` : `${remainingTime}분 후`}
               </div>
             }
             changeTime={
@@ -122,7 +150,6 @@ const Information = ({ stockId }: Props) => {
       <DimContainer>
         {pastInfos.map(({ company, price, timeIdx }) => {
           const pastTime = gameTimeInMinutes - timeIdx * stock.fluctuationsInterval;
-          console.log('pastTime', pastTime);
           return (
             <InfoBox
               key={`${company}_${timeIdx}`}
@@ -138,7 +165,7 @@ const Information = ({ stockId }: Props) => {
                     letter-spacing: 0.5px;
                   `}
                 >
-                  {pastTime < 5 ? '방금 전' : `${pastTime}분 전`}
+                  {pastTime <= 1 ? '방금 전' : `${pastTime}분 전`}
                 </div>
               }
               changeTime={
