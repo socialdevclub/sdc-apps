@@ -33,12 +33,10 @@ const InfoBox: React.FC<InfoBoxProps> = ({ title, value, valueColor, leftTime, c
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
-  gap: 12px;
   background-color: #252836;
   border-radius: 8px;
   padding: 16px;
   overflow: hidden;
-  margin-bottom: 12px;
 `;
 
 const Wrapper = styled.div`

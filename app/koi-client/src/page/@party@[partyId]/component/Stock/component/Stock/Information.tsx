@@ -189,6 +189,9 @@ const Information = ({ stockId }: Props) => {
 
 const Container = styled.div`
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 const TitleWrapper = styled.div`
