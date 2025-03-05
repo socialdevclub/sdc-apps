@@ -31,3 +31,5 @@ export type Common = {
   message: string;
   data?: unknown;
 };
+
+export type SetIntroduce = StockUserSchema;

@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
-import { CompanyInfo, Request, Response } from 'shared~type-stock';
+import { CompanyInfo, Request, Response, StockPhase } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
 import { ceilToUnit } from '@toss/utils';
 import mongoose, { ProjectionType, QueryOptions } from 'mongoose';
@@ -92,7 +92,6 @@ export class StockService {
   }
 
   async initStock(stockId: string): Promise<Stock> {
-    const stock = await this.stockRepository.findOneById(stockId);
     const players = await this.userService.getUserList(stockId);
 
     const companyPriceChange: string[][] = [[]];
@@ -149,7 +148,7 @@ export class StockService {
         if (isChangePrice) {
           const infoPlayerIdx = randomPlayers.pop();
           if (infoPlayerIdx !== undefined) {
-            const partnerPlayerIdx = (infoPlayerIdx + stock.round + 1) % players.length;
+            const partnerPlayerIdx = (infoPlayerIdx + 1) % players.length;
             info.push(players[infoPlayerIdx].userId, players[partnerPlayerIdx].userId);
           }
         }
@@ -560,5 +559,12 @@ export class StockService {
     }
 
     return true;
+  }
+
+  async setStockPhase(stockId: string, phase: StockPhase): Promise<Stock> {
+    if (phase === 'INTRO_RESULT') {
+      await this.userService.alignIndexByOpenAI(stockId);
+    }
+    return this.stockRepository.findOneAndUpdate(stockId, { $set: { stockPhase: phase } });
   }
 }

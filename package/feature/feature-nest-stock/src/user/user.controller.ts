@@ -18,6 +18,11 @@ export class UserController {
     return this.userService.setUser(body);
   }
 
+  @Post('/introduce')
+  async setIntroduce(@Body() body: Request.PostIntroduce): Promise<Response.SetIntroduce> {
+    return this.userService.setIntroduce(body.stockId, body.userId, body.introduction);
+  }
+
   @Post('loan')
   async startLoan(@Body() body: Request.PostLoan): Promise<Response.Common> {
     return this.userService.startLoan(body.stockId, body.userId);
