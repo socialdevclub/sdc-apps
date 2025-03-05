@@ -1,4 +1,4 @@
-import { stock } from 'shared~config';
+import { StockConfig } from 'shared~config';
 import React from 'react';
 import styled from '@emotion/styled';
 import { commaizeNumber } from '@toss/utils';
@@ -24,7 +24,7 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
 
   const sortedUsers = [...users].sort((a, b) => b.money - a.money) || [];
   const { companies, remainingStocks } = game;
-  const companyNames = Object.keys(companies) as stock.CompanyNames[];
+  const companyNames = Object.keys(companies) as StockConfig.CompanyNames[];
 
   return (
     <Wrapper>
@@ -54,7 +54,7 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
               <tr key={idx}>
                 <Td>{`${prependZero(idx * game.fluctuationsInterval, 2)}분`}</Td>
                 {companyNames.map((key) => {
-                  const company = key as stock.CompanyNames;
+                  const company = key as StockConfig.CompanyNames;
                   const diff = idx === 0 ? 0 : companies[company][idx].가격 - companies[company][idx - 1].가격;
                   const 등락 = diff > 0 ? `${Math.abs(diff)}▲` : diff < 0 ? `${Math.abs(diff)}▼` : '-';
                   const 정보 = companies[company][idx].정보.join('/');
@@ -63,7 +63,9 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
                     return (
                       <React.Fragment key={company}>
                         <Td>{commaizeNumber(등락)}</Td>
-                        <Td key={company}>{commaizeNumber(companies[company as stock.CompanyNames][idx]?.가격)}</Td>
+                        <Td key={company}>
+                          {commaizeNumber(companies[company as StockConfig.CompanyNames][idx]?.가격)}
+                        </Td>
                         <Td>{pov === 'host' ? 정보 : '.'}</Td>
                       </React.Fragment>
                     );

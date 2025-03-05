@@ -30,6 +30,11 @@ export class StockController {
     return { stockPhase: stock.stockPhase };
   }
 
+  @Post('/phase')
+  async setStockPhase(@Body() body: Request.PostSetStockPhase): Promise<StockSchema> {
+    return this.stockService.setStockPhase(body.stockId, body.phase);
+  }
+
   @Post('/create')
   createStock(): Promise<StockSchema> {
     return this.stockService.createStock();
@@ -58,6 +63,11 @@ export class StockController {
   @Post('/buy')
   buyStock(@Body() body: Request.PostBuyStock): Promise<StockSchema> {
     return this.stockService.buyStock(body.stockId, body);
+  }
+
+  @Post('/draw-info')
+  buyStockInfo(@Body() body: Request.PostDrawStockInfo): Promise<StockSchema> {
+    return this.stockService.drawStockInfo(body.stockId, body);
   }
 
   @Post('/sell')

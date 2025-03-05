@@ -1,22 +1,14 @@
 import { Button } from 'antd';
-import { useSetAtom } from 'jotai';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { PartySchemaWithId } from 'shared~type-party';
-import { UiStore } from '../../../store';
+import { useDisableScrollView } from '../hook/useDisableScrollView';
 
 interface Props {
   party: PartySchemaWithId;
 }
 
 const Feed = ({ party }: Props) => {
-  const setIsScrollView = useSetAtom(UiStore.isScrollView);
-
-  useEffect(() => {
-    setIsScrollView(false);
-    return () => {
-      setIsScrollView(true);
-    };
-  }, [setIsScrollView]);
+  useDisableScrollView();
 
   return (
     <center>

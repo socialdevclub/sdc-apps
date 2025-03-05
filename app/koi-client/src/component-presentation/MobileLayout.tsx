@@ -30,6 +30,7 @@ const MobileLayout = ({
         justify-content: center;
         width: 100%;
         height: 100%;
+        background: linear-gradient(to bottom, #111827, #000000);
       `}
     >
       <div

@@ -7,6 +7,8 @@ import Stock from './Stock';
 import Result from './Result';
 import { Query } from '../../../../../hook';
 import { UserStore } from '../../../../../store';
+import Introduce from './Introduce';
+import IntroduceResult from './IntroduceResult';
 
 interface Props {
   stockId: string;
@@ -32,7 +34,9 @@ const Phase = ({ stockId }: Props) => {
       <SwitchCase
         value={stockPhase}
         caseBy={{
-          CROWDING: isEntry ? <Waiting /> : <ProfileSetter stockId={stockId} userId={supabaseSession?.user.id} />,
+          CROWDING: isEntry ? <Waiting /> : <ProfileSetter stockId={stockId} />,
+          INTRO_INPUT: <Introduce stockId={stockId} />,
+          INTRO_RESULT: <IntroduceResult stockId={stockId} />,
           PLAYING: <Stock stockId={stockId} />,
           RESULT: <Result stockId={stockId} />,
           WAITING: <Waiting />,

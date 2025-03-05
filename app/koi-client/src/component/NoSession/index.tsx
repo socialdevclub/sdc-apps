@@ -1,7 +1,7 @@
 import React from 'react';
 import { SwitchCase } from '@toss/react';
-import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { Auth } from '../../library/supabase/auth';
 import MobileLayout from '../../component-presentation/MobileLayout';
 import Splash from './Splash';
 import { supabase } from '../../library/supabase';
@@ -20,8 +20,9 @@ const NoSession = () => {
             <Auth
               supabaseClient={supabase}
               appearance={{ theme: ThemeSupa }}
-              providers={[]}
+              providers={['google']}
               localization={authLocalization}
+              redirectTo={window.location.origin}
             />
           </MobileLayout>
         ),

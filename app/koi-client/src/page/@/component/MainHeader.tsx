@@ -12,7 +12,7 @@ const MainHeader = () => {
 
   const { data, isError } = Query.Supabase.useQueryAvatarUrl({ supabaseSession });
 
-  const isVisibleAvatar = !!data && !isError;
+  const isVisibleAvatar = !isError;
 
   return (
     <ProfileValidator>
