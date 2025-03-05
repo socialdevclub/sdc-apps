@@ -52,11 +52,7 @@ const Home = ({ stockId }: Props) => {
   return (
     <>
       <Container>
-        {/* <Flex align="center" justify="space-between" gap={4} css={{ width: '100%' }}>
-        <H3>홈</H3>
-
-      </Flex> */}
-        <MyLevel moneyRatio={300} initialMoney={1000000} />
+        <MyLevel moneyRatio={moneyRatio} initialMoney={1000000} />
         <Flex gap={12} css={{ width: '100%' }}>
           <Card
             title="잔액"
