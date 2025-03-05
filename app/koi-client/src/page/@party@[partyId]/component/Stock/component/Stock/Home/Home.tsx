@@ -108,7 +108,7 @@ const Container = styled.div`
   width: 100%;
   height: 100%;
   gap: 12px;
-  padding-top: 12px;
+  padding: 12px 0 100px 0;
   flex: 1 1 0;
 `;
 
