@@ -163,7 +163,7 @@ const LevelInfo = styled.div`
 `;
 
 const LevelLabel = styled.div`
-  font-size: 24px;
+  font-size: 22px;
   word-break: keep-all;
   font-weight: 700;
   margin-right: 8px;
@@ -180,7 +180,7 @@ const NextLevel = styled.div`
 `;
 
 const PercentValue = styled.div`
-  font-size: 36px;
+  font-size: 30px;
   font-weight: 700;
   color: ${COLOR.pastelGreen};
 `;
