@@ -181,7 +181,6 @@ const NextLevel = styled.div`
 
 const PercentValue = styled.div`
   font-size: 30px;
-  font-weight: 700;
   color: ${COLOR.pastelGreen};
 `;
 
