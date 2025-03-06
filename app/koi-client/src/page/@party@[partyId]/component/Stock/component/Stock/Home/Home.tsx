@@ -91,7 +91,7 @@ const Home = ({ stockId }: Props) => {
         />
         <br />
         <Flex align="center" justify="space-between" gap={4} css={{ width: '100%' }}>
-          <H3>내가 가진 정보</H3>
+          <h3>내가 가진 정보</h3>
           <DrawStockInfo stockId={stockId} />
         </Flex>
       </Container>
@@ -110,10 +110,6 @@ const Container = styled.div`
   gap: 12px;
   padding: 12px 0 100px 0;
   flex: 1 1 0;
-`;
-
-const H3 = styled.h3`
-  text-shadow: 2px 2px #8461f8;
 `;
 
 // TODO: 만약 영역이 겹치는 이슈가 발생 시 수정

@@ -18,7 +18,7 @@ const MobileLayout = ({
   HeaderComponent,
   justifyContent = 'center',
   padding = '20px',
-  backgroundColor = '#f1f1f1',
+  backgroundColor = '',
   ScrollViewComponent = ScrollView,
 }: Props) => {
   const isDesktop = useMediaQuery({ query: `(min-width: 800px)` });

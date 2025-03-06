@@ -79,31 +79,37 @@ const Wrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
+
   width: 100%;
   height: 100%;
+
   padding: 180px 120px;
   box-sizing: border-box;
+  background: linear-gradient(to bottom, #111827, #000000);
 `;
 
 const TimeBox = styled.div`
   position: absolute;
-  display: flex;
-  justify-content: center;
+  text-align: center;
   width: 100%;
-  margin-top: 100px;
-  font-size: 48px;
-  text-shadow: 2px 2px #8461f8;
+  top: 100px;
+
+  font-size: 52px;
   color: white;
+  z-index: 1;
 `;
 
 const Container = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+
   width: 100%;
   height: 100%;
 
-  box-shadow: 5px 5px #000000;
-  background-color: #000084;
+  border-radius: 4px;
+  box-shadow: 5px 5px 10px #000000;
+  background-color: #252836;
+
+  padding: 20px 0;
 `;
