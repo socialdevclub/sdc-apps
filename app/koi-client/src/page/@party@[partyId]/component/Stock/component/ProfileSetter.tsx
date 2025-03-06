@@ -11,25 +11,24 @@ const ProfileSetter = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
 
   const { data: user } = Query.Supabase.useMyProfile({ supabaseSession });
-  const { mutateAsync } = Query.Stock.useSetUser();
+  const { mutateAsync } = Query.Stock.useRegisterUser();
 
   const userId = user?.data?.id;
+  const gender = user?.data?.gender;
+  const nickname = user?.data?.username;
 
   useEffect(() => {
+    if (!userId || !gender || !nickname) return;
+
     mutateAsync({
-      index: 0,
-      inventory: {},
-      lastActivityTime: new Date(),
-      loanCount: 0,
-      money: 1000000,
       stockId,
       userId,
       userInfo: {
-        gender: user?.data?.gender,
-        nickname: user?.data?.username,
+        gender,
+        nickname,
       },
     });
-  }, [mutateAsync, stockId, user?.data?.gender, user?.data?.username, userId]);
+  }, [gender, mutateAsync, nickname, stockId, userId]);
 
   return <></>;
 };

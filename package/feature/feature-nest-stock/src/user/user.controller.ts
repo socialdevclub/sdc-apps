@@ -14,8 +14,13 @@ export class UserController {
   }
 
   @Post()
-  setUser(@Body() body: StockUser): Promise<StockUser> {
+  setUser(@Body() body: StockUser): Promise<boolean> {
     return this.userService.setUser(body);
+  }
+
+  @Post('/register')
+  async registerUser(@Body() body: StockUser): Promise<Response.GetCreateUser> {
+    return this.userService.registerUser(body);
   }
 
   @Post('/introduce')
