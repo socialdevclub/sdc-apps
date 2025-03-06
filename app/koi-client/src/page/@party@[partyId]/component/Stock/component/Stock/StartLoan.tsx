@@ -61,7 +61,7 @@ const StartLoan = ({ stockId }: Props) => {
   return (
     <>
       {contextHolder}
-      <LoanButton onClick={() => setOpen(true)} disabled>
+      <LoanButton onClick={() => setOpen(true)} disabled={isDisabled}>
         대출하기
       </LoanButton>
       <div
