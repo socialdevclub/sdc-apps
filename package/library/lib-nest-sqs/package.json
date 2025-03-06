@@ -1,0 +1,20 @@
+{
+  "name": "lib-nest-sqs",
+  "main": "./dist/index.js",
+  "private": true,
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc -w"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.414.0",
+    "@nestjs/common": "^10.3.0",
+    "@nestjs/config": "^3.1.1",
+    "rxjs": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.5.5",
+    "typescript": "^5.1.3"
+  }
+}

@@ -7,6 +7,7 @@ import { InjectConnection } from '@nestjs/mongoose';
 import { getDateDistance } from '@toss/date';
 import { StockConfig } from 'shared~config';
 import { OpenAI } from 'openai';
+import { SqsService } from 'lib-nest-sqs';
 import { StockUser, UserDocument } from './user.schema';
 import { UserRepository } from './user.repository';
 import { StockRepository } from '../stock.repository';
@@ -19,6 +20,7 @@ export class UserService {
     @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly userRepository: UserRepository,
     private readonly stockRepository: StockRepository,
+    private readonly sqsService: SqsService,
   ) {
     if (process.env.OPENAI_API_KEY) {
       this.openai = new OpenAI({
@@ -47,6 +49,26 @@ export class UserService {
   }
 
   async registerUser(user: StockUser): Promise<Response.GetCreateUser> {
+    if (this.sqsService) {
+      try {
+        const messageId = await this.sqsService.sendMessage('registerUser', user);
+
+        const tempUser = {
+          ...user,
+          _id: new mongoose.Types.ObjectId(),
+          messageId,
+          processingStatus: 'QUEUED',
+        };
+
+        return {
+          isAlreadyExists: false,
+          user: tempUser as unknown as StockUser,
+        };
+      } catch (error) {
+        console.error('SQS 메시지 전송 오류:', error);
+      }
+    }
+
     return this.userRepository.create(user);
   }
 

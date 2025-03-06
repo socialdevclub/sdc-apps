@@ -1,5 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { SqsModule } from 'lib-nest-sqs';
 import { StockService } from './stock.service';
 import { Stock, stockSchema } from './stock.schema';
 import { StockController } from './stock.controller';
@@ -16,6 +17,7 @@ import { UserModule } from './user/user.module';
     forwardRef(() => UserModule),
     LogModule,
     ResultModule,
+    forwardRef(() => SqsModule),
   ],
   providers: [StockService, StockRepository],
 })
