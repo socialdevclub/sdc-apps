@@ -1,8 +1,10 @@
-import { useQuery } from 'lib-react-query';
+import { getQueryKey, useQuery } from 'lib-react-query';
 import { Response } from 'shared~type-stock';
 import { serverApiUrl } from '../../../config/baseUrl';
 
-const useUserList = (stockId: string | undefined) => {
+type StockId = string | undefined;
+
+const useUserList = (stockId: StockId) => {
   const { data } = useQuery<Response.GetStockUser[]>({
     api: {
       hostname: serverApiUrl,
@@ -17,5 +19,11 @@ const useUserList = (stockId: string | undefined) => {
 
   return { data: data ?? [] };
 };
+useUserList.queryKey = (stockId: StockId) =>
+  getQueryKey({
+    hostname: serverApiUrl,
+    method: 'GET',
+    pathname: `/stock/user?stockId=${stockId}`,
+  });
 
 export default useUserList;
