@@ -95,27 +95,12 @@ const Home = ({ stockId }: Props) => {
     return myInfos;
   }, [] as Array<{ company: string; timeIdx: number; price: number }>);
 
-  const { futureInfos } = myInfos.reduce(
-    (acc, info) => {
+  const futureInfos = myInfos
+    .filter((info) => {
       const infoTimeInSeconds = stock?.fluctuationsInterval && info.timeIdx * 60 * stock.fluctuationsInterval;
-
-      if (infoTimeInSeconds >= gameTimeInSeconds) {
-        let index = acc.futureInfos.findIndex((item) => item.timeIdx > info.timeIdx);
-        if (index === -1) index = acc.futureInfos.length;
-        acc.futureInfos.splice(index, 0, info);
-      } else {
-        let index = acc.pastInfos.findIndex((item) => item.timeIdx < info.timeIdx);
-        if (index === -1) index = acc.pastInfos.length;
-        acc.pastInfos.splice(index, 0, info);
-      }
-
-      return acc;
-    },
-    {
-      futureInfos: [] as Array<{ company: string; timeIdx: number; price: number }>,
-      pastInfos: [] as Array<{ company: string; timeIdx: number; price: number }>,
-    },
-  );
+      return infoTimeInSeconds >= gameTimeInSeconds;
+    })
+    .sort((a, b) => a.timeIdx - b.timeIdx);
 
   const allProfitDesc = allUserSellPriceDesc()
     .map(({ userId, allSellPrice }) => {
