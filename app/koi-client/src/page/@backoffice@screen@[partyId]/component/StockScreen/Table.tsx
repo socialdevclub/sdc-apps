@@ -1,4 +1,4 @@
-import { stock } from 'shared~config';
+import { StockConfig } from 'shared~config';
 import React, { CSSProperties } from 'react';
 import styled from '@emotion/styled';
 import { commaizeNumber } from '@toss/utils';
@@ -12,15 +12,27 @@ interface Props {
 const Table = ({ stockId }: Props) => {
   const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId, { keepPreviousData: false });
 
-  if (!stock?.companies || !timeIdx) {
+  if (!stock?.companies || timeIdx === undefined) {
     return <></>;
   }
 
   const { companies } = stock;
-  const companyNames = Object.keys(companies) as stock.CompanyNames[];
+  const companyNames = Object.keys(companies) as StockConfig.CompanyNames[];
 
   return (
     <Wrapper>
+      <Row>
+        <RowHeaderItem>주식이름</RowHeaderItem>
+        <RowHeaderItem>현재 가격</RowHeaderItem>
+        <RowHeaderItem>변동 정보</RowHeaderItem>
+        <RowHeaderItem>남은 수량</RowHeaderItem>
+      </Row>
+      <Row>
+        <RowHeaderItem>주식이름</RowHeaderItem>
+        <RowHeaderItem>현재 가격</RowHeaderItem>
+        <RowHeaderItem>변동 정보</RowHeaderItem>
+        <RowHeaderItem>남은 수량</RowHeaderItem>
+      </Row>
       {companyNames.map((company) => {
         if (timeIdx > 9) {
           return <></>;
@@ -29,8 +41,8 @@ const Table = ({ stockId }: Props) => {
         const remainingStock = stock.remainingStocks[company];
         const diff = timeIdx === 0 ? 0 : companies[company][timeIdx].가격 - companies[company][timeIdx - 1].가격;
         const 등락 =
-          diff > 0 ? `▲${commaizeNumber(Math.abs(diff))}` : diff < 0 ? `▼${commaizeNumber(Math.abs(diff))}` : '';
-        const color = diff > 0 ? '#00ff00' : diff < 0 ? '#ff0000' : undefined;
+          diff > 0 ? `▲${commaizeNumber(Math.abs(diff))}` : diff < 0 ? `▼${commaizeNumber(Math.abs(diff))}` : '-';
+        const color = diff > 0 ? '#60A5FA' : diff < 0 ? '#F87171' : undefined;
 
         return (
           <Row key={company}>
@@ -52,28 +64,43 @@ const Table = ({ stockId }: Props) => {
 };
 
 const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
   width: 100%;
   height: 100%;
+
+  display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
 `;
 
 const Row = styled.div`
   display: flex;
+  align-items: center;
   flex-direction: row;
   width: 50%;
   font-size: 28px;
   color: white;
-  justify-content: space-evenly;
 `;
 
 const RowItem = styled.div<{ color?: CSSProperties['color'] }>`
-  width: 140px;
+  flex: 1;
   ${({ color }) => css`
     color: ${color};
   `};
+  display: flex;
+  justify-content: center;
+`;
+
+const RowHeaderItem = styled.div`
+  flex: 1;
+  color: rgb(202, 202, 202);
+  display: flex;
+  font-size: 20px;
+  justify-content: center;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
 `;
 
 export default Table;

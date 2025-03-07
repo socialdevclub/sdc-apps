@@ -2,6 +2,7 @@ import { objectEntries } from '@toss/utils';
 import { useAtomValue } from 'jotai';
 import { Button, message } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
+import styled from '@emotion/styled';
 import { UserStore } from '../../../../../../store';
 import { Query } from '../../../../../../hook';
 import Box from '../../../../../../component-presentation/Box';
@@ -28,6 +29,7 @@ const Buy = ({ stockId }: Props) => {
   const onClickBuy = (company: string) => {
     buyStock({ amount: 1, company, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
+        messageApi.destroy();
         messageApi.open({
           content: '주식을 구매하였습니다.',
           duration: 2,
@@ -35,6 +37,7 @@ const Buy = ({ stockId }: Props) => {
         });
       })
       .catch((reason: Error) => {
+        messageApi.destroy();
         messageApi.open({
           content: `${reason.message}`,
           duration: 2,
@@ -54,7 +57,8 @@ const Buy = ({ stockId }: Props) => {
             key={company}
             value={company}
             rightComponent={
-              <Button
+              <BuyButton
+                name="buy"
                 icon={<ShoppingCartOutlined />}
                 disabled={count === 0 || isDisabled}
                 loading={isLoading || isFreezed}
@@ -63,7 +67,7 @@ const Buy = ({ stockId }: Props) => {
                 }}
               >
                 사기
-              </Button>
+              </BuyButton>
             }
           />
         );
@@ -73,3 +77,11 @@ const Buy = ({ stockId }: Props) => {
 };
 
 export default Buy;
+
+const BuyButton = styled(Button)`
+  &:disabled {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+`;

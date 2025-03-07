@@ -1,6 +1,19 @@
-import { StockUserForm, StockUserRequired, StockUserSchema } from 'shared~type-stock';
+import { StockUserForm, StockUserRequired, StockUserSchema, StockUserInfoSchema } from 'shared~type-stock';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes } from 'mongoose';
+import { StockConfig } from 'shared~config';
+
+@Schema({ _id: false })
+export class StockUserInfo implements StockUserInfoSchema {
+  @Prop()
+  gender: string;
+
+  @Prop()
+  nickname: string;
+
+  @Prop()
+  introduction?: string;
+}
 
 @Schema()
 export class StockUser implements StockUserSchema {
@@ -9,6 +22,12 @@ export class StockUser implements StockUserSchema {
 
   @Prop()
   userId: string;
+
+  @Prop({ type: StockUserInfo })
+  userInfo: StockUserInfoSchema;
+
+  @Prop()
+  index: number;
 
   @Prop()
   money: number;
@@ -19,13 +38,19 @@ export class StockUser implements StockUserSchema {
   @Prop({ type: SchemaTypes.Date })
   lastActivityTime: Date;
 
+  @Prop({ default: 0 })
+  loanCount: number;
+
   constructor(required: Pick<StockUserSchema, StockUserRequired>, partial: StockUserForm) {
     this.userId = required.userId;
     this.stockId = required.stockId;
+    this.userInfo = required.userInfo;
 
-    this.money = partial.money ?? 1000000;
+    this.index = partial.index ?? 0;
+    this.money = partial.money ?? StockConfig.INIT_USER_MONEY;
     this.inventory = partial.inventory ?? {};
     this.lastActivityTime = new Date();
+    this.loanCount = partial.loanCount ?? 0;
   }
 }
 

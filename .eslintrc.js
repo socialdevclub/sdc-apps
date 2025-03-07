@@ -32,12 +32,15 @@ module.exports = {
     'class-methods-use-this': 0,
     'global-require': 0,
     'import/extensions': 0,
+    'import/no-absolute-path': 'error',
     'import/no-extraneous-dependencies': 0,
     'import/no-import-module-exports': 0,
     'import/no-unresolved': 0,
     'import/prefer-default-export': 0,
     'max-classes-per-file': 0,
+    'new-cap': 0,
     'no-alert': 0,
+    'no-await-in-loop': 0,
     'no-console': 0,
     'no-continue': 0,
     'no-empty-pattern': 0,
@@ -46,6 +49,17 @@ module.exports = {
     'no-param-reassign': 0,
     'no-plusplus': 0,
     'no-restricted-globals': 0,
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            group: ['src/*'],
+            message: 'Use relative imports instead',
+          },
+        ],
+      },
+    ],
     'no-restricted-syntax': 0,
     'no-shadow': 0,
     'no-underscore-dangle': 0,

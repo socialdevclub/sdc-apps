@@ -14,8 +14,28 @@ export class UserController {
   }
 
   @Post()
-  setUser(@Body() body: StockUser): Promise<StockUser> {
+  setUser(@Body() body: StockUser): Promise<boolean> {
     return this.userService.setUser(body);
+  }
+
+  @Post('/register')
+  async registerUser(@Body() body: StockUser): Promise<Response.GetCreateUser> {
+    return this.userService.registerUser(body);
+  }
+
+  @Post('/introduce')
+  async setIntroduce(@Body() body: Request.PostIntroduce): Promise<Response.SetIntroduce> {
+    return this.userService.setIntroduce(body.stockId, body.userId, body.introduction);
+  }
+
+  @Post('loan')
+  async startLoan(@Body() body: Request.PostLoan): Promise<Response.Common> {
+    return this.userService.startLoan(body.stockId, body.userId);
+  }
+
+  @Post('loan/settle')
+  async settleLoan(@Body() body: Request.PostSettleLoan): Promise<Response.Common> {
+    return this.userService.settleLoan(body.stockId, body.userId);
   }
 
   @Delete()

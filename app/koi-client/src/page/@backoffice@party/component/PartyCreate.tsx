@@ -26,16 +26,31 @@ const PartyCreate = () => {
   return (
     <Form>
       <Form.Item required label="title">
-        <Input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <Input type="text" name="title" value={title} onChange={(e) => setTitle(e.target.value)} />
       </Form.Item>
       <Form.Item required label="limitAllCount">
-        <Input type="text" value={limitAllCount} onChange={(e) => setLimitAllCount(e.target.value)} />
+        <Input
+          type="text"
+          name="limitAllCount"
+          value={limitAllCount}
+          onChange={(e) => setLimitAllCount(e.target.value)}
+        />
       </Form.Item>
       <Form.Item label="limitMaleCount">
-        <Input type="text" value={limitMaleCount} onChange={(e) => setLimitMaleCount(e.target.value)} />
+        <Input
+          type="text"
+          name="limitMaleCount"
+          value={limitMaleCount}
+          onChange={(e) => setLimitMaleCount(e.target.value)}
+        />
       </Form.Item>
       <Form.Item label="limitFemaleCount">
-        <Input type="text" value={limitFemaleCount} onChange={(e) => setLimitFemaleCount(e.target.value)} />
+        <Input
+          type="text"
+          name="limitFemaleCount"
+          value={limitFemaleCount}
+          onChange={(e) => setLimitFemaleCount(e.target.value)}
+        />
       </Form.Item>
       <Form.Item>
         <Button

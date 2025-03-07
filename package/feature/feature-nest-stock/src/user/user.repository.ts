@@ -1,22 +1,56 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, MongooseQueryOptions, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+import { HttpException, Injectable } from '@nestjs/common';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import mongoose, {
+  FilterQuery,
+  Model,
+  MongooseQueryOptions,
+  ProjectionType,
+  QueryOptions,
+  UpdateQuery,
+} from 'mongoose';
 import { DeleteOptions, UpdateOptions } from 'mongodb';
+import { Response } from 'shared~type-stock';
 import { StockUser, UserDocument } from './user.schema';
 
 @Injectable()
 export class UserRepository {
   constructor(
+    @InjectConnection() private readonly connection: mongoose.Connection,
     @InjectModel(StockUser.name)
     private readonly userModel: Model<StockUser>,
   ) {}
+
+  async create(user: StockUser): Promise<Response.GetCreateUser> {
+    const session = await this.connection.startSession();
+
+    try {
+      const result = await session.withTransaction(async () => {
+        const doc = await this.findOne({ stockId: user.stockId, userId: user.userId }, null, {
+          session,
+        });
+        if (!doc) {
+          const newStockUser = new StockUser(user, user);
+          const newDoc = new this.userModel(newStockUser);
+          const updatedDoc = await newDoc.save({ session });
+          return { isAlreadyExists: false, user: updatedDoc };
+        }
+        return { isAlreadyExists: true, user: doc };
+      });
+      return result;
+    } catch (err) {
+      console.error(err);
+      throw new HttpException('POST /stock/user/register Unknown Error', 500, { cause: err });
+    } finally {
+      await session.endSession();
+    }
+  }
 
   find(
     filter?: FilterQuery<StockUser>,
     projection?: ProjectionType<StockUser>,
     options?: QueryOptions<StockUser>,
   ): Promise<UserDocument[]> {
-    return this.userModel.find(filter, projection, options);
+    return this.userModel.find(filter, projection, { sort: { index: 1 }, ...options });
   }
 
   findOne(
@@ -29,7 +63,7 @@ export class UserRepository {
 
   findOneAndUpdate(
     filter: FilterQuery<StockUser>,
-    update: StockUser,
+    update: UpdateQuery<StockUser>,
     options?: QueryOptions<StockUser>,
   ): Promise<UserDocument> {
     return this.userModel.findOneAndUpdate(filter, update, { returnDocument: 'after', ...options });
@@ -47,6 +81,14 @@ export class UserRepository {
     options?: DeleteOptions & Omit<MongooseQueryOptions<StockUser>, 'lean' | 'timestamps'>,
   ): Promise<boolean> {
     return !!(await this.userModel.deleteMany(filter, options));
+  }
+
+  async updateOne(
+    filter: FilterQuery<StockUser>,
+    update: UpdateQuery<StockUser>,
+    options?: UpdateOptions & Omit<MongooseQueryOptions<StockUser>, 'lean'>,
+  ): Promise<boolean> {
+    return !!(await this.userModel.updateOne(filter, update, options));
   }
 
   async updateMany(

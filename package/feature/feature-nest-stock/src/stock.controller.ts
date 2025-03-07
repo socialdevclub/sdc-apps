@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common';
 import { Request, Response, StockSchema } from 'shared~type-stock';
 import { Stock } from './stock.schema';
 import { StockService } from './stock.service';
@@ -19,10 +19,20 @@ export class StockController {
     return this.stockService.transStockToDto(stock);
   }
 
+  @Delete()
+  async deleteStock(@Query('stockId') stockId: string): Promise<boolean> {
+    return this.stockService.deleteStock(stockId);
+  }
+
   @Get('/phase')
   async getStockPhase(@Query('stockId') stockId: string): Promise<Response.GetStockPhase> {
     const stock = await this.stockService.findOneById(stockId, { stockPhase: true });
     return { stockPhase: stock.stockPhase };
+  }
+
+  @Post('/phase')
+  async setStockPhase(@Body() body: Request.PostSetStockPhase): Promise<StockSchema> {
+    return this.stockService.setStockPhase(body.stockId, body.phase);
   }
 
   @Post('/create')
@@ -53,6 +63,11 @@ export class StockController {
   @Post('/buy')
   buyStock(@Body() body: Request.PostBuyStock): Promise<StockSchema> {
     return this.stockService.buyStock(body.stockId, body);
+  }
+
+  @Post('/draw-info')
+  buyStockInfo(@Body() body: Request.PostDrawStockInfo): Promise<StockSchema> {
+    return this.stockService.drawStockInfo(body.stockId, body);
   }
 
   @Post('/sell')

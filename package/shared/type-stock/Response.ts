@@ -25,3 +25,16 @@ export type Stock = StockSchema;
 export type Log = StockLogSchema;
 
 export type Result = ResultSchema;
+
+export type Common = {
+  status: number;
+  message: string;
+  data?: unknown;
+};
+
+export type SetIntroduce = StockUserSchema;
+
+export type GetCreateUser = {
+  isAlreadyExists: boolean;
+  user: StockUserSchema;
+};

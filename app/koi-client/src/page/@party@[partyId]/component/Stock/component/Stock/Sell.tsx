@@ -28,6 +28,7 @@ const Sell = ({ stockId }: Props) => {
   const onClickSell = (company: string) => {
     sellStock({ amount: 1, company, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
+        messageApi.destroy();
         messageApi.open({
           content: '주식을 팔았습니다.',
           duration: 2,
@@ -35,6 +36,7 @@ const Sell = ({ stockId }: Props) => {
         });
       })
       .catch((reason: Error) => {
+        messageApi.destroy();
         messageApi.open({
           content: `${reason.message}`,
           duration: 2,
@@ -56,6 +58,7 @@ const Sell = ({ stockId }: Props) => {
             value={company}
             rightComponent={
               <Button
+                name="sell"
                 icon={<DollarOutlined />}
                 disabled={count === 0 || isDisabled}
                 loading={isLoading || isFreezed}

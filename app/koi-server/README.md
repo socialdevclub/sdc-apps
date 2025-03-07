@@ -44,7 +44,7 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
     # Mac/Linux의 경우: /etc/hosts
     
     # 아래 내용을 hosts 파일에 추가
-    127.0.0.1    local.palete.me
+    127.0.0.1    local.socialdev.club
     ```
 
 4. 개발 서버 실행

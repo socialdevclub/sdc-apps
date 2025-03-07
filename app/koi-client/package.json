@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "yarn run build-shared~config && vite --host",
-    "build": "yarn run build-shared~config && tsc && vite build",
+    "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "build-shared~config": "yarn workspace shared~config build"
+    "build-shared~config": "yarn workspace shared~config build",
+    "turbo:build": "turbo run build"
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
@@ -18,7 +19,6 @@
     "@linaria/core": "^6.0.0",
     "@linaria/react": "^6.0.0",
     "@radix-ui/react-scroll-area": "^1.2.1",
-    "@supabase/auth-ui-react": "^0.4.6",
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "^2.39.0",
     "@swc/plugin-emotion": "^2.5.86",
@@ -36,6 +36,7 @@
     "jotai": "^2.4.2",
     "lib-react-query": "workspace:*",
     "localforage": "^1.10.0",
+    "lucide-react": "^0.475.0",
     "match-sorter": "^6.3.1",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
@@ -52,6 +53,7 @@
     "@babel/core": "^7.23.6",
     "@babel/preset-react": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
+    "@stitches/core": "^1.2.8",
     "@tanstack/react-query-devtools": "^4.35.3",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^18.5.5",
@@ -81,6 +83,7 @@
     "shared~type-koi": "workspace:*",
     "shared~type-poll": "workspace:*",
     "shared~type-stock": "workspace:*",
+    "turbo": "^1.11.2",
     "typescript": "^5.1.3",
     "vite": "^4.4.5",
     "vite-plugin-commonjs": "^0.9.0"
