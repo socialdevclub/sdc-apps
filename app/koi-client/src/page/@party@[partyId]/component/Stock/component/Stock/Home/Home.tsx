@@ -173,7 +173,7 @@ const Home = ({ stockId }: Props) => {
           <H5 onClick={handlePageChange}>전체보기 &gt;</H5>
         </TitleWrapper>
         <H4>현재 시각 이후의 정보 최대 2개가 표시됩니다</H4>
-        <FutuerInfoWrapper>
+        <FutureInfoWrapper>
           {futureInfos.slice(0, 2).map(({ company, price, timeIdx }) => {
             const infoTimeInMinutes = timeIdx * stock.fluctuationsInterval;
             const remainingTime = infoTimeInMinutes - gameTimeInMinutes;
@@ -210,7 +210,7 @@ const Home = ({ stockId }: Props) => {
               />
             );
           })}
-        </FutuerInfoWrapper>
+        </FutureInfoWrapper>
       </Wrapper>
       <StickyBottom>
         <StartLoan stockId={stockId} />
@@ -277,7 +277,7 @@ const H6Wrapper = styled.div`
   border-radius: 20px;
 `;
 
-const FutuerInfoWrapper = styled.div`
+const FutureInfoWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
