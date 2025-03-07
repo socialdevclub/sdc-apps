@@ -222,6 +222,9 @@ const Divider = styled.div`
 `;
 
 const DimContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   opacity: 0.5;
   pointer-events: none;
 `;
