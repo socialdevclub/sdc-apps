@@ -1,22 +1,16 @@
-import { Flex } from 'antd';
+import dayjs from 'dayjs';
 import { useAtomValue } from 'jotai';
-import { commaizeNumber, objectEntries } from '@toss/utils';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { getDateDistance } from '@toss/date';
-import dayjs from 'dayjs';
-import { useEffect, useRef, useState } from 'react';
-import { css } from '@emotion/react';
-import { UserStore } from '../../../../../../../store';
-import { Query } from '../../../../../../../hook';
-import { MyLevel } from './MyLevel';
-import Card from '../../../../../../../component-presentation/Card';
-import * as COLOR from '../../../../../../../config/color';
-import StartLoan from '../StartLoan';
-import prependZero from '../../../../../../../service/prependZero';
-import InfoBox from '../../../../../../../component-presentation/InfoBox';
-import { colorDown, colorUp } from '../../../../../../../config/color';
+import { commaizeNumber, objectEntries } from '@toss/utils';
 
-const getProfitRatio = (v: number) => ((v / 1000000) * 100 - 100).toFixed(2);
+import { useEffect, useRef, useState } from 'react';
+import InfoBox from '../../../../../../component-presentation/InfoBox';
+import { colorDown, colorUp } from '../../../../../../config/color';
+import { Query } from '../../../../../../hook';
+import prependZero from '../../../../../../service/prependZero';
+import { UserStore } from '../../../../../../store';
 
 interface Props {
   stockId: string;
@@ -31,15 +25,11 @@ const getFormattedGameTime = (startTime?: string) => {
   )}`;
 };
 
-const Home = ({ stockId }: Props) => {
+const Information = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
-
   const { data: stock, refetch } = Query.Stock.useQueryStock(stockId);
-  const { data: users } = Query.Stock.useUserList(stockId);
   const { user } = Query.Stock.useUser({ stockId, userId });
-
-  const { allSellPrice, allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId, userId });
   const [gameTime, setGameTime] = useState(getFormattedGameTime(stock?.startedTime));
   const gameTimeRef = useRef(gameTime);
 
@@ -107,71 +97,59 @@ const Home = ({ stockId }: Props) => {
     },
   );
 
-  const allProfitDesc = allUserSellPriceDesc()
-    .map(({ userId, allSellPrice }) => {
-      const user = users.find((v) => v.userId === userId);
-      if (!user) {
-        return {
-          profit: 0,
-          userId,
-        };
-      }
-
-      return {
-        profit: allSellPrice + user.money,
-        userId,
-      };
-    })
-    .sort((a, b) => b.profit - a.profit);
-
-  const moneyRatio = getProfitRatio(user.money + allSellPrice);
-
   return (
-    <>
-      <Container>
-        <MyLevel moneyRatio={moneyRatio} initialMoney={1000000} />
-        <Flex gap={12} css={{ width: '100%' }}>
-          <Card
-            title="잔액"
-            value={`₩${commaizeNumber(user.money)}`}
-            valueColor={COLOR.pastelGreen}
-            rightComponent={
-              stock.isVisibleRank ? (
-                <>{users.sort((a, b) => b.money - a.money).findIndex((v) => v.userId === userId) + 1}위</>
-              ) : (
-                <></>
-              )
-            }
-          />
-          <Card
-            title="주식 가치"
-            valueColor={COLOR.pastelViolet}
-            value={`₩${commaizeNumber(allSellPrice)}`}
-            rightComponent={
-              stock.isVisibleRank ? <>{allUserSellPriceDesc().findIndex((v) => v.userId === userId) + 1}위</> : <></>
-            }
-          />
-        </Flex>
-        <Card
-          title="모두 팔고 난 뒤의 금액"
-          value={`₩${commaizeNumber(user.money + allSellPrice)}`}
-          rightComponent={
-            stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>
-          }
-        />
-        <Card
-          title="모두 팔고 난 뒤의 순이익"
-          value={`${moneyRatio}%`}
-          rightComponent={
-            stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>
-          }
-        />
-        <br />
-        <H3>내 예측 정보</H3>
-        {futureInfos.slice(0, 2).map(({ company, price, timeIdx }) => {
-          const infoTimeInMinutes = timeIdx * stock.fluctuationsInterval;
-          const remainingTime = infoTimeInMinutes - gameTimeInMinutes;
+    <Container>
+      <TitleWrapper>
+        <H1>앞으로의 정보</H1>
+        <H2>{futureInfos.length}개 보유</H2>
+      </TitleWrapper>
+      {futureInfos.map(({ company, price, timeIdx }) => {
+        const infoTimeInMinutes = timeIdx * stock.fluctuationsInterval;
+        const remainingTime = infoTimeInMinutes - gameTimeInMinutes;
 
+        return (
+          <InfoBox
+            key={`${company}_${timeIdx}`}
+            title={company}
+            value={`${price >= 0 ? '▲' : '▼'}${commaizeNumber(Math.abs(price))}`}
+            valueColor={price >= 0 ? colorUp : colorDown}
+            leftTime={
+              <div
+                css={css`
+                  font-size: 14px;
+                  color: #c084fc;
+                  min-width: 50px;
+                  letter-spacing: 0.5px;
+                `}
+              >
+                {remainingTime <= 1 ? `🚨 임박` : `${remainingTime}분 후`}
+              </div>
+            }
+            changeTime={
+              <div
+                css={css`
+                  font-size: 12px;
+                  color: #9ca3af;
+                  letter-spacing: 0.5px;
+                `}
+              >
+                {prependZero(timeIdx * stock.fluctuationsInterval, 2)}:00
+              </div>
+            }
+          />
+        );
+      })}
+
+      <Divider />
+
+      <TitleWrapper>
+        <H1>지난 정보</H1>
+        <H2>{pastInfos.length}개 보유</H2>
+      </TitleWrapper>
+
+      <DimContainer>
+        {pastInfos.map(({ company, price, timeIdx }) => {
+          const pastTime = gameTimeInMinutes - timeIdx * stock.fluctuationsInterval;
           return (
             <InfoBox
               key={`${company}_${timeIdx}`}
@@ -182,12 +160,12 @@ const Home = ({ stockId }: Props) => {
                 <div
                   css={css`
                     font-size: 14px;
-                    color: #c084fc;
+                    color: #ffffff;
                     min-width: 50px;
                     letter-spacing: 0.5px;
                   `}
                 >
-                  {remainingTime <= 1 ? `🚨 임박` : `${remainingTime}분 후`}
+                  {pastTime <= 1 ? '방금 전' : `${pastTime}분 전`}
                 </div>
               }
               changeTime={
@@ -204,34 +182,48 @@ const Home = ({ stockId }: Props) => {
             />
           );
         })}
-      </Container>
-      <StickyBottom>
-        <StartLoan stockId={stockId} />
-      </StickyBottom>
-    </>
+      </DimContainer>
+    </Container>
   );
 };
 
 const Container = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 100%;
   gap: 12px;
-  padding: 12px 0 100px 0;
-  flex: 1 1 0;
 `;
 
-// TODO: 만약 영역이 겹치는 이슈가 발생 시 수정
-const StickyBottom = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #252836;
+const TitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+`;
+
+const H1 = styled.div`
+  font-size: 16px;
+  line-height: 22px;
+`;
+
+const H2 = styled.div`
+  padding: 2px 8px;
+  font-size: 10px;
+  line-height: 22px;
+  color: #c084fc;
+  border-radius: 16px;
+  background-color: rgba(192, 132, 252, 0.2);
+`;
+
+const Divider = styled.div`
   border-top: 1px solid #374151;
-  padding: 20px;
-  box-sizing: border-box;
+  margin-top: 8px;
+  margin-bottom: 8px;
 `;
 
-export default Home;
+const DimContainer = styled.div`
+  opacity: 0.5;
+  pointer-events: none;
+`;
+
+export default Information;

@@ -12,7 +12,7 @@ interface Options {
 }
 
 const useQueryStock = (stockId: string | undefined, options?: Options) => {
-  const { data } = useQuery<Response.GetStock>({
+  const { data, refetch } = useQuery<Response.GetStock>({
     api: {
       hostname: serverApiUrl,
       method: 'GET',
@@ -45,7 +45,7 @@ const useQueryStock = (stockId: string | undefined, options?: Options) => {
     [data?.companies, data?.startedTime, timeIdx],
   );
 
-  return { companiesPrice, data, timeIdx };
+  return { companiesPrice, data, refetch, timeIdx };
 };
 
 export default useQueryStock;
