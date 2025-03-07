@@ -32,6 +32,19 @@ const buttonDefaultStyles = css({
         borderColor: '$defaultButtonBorder',
         color: '$defaultButtonText',
       },
+      discord: {
+        '&:hover:not(:disabled)': {
+          backgroundColor: '#4A56D9',
+        },
+        alignItems: 'center',
+        backgroundColor: '#5965fe',
+        color: '$discordButtonText',
+        display: 'flex',
+        flexDirection: 'row',
+        fontSize: '20px',
+        height: '54px',
+        justifyContent: 'center',
+      },
       primary: {
         '&:hover:not(:disabled)': {
           backgroundColor: '$brandAccent',

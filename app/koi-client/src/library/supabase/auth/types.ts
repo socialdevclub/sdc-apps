@@ -18,4 +18,6 @@ export interface Auth extends BaseAuth {
   children?: ReactNode;
   appearance?: Appearance;
   passwordLimit?: boolean;
+  route?: string;
+  handleRouteChange?: (newRoute: string) => void;
 }
