@@ -6,6 +6,7 @@ import { getDateDistance } from '@toss/date';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { UserStore } from '../../../../../../../store';
 import { Query } from '../../../../../../../hook';
 import { MyLevel } from './MyLevel';
@@ -42,6 +43,15 @@ const Home = ({ stockId }: Props) => {
   const { allSellPrice, allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId, userId });
   const [gameTime, setGameTime] = useState(getFormattedGameTime(stock?.startedTime));
   const gameTimeRef = useRef(gameTime);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handlePageChange = () => {
+    const params = new URLSearchParams(location.search);
+    params.set('page', '정보');
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+  };
 
   useEffect(() => {
     if (!stock?.startedTime) return () => {};
@@ -175,7 +185,7 @@ const Home = ({ stockId }: Props) => {
               <H6>총 {myInfos.length}개 보유</H6>
             </H6Wrapper>
           </LeftSection>
-          <H5>전체보기 &gt;</H5>
+          <H5 onClick={handlePageChange}>전체보기 &gt;</H5>
         </TitleWrapper>
         <H4>현재 시각 이후의 정보 최대 2개가 표시됩니다</H4>
         <FutuerInfoWrapper>
@@ -262,6 +272,7 @@ const H5 = styled.h5`
   padding: 8px 8px;
   cursor: pointer;
 `;
+
 const H4 = styled.h4`
   font-size: 10px;
 `;
