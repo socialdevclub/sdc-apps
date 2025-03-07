@@ -222,10 +222,6 @@ const Container = styled.div`
   flex: 1 1 0;
 `;
 
-const H3 = styled.h3`
-  text-shadow: 2px 2px #8461f8;
-`;
-
 // TODO: 만약 영역이 겹치는 이슈가 발생 시 수정
 const StickyBottom = styled.div`
   position: absolute;

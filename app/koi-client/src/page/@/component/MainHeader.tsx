@@ -1,6 +1,6 @@
-import React from 'react';
 import { useAtomValue } from 'jotai';
 import { useNavigate } from 'react-router-dom';
+import styled from '@emotion/styled';
 import { Query } from '../../../hook';
 import { UserStore } from '../../../store';
 import Header from '../../../component-presentation/Header';
@@ -24,9 +24,14 @@ const MainHeader = () => {
           },
           src: data,
         }}
+        CenterComponent={<Title>소셜데브클럽</Title>}
       />
     </ProfileValidator>
   );
 };
+const Title = styled.div`
+  color: white;
+  font-size: 20px;
+`;
 
 export default MainHeader;
