@@ -8814,6 +8814,17 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["echarts", [\
+      ["npm:5.6.0", {\
+        "packageLocation": "./.yarn/cache/echarts-npm-5.6.0-0be59a270b-e73344abb7.zip/node_modules/echarts/",\
+        "packageDependencies": [\
+          ["echarts", "npm:5.6.0"],\
+          ["tslib", "npm:2.3.0"],\
+          ["zrender", "npm:5.6.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["ee-first", [\
       ["npm:1.1.1", {\
         "packageLocation": "./.yarn/cache/ee-first-npm-1.1.1-33f8535b39-1b4cac778d.zip/node_modules/ee-first/",\
@@ -13059,6 +13070,7 @@ const RAW_RUNTIME_STATE =
           ["@wyw-in-js/vite", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:0.2.2"],\
           ["antd", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:5.10.1"],\
           ["dayjs", "npm:1.11.10"],\
+          ["echarts", "npm:5.6.0"],\
           ["eslint", "npm:8.41.0"],\
           ["eslint-config-airbnb", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:19.0.4"],\
           ["eslint-config-prettier", "virtual:f0e6e78d6b94d6d65d0585878a55ca95104271934af8fe25dfd83a2f93644fdb8872053bf9c8f7201b41bf68f652302ccefef4a7992653164e3cb1cc160f59a5#npm:8.8.0"],\
@@ -18186,6 +18198,13 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "HARD"\
       }],\
+      ["npm:2.3.0", {\
+        "packageLocation": "./.yarn/cache/tslib-npm-2.3.0-277e75e108-9c55c9abd5.zip/node_modules/tslib/",\
+        "packageDependencies": [\
+          ["tslib", "npm:2.3.0"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.6.2", {\
         "packageLocation": "./.yarn/cache/tslib-npm-2.6.2-4fc8c068d9-bd26c22d36.zip/node_modules/tslib/",\
         "packageDependencies": [\
@@ -19351,6 +19370,16 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/yocto-queue-npm-0.1.0-c6c9a7db29-f77b3d8d00.zip/node_modules/yocto-queue/",\
         "packageDependencies": [\
           ["yocto-queue", "npm:0.1.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["zrender", [\
+      ["npm:5.6.1", {\
+        "packageLocation": "./.yarn/cache/zrender-npm-5.6.1-9037fc7858-25dfd476be.zip/node_modules/zrender/",\
+        "packageDependencies": [\
+          ["zrender", "npm:5.6.1"],\
+          ["tslib", "npm:2.3.0"]\
         ],\
         "linkType": "HARD"\
       }]\

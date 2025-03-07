@@ -31,6 +31,7 @@
     "@wyw-in-js/vite": "^0.2.2",
     "antd": "^5.10.1",
     "dayjs": "^1.11.10",
+    "echarts": "^5.6.0",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
     "jotai": "^2.4.2",
