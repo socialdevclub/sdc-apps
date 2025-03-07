@@ -67,12 +67,6 @@ const Global: React.FC = () => {
     <QueryClientProvider>
       <ConfigProvider
         theme={{
-          components: {
-            Tabs: {
-              cardBg: '#BBB',
-              inkBarColor: '#FFFF44',
-            },
-          },
           token: {
             fontFamily: 'DungGeunMo',
           },

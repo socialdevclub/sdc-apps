@@ -1,7 +1,6 @@
-import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 import { Avatar } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { UserRound } from 'lucide-react';
 import React from 'react';
 
 interface AvatarProp {
@@ -17,64 +16,86 @@ type Props = {
   | {
       avatar?: AvatarProp;
       LeftComponent?: never;
+      CenterComponent?: never;
     }
   | {
       avatar?: never;
       LeftComponent?: React.ReactNode;
+      CenterComponent?: never;
+    }
+  | {
+      avatar?: AvatarProp;
+      LeftComponent?: never;
+      CenterComponent?: React.ReactNode;
     }
 );
 
-const Header = ({ title, avatar = { isVisible: false }, LeftComponent, RightComponent }: Props) => {
+const Header = ({ title, avatar = { isVisible: false }, CenterComponent, LeftComponent, RightComponent }: Props) => {
   const { isVisible, src, onClick } = avatar;
 
   return (
-    <div
-      className={css`
-        position: relative;
-        min-height: 64px;
-        max-height: 64px;
-        background-color: #fefefe;
-        padding: 12px;
-        box-sizing: border-box;
-        display: flex;
-        align-items: center;
-      `}
-    >
-      <AvatarWrapper>
+    <Container>
+      <LeftSection>
         {LeftComponent || (
           <Avatar
             size="large"
-            style={{ cursor: onClick ? 'pointer' : 'default', visibility: isVisible ? 'visible' : 'hidden' }}
-            icon={<UserOutlined />}
+            style={{
+              alignItems: 'center',
+              backgroundColor: '#4B5563',
+              color: '#D1D5DB',
+              cursor: onClick ? 'pointer' : 'default',
+              display: 'flex',
+              justifyContent: 'center',
+              visibility: isVisible ? 'visible' : 'hidden',
+            }}
+            icon={<UserRound />}
             src={src}
             onClick={onClick}
           />
         )}
-      </AvatarWrapper>
-      <div
-        className={css`
-          flex: 1 0 auto;
-          display: flex;
-          justify-content: center;
-        `}
-      >
-        {title}
-      </div>
-      <div
-        className={css`
-          flex: 80px;
-          display: flex;
-          justify-content: flex-end;
-        `}
-      >
-        {RightComponent}
-      </div>
-    </div>
+        <Title>{title}</Title>
+      </LeftSection>
+      {CenterComponent && <CenterSection>{CenterComponent}</CenterSection>}
+      <RightSection>{RightComponent}</RightSection>
+    </Container>
   );
 };
 
-const AvatarWrapper = styled.div`
-  flex: 80px;
+const Title = styled.div`
+  color: white;
+  flex: 1 0 auto;
+  font-size: 24px;
+`;
+
+const LeftSection = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+const CenterSection = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+`;
+
+const RightSection = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const Container = styled.div`
+  position: relative;
+  padding: 16px 16px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
 `;
 
 export default Header;

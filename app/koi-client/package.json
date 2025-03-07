@@ -36,6 +36,7 @@
     "jotai": "^2.4.2",
     "lib-react-query": "workspace:*",
     "localforage": "^1.10.0",
+    "lucide-react": "^0.475.0",
     "match-sorter": "^6.3.1",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",

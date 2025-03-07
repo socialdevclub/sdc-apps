@@ -182,13 +182,30 @@ test('stock', async () => {
   const stockTradeActivateButton = backofficeSession.page.locator('button:has-text("주식 거래 활성화")');
   await stockTradeActivateButton.click();
 
+  // 시간 요소 선택
+  const timeBox = backofficeSession.page.locator('[data-testid="time-box"]');
+  await expect(timeBox).toBeVisible();
+
   // 게임 시간 설정
-  const startTime = new Date();
   const gameDuration = 9 * fluctuationsInterval * 60 * 1000; // 9라운드 총 게임 시간
 
   while (true) {
-    const currentTime = new Date();
-    const elapsedTime = currentTime.getTime() - startTime.getTime();
+    // 시간 텍스트 가져오기
+    const timeText = await timeBox.textContent();
+
+    if (timeText === null) {
+      throw new Error('시간 데이터를 찾을 수 없습니다.');
+    }
+
+    const timeOnly = timeText.replace('경과된 시간 : ', '').trim();
+    const [minutes, seconds] = timeOnly.split(':').map(Number);
+
+    if (isNaN(minutes) || isNaN(seconds)) {
+      throw new Error(`Invalid time format: ${timeText}`);
+    }
+
+    const elapsedTime = (minutes * 60 + seconds) * 1000;
+    console.log('elapsedTime', elapsedTime);
 
     // 9분이 지나면 result 버튼 클릭하고 종료
     if (elapsedTime >= gameDuration) break;
@@ -199,22 +216,27 @@ test('stock', async () => {
       await Promise.all([
         sessionBatch.map(async (session, batchIndex) => {
           try {
-            await session.page.goto(`http://local.socialdev.club:5173/party/${partyId}?page=사기`);
-            await session.page.waitForLoadState('domcontentloaded');
+            // 랜덤으로 사기 또는 팔기 행동 선택
+            const action = Math.random() < 0.5 ? 'buy' : 'sell';
 
-            // 여러 개의 활성화된 `사기` 버튼 중 하나 클릭
-            const buyButtons = session.page.locator('button[name="buy"]');
-            await expect(buyButtons.first()).toBeVisible();
-            const buyButtonCount = await buyButtons.count();
-            await buyButtons.nth(Math.floor(Math.random() * buyButtonCount)).click();
+            if (action === 'buy') {
+              await session.page.goto(`http://local.socialdev.club:5173/party/${partyId}?page=사기`);
+              await session.page.waitForLoadState('domcontentloaded');
 
-            await session.page.goto(`http://local.socialdev.club:5173/party/${partyId}?page=팔기`);
-            await session.page.waitForLoadState('domcontentloaded');
+              // 여러 개의 활성화된 `사기` 버튼 중 하나 클릭
+              const buyButtons = session.page.locator('button[name="buy"]');
+              await expect(buyButtons.first()).toBeVisible();
+              const buyButtonCount = await buyButtons.count();
+              await buyButtons.nth(Math.floor(Math.random() * buyButtonCount)).click();
+            } else {
+              await session.page.goto(`http://local.socialdev.club:5173/party/${partyId}?page=팔기`);
+              await session.page.waitForLoadState('domcontentloaded');
 
-            // 여러 개의 활성화된 `팔기` 버튼 중 하나 클릭
-            const sellButtons = session.page.locator('button[name="sell"]');
-            const sellButtonCount = await sellButtons.count();
-            await sellButtons.nth(Math.floor(Math.random() * sellButtonCount)).click();
+              // 여러 개의 활성화된 `팔기` 버튼 중 하나 클릭
+              const sellButtons = session.page.locator('button[name="sell"]');
+              const sellButtonCount = await sellButtons.count();
+              await sellButtons.nth(Math.floor(Math.random() * sellButtonCount)).click();
+            }
           } catch (error) {
             console.error(`세션 ${i + batchIndex + 1} 사기/팔기 에러:`, error);
           }

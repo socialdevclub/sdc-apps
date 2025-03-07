@@ -13,16 +13,18 @@ import { StockRepository } from '../stock.repository';
 
 @Injectable()
 export class UserService {
-  private openai: OpenAI;
+  private openai?: OpenAI;
 
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly userRepository: UserRepository,
     private readonly stockRepository: StockRepository,
   ) {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    if (process.env.OPENAI_API_KEY) {
+      this.openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    }
   }
 
   transStockUserToDto(stockUser: UserDocument): Response.GetStockUser {
@@ -40,8 +42,12 @@ export class UserService {
     return this.userRepository.findOne({ stockId, userId }, null, options);
   }
 
-  setUser(user: StockUser): Promise<StockUser> {
-    return this.userRepository.findOneAndUpdate({ stockId: user.stockId, userId: user.userId }, user, { upsert: true });
+  setUser(user: StockUser): Promise<boolean> {
+    return this.userRepository.updateOne({ stockId: user.stockId, userId: user.userId }, user);
+  }
+
+  async registerUser(user: StockUser): Promise<Response.GetCreateUser> {
+    return this.userRepository.create(user);
   }
 
   async alignIndex(stockId: string): Promise<void> {
@@ -74,6 +80,12 @@ export class UserService {
   }
 
   async alignIndexByOpenAI(stockId: string): Promise<void> {
+    if (!this.openai) {
+      console.warn('OpenAI API key is not set');
+      await this.alignIndex(stockId);
+      return;
+    }
+
     try {
       // 주어진 주식방의 모든 사용자 목록을 가져옵니다.
       const allUsers = await this.getUserList(stockId);
