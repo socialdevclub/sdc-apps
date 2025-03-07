@@ -11,6 +11,7 @@ import { colorDown, colorUp } from '../../../../../../config/color';
 import { Query } from '../../../../../../hook';
 import prependZero from '../../../../../../service/prependZero';
 import { UserStore } from '../../../../../../store';
+import DrawStockInfo from './DrawInfo';
 
 interface Props {
   stockId: string;
@@ -183,6 +184,9 @@ const Information = ({ stockId }: Props) => {
           );
         })}
       </DimContainer>
+      <StickyBottom>
+        <DrawStockInfo stockId={stockId} />
+      </StickyBottom>
     </Container>
   );
 };
@@ -227,6 +231,17 @@ const DimContainer = styled.div`
   gap: 12px;
   opacity: 0.5;
   pointer-events: none;
+`;
+
+const StickyBottom = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #252836;
+  border-top: 1px solid #374151;
+  padding: 20px;
+  box-sizing: border-box;
 `;
 
 export default Information;
