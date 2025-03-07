@@ -17,7 +17,7 @@ const StartLoan = ({ stockId }: Props) => {
   const { mutateAsync: startLoan, isLoading } = Query.Stock.useStartLoan();
 
   const [open, setOpen] = useState(false);
-  const modalRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLUListElement>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId);
 
@@ -72,23 +72,59 @@ const StartLoan = ({ stockId }: Props) => {
         <Modal
           title="대출하기"
           open={open}
+          centered
           onCancel={() => setOpen(false)}
           okText="대출하기"
           cancelText="닫기"
           getContainer={false}
-          okButtonProps={{ loading: isLoading }}
+          cancelButtonProps={{ style: { backgroundColor: '#252836', color: 'white' } }}
+          okButtonProps={{
+            loading: isLoading,
+            style: { backgroundColor: COLOR.violetLight },
+          }}
           onOk={onClickStartLoan}
         >
-          <div ref={modalRef} tabIndex={-1}>
-            <p>1회 대출시 100만원을 받을 수 있어요</p>
-            <p>[매수 가능 금액]이나 [매수 가능 금액 + 주식가치]의 합이 100만원 이상일 경우 대출을 받을 수 없어요</p>
-            <p>게임이 종료되면 [대출 횟수 * 200만원]만큼 회수를 해요</p>
-          </div>
+          <LoanRulesList ref={modalRef} tabIndex={-1}>
+            <li>
+              <h3>1. 대출 금액</h3>
+              <p>
+                1회 대출시 <HighlightedText>100만원</HighlightedText>을 받을 수 있어요
+              </p>
+            </li>
+            <li>
+              <h3>2. 대출 가능 조건</h3>
+              <p>
+                [매수 가능 금액]이나 [매수 가능 금액 + 주식가치]의 <HighlightedText>합</HighlightedText>이 100만원
+                이상일 경우 대출을 받을 수 없어요
+              </p>
+            </li>
+            <li>
+              <h3>3. 상환 조건</h3>
+              <p>
+                게임이 종료되면 <HighlightedText>[대출 횟수 * 200만원]</HighlightedText> 만큼 회수를 해요
+              </p>
+            </li>
+          </LoanRulesList>
         </Modal>
       </div>
     </>
   );
 };
+
+const LoanRulesList = styled.ul`
+  list-style: none;
+  font-size: 11px;
+  color: #9ca3af;
+  padding: 3px 0;
+
+  & > li > h3 {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+`;
+const HighlightedText = styled.span`
+  color: ${COLOR.pastelGreen};
+`;
 
 const LoanButton = styled.button`
   width: 100%;

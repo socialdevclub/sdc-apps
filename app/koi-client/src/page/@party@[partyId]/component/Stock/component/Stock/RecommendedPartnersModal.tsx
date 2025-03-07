@@ -2,6 +2,7 @@ import { Avatar, Modal } from 'antd';
 import { ReactElement, cloneElement, useReducer } from 'react';
 import styled from '@emotion/styled';
 import { useRecommendedPartners } from '../../../../../../hook/query/Stock/useRecommendedPartners';
+import * as COLOR from '../../../../../../config/color';
 
 interface ButtonProps {
   onClick?: () => void;
@@ -27,12 +28,12 @@ const RecommendedPartnersModal = ({ trigger, stockId }: Props) => {
         centered
         footer={null}
       >
-        <Description>
-          일부 <span style={{ color: '#BEF264' }}>정보를 공유</span>하는 대화 상대를 발견했어요 👀
-        </Description>
+        <PartnerDescription>
+          일부 <span>정보를 공유</span>하는 대화 상대를 발견했어요 👀
+        </PartnerDescription>
 
         {partnerNicknames?.length === 0 ? (
-          <Description>라고 할 뻔.. 사실 발견 못했어요 😢</Description>
+          <PartnerDescription>라고 할 뻔.. 사실 발견 못했어요 😢</PartnerDescription>
         ) : (
           <PartnerList>
             {partnerNicknames.map((name) => (
@@ -50,9 +51,13 @@ const RecommendedPartnersModal = ({ trigger, stockId }: Props) => {
 
 export default RecommendedPartnersModal;
 
-const Description = styled.p`
+const PartnerDescription = styled.p`
   font-size: 12px;
   color: #9ca3af;
+
+  & > span {
+    color: ${COLOR.pastelGreen};
+  }
 `;
 
 const PartnerList = styled.ul`
