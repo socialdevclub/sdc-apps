@@ -85,7 +85,7 @@ const Home = ({ stockId }: Props) => {
     return myInfos;
   }, [] as Array<{ company: string; timeIdx: number; price: number }>);
 
-  const { futureInfos, pastInfos } = myInfos.reduce(
+  const { futureInfos } = myInfos.reduce(
     (acc, info) => {
       const infoTimeInSeconds = stock?.fluctuationsInterval && info.timeIdx * 60 * stock.fluctuationsInterval;
 
@@ -166,45 +166,57 @@ const Home = ({ stockId }: Props) => {
             stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>
           }
         />
-        <br />
-        <H3>내 예측 정보</H3>
-        {futureInfos.slice(0, 2).map(({ company, price, timeIdx }) => {
-          const infoTimeInMinutes = timeIdx * stock.fluctuationsInterval;
-          const remainingTime = infoTimeInMinutes - gameTimeInMinutes;
-
-          return (
-            <InfoBox
-              key={`${company}_${timeIdx}`}
-              title={company}
-              value={`${price >= 0 ? '▲' : '▼'}${commaizeNumber(Math.abs(price))}`}
-              valueColor={price >= 0 ? colorUp : colorDown}
-              leftTime={
-                <div
-                  css={css`
-                    font-size: 14px;
-                    color: #c084fc;
-                    min-width: 50px;
-                    letter-spacing: 0.5px;
-                  `}
-                >
-                  {remainingTime <= 1 ? `🚨 임박` : `${remainingTime}분 후`}
-                </div>
-              }
-              changeTime={
-                <div
-                  css={css`
-                    font-size: 12px;
-                    color: #9ca3af;
-                    letter-spacing: 0.5px;
-                  `}
-                >
-                  {prependZero(timeIdx * stock.fluctuationsInterval, 2)}:00
-                </div>
-              }
-            />
-          );
-        })}
       </Container>
+      <Wrapper>
+        <TitleWrapper>
+          <LeftSection>
+            <H3>내 예측 정보</H3>
+            <H6Wrapper>
+              <H6>총 {myInfos.length}개 보유</H6>
+            </H6Wrapper>
+          </LeftSection>
+          <H5>전체보기 &gt;</H5>
+        </TitleWrapper>
+        <H4>현재 시각 이후의 정보 최대 2개가 표시됩니다</H4>
+        <FutuerInfoWrapper>
+          {futureInfos.slice(0, 2).map(({ company, price, timeIdx }) => {
+            const infoTimeInMinutes = timeIdx * stock.fluctuationsInterval;
+            const remainingTime = infoTimeInMinutes - gameTimeInMinutes;
+
+            return (
+              <InfoBox
+                key={`${company}_${timeIdx}`}
+                title={company}
+                value={`${price >= 0 ? '▲' : '▼'}${commaizeNumber(Math.abs(price))}`}
+                valueColor={price >= 0 ? colorUp : colorDown}
+                leftTime={
+                  <div
+                    css={css`
+                      font-size: 14px;
+                      color: #c084fc;
+                      min-width: 50px;
+                      letter-spacing: 0.5px;
+                    `}
+                  >
+                    {remainingTime <= 1 ? `🚨 임박` : `${remainingTime}분 후`}
+                  </div>
+                }
+                changeTime={
+                  <div
+                    css={css`
+                      font-size: 12px;
+                      color: #9ca3af;
+                      letter-spacing: 0.5px;
+                    `}
+                  >
+                    {prependZero(timeIdx * stock.fluctuationsInterval, 2)}:00
+                  </div>
+                }
+              />
+            );
+          })}
+        </FutuerInfoWrapper>
+      </Wrapper>
       <StickyBottom>
         <StartLoan stockId={stockId} />
       </StickyBottom>
@@ -216,10 +228,63 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
   gap: 12px;
-  padding: 12px 0 100px 0;
+  padding: 12px 0 20px 0;
   flex: 1 1 0;
+`;
+
+const Wrapper = styled.div`
+  width: 100%;
+`;
+
+const TitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+const LeftSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const H3 = styled.h3`
+  font-size: 16px;
+  margin: 0;
+`;
+
+const H5 = styled.h5`
+  font-size: 10px;
+  color: #9ca3af;
+  margin: 0;
+  padding: 8px 8px;
+  cursor: pointer;
+`;
+const H4 = styled.h4`
+  font-size: 10px;
+`;
+
+const H6 = styled.h6`
+  font-size: 12px;
+  margin: 0;
+  color: #c084fc;
+`;
+
+const H6Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 8px;
+  background-color: rgba(192, 132, 252, 0.2);
+  border-radius: 20px;
+`;
+
+const FutuerInfoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 // TODO: 만약 영역이 겹치는 이슈가 발생 시 수정
