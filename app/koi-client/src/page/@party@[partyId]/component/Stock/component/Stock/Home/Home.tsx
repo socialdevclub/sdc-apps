@@ -162,6 +162,7 @@ const Home = ({ stockId }: Props) => {
           }
         />
       </Container>
+      <Divider />
       <Wrapper>
         <TitleWrapper>
           <LeftSection>
@@ -285,6 +286,13 @@ const FutureInfoWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+`;
+
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #374151;
+  margin-bottom: 20px;
 `;
 
 // TODO: 만약 영역이 겹치는 이슈가 발생 시 수정
