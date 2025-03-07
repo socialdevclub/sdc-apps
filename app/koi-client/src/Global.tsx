@@ -67,7 +67,16 @@ const Global: React.FC = () => {
     <QueryClientProvider>
       <ConfigProvider
         theme={{
+          components: {
+            Modal: {
+              contentBg: '#252836',
+              headerBg: '#252836',
+              titleColor: '#ffffff',
+              titleFontSize: 18,
+            },
+          },
           token: {
+            colorIcon: '#A2A2A2',
             fontFamily: 'DungGeunMo',
           },
         }}

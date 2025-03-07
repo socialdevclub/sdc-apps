@@ -1,4 +1,4 @@
-import { Modal } from 'antd';
+import { Avatar, Modal } from 'antd';
 import { ReactElement, cloneElement, useReducer } from 'react';
 import styled from '@emotion/styled';
 import { useRecommendedPartners } from '../../../../../../hook/query/Stock/useRecommendedPartners';
@@ -27,12 +27,22 @@ const RecommendedPartnersModal = ({ trigger, stockId }: Props) => {
         centered
         footer={null}
       >
-        <p>흥미로운 대화 상대를 발견했어요 ✨</p>
-        <PartnerList>
-          {partnerNicknames.map((name) => (
-            <li key={name}>{name}</li>
-          ))}
-        </PartnerList>
+        <Description>
+          일부 <span style={{ color: '#BEF264' }}>정보를 공유</span>하는 대화 상대를 발견했어요 👀
+        </Description>
+
+        {partnerNicknames?.length === 0 ? (
+          <Description>라고 할 뻔.. 사실 발견 못했어요 😢</Description>
+        ) : (
+          <PartnerList>
+            {partnerNicknames.map((name) => (
+              <PartnerItem key={name}>
+                <Avatar size={40}>{name?.[0]}</Avatar>
+                <span>{name}</span>
+              </PartnerItem>
+            ))}
+          </PartnerList>
+        )}
       </Modal>
     </>
   );
@@ -40,12 +50,25 @@ const RecommendedPartnersModal = ({ trigger, stockId }: Props) => {
 
 export default RecommendedPartnersModal;
 
-const PartnerList = styled.ul`
-  list-style-type: disc;
-  padding-left: 20px;
-  font-size: 16px;
+const Description = styled.p`
+  font-size: 12px;
+  color: #9ca3af;
+`;
 
-  li {
-    margin: 8px 0;
-  }
+const PartnerList = styled.ul`
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+  color: rgb(213, 213, 213);
+  padding-left: 0px;
+  font-size: 17px;
+`;
+
+const PartnerItem = styled.li`
+  background-color: rgb(47, 51, 72);
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  column-gap: 16px;
 `;
