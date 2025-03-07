@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Post, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -26,20 +26,5 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
-  }
-
-  @Post('add-topic')
-  async addSubscriptionTopic(@Body('topic') topic: string): Promise<string> {
-    console.log(topic);
-    if (topic === undefined) {
-      return 'topic is undefined';
-    }
-    await this.appService.addSubscriptionTopic(topic);
-    return `topic ${topic} added`;
-  }
-
-  @Post('send/:topic')
-  async sendMessage(@Body() msg: { value: string }, @Param('topic') topic: string): Promise<void> {
-    await this.appService.sendMessage(topic, msg.value);
   }
 }

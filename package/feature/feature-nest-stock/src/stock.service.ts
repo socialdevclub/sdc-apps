@@ -16,6 +16,7 @@ import { StockRepository } from './stock.repository';
 import { UserRepository } from './user/user.repository';
 import { OutboxService } from './outbox/outbox.service';
 import { OutboxEventType } from './outbox/outbox.schema';
+import { KafkaService } from './kafka/kafka.service';
 
 @Injectable()
 export class StockService {
@@ -29,6 +30,7 @@ export class StockService {
     private readonly logService: LogService,
     private readonly resultService: ResultService,
     private readonly outboxService: OutboxService,
+    private readonly kafkaService: KafkaService,
   ) {}
 
   transStockToDto(stock: StockDocument): Response.GetStock {
@@ -256,6 +258,16 @@ export class StockService {
         await user.save({ session });
         result = await stock.save({ session });
 
+        const transactionData = {
+          eventType: 'STOCK_TRANSACTION_SUCCESS',
+          payload: {
+            ...stockLog,
+            timestamp: new Date().toISOString(),
+          },
+        };
+
+        this.kafkaService.sendMessage('stock.transaction.topic', transactionData);
+
         // 로그 생성
         stockLog = new StockLog({
           action: 'BUY',
@@ -267,21 +279,49 @@ export class StockService {
           userId,
         });
 
+        console.debug({
+          amount,
+          company,
+          stockId,
+          timestamp: new Date().toISOString(),
+          totalPrice,
+          unitPrice: companyPrice,
+          userId,
+        });
+
         // 아웃박스 메시지 생성 (트랜잭션 내에서)
         await this.outboxService.createOutboxMessage(
           OutboxEventType.STOCK_PURCHASED,
           {
-            amount,
-            company,
-            stockId,
+            ...stockLog,
             timestamp: new Date().toISOString(),
-            totalPrice,
-            unitPrice: companyPrice,
-            userId,
           },
-          'stock-transactions',
+          'stock.transaction.topic',
           { session },
         );
+
+        // 트랜잭션 성공 시 Kafka 메시지 직접 전송
+        try {
+          const transactionData = {
+            eventType: 'STOCK_TRANSACTION_SUCCESS',
+            payload: {
+              ...stockLog,
+              timestamp: new Date().toISOString(),
+            },
+          };
+
+          this.kafkaService
+            .sendMessage('stock.transaction.topic', transactionData)
+            .then(() => {
+              console.debug('Kafka 메시지 전송 성공:', transactionData.eventType);
+            })
+            .catch((kafkaError) => {
+              console.error('Kafka 메시지 전송 실패:', kafkaError);
+            });
+        } catch (kafkaError) {
+          console.error('Kafka 메시지 준비 실패:', kafkaError);
+          // Kafka 메시지 전송 실패는 전체 트랜잭션에 영향을 주지 않음
+        }
       });
     } catch (error) {
       console.error(error);
@@ -474,7 +514,7 @@ export class StockService {
             unitPrice: companyPrice,
             userId,
           },
-          'stock-transactions',
+          'stock.transaction.topic',
           { session },
         );
       });
@@ -551,7 +591,7 @@ export class StockService {
                 transactions: sellTransactions,
                 userId: user.userId,
               },
-              'stock-transactions',
+              'stock.transaction.topic',
               { session },
             );
           }

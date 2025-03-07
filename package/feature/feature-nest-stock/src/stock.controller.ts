@@ -2,10 +2,11 @@ import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/commo
 import { Request, Response, StockSchema } from 'shared~type-stock';
 import { Stock } from './stock.schema';
 import { StockService } from './stock.service';
+import { KafkaService } from './kafka/kafka.service';
 
 @Controller('stock')
 export class StockController {
-  constructor(private readonly stockService: StockService) {}
+  constructor(private readonly stockService: StockService, private readonly kafkaService: KafkaService) {}
 
   @Get('/list')
   async getStockList(@Body() body: Request.GetStockList): Promise<Stock[]> {
@@ -79,5 +80,14 @@ export class StockController {
   async stockFinish(@Query('stockId') stockId: string): Promise<StockSchema> {
     await this.stockService.findOneByIdAndUpdate({ _id: stockId, isTransaction: false });
     return this.stockService.allUserSellStock(stockId);
+  }
+
+  @Post('/send')
+  async sendMessage(@Body() msg: { value: string; topic: string }): Promise<void> {
+    if (!msg.topic) {
+      throw new Error('Topic is required as a query parameter');
+    }
+    console.log(`Sending message to topic: ${msg.topic}`);
+    await this.kafkaService.sendMessage(msg.topic, msg.value);
   }
 }
