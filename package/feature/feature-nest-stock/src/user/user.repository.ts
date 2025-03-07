@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import mongoose, {
   FilterQuery,
@@ -38,7 +38,7 @@ export class UserRepository {
       });
     } catch (err) {
       console.error(err);
-      throw err;
+      throw new HttpException('POST /stock/user/register Unknown Error', 500, { cause: err });
     } finally {
       await session.endSession();
     }
