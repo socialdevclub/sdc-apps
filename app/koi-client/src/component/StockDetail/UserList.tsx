@@ -13,9 +13,24 @@ const UserList: React.FC<UserListProps> = ({ stockId }) => {
   const introNotCompletedUsers = users.filter((user) => !user.userInfo.introduction);
 
   const { mutateAsync: mutateRemoveUser } = Query.Stock.useRemoveUser();
+  const { mutateAsync: mutateSetUser } = Query.Stock.useSetUser();
 
   return (
     <>
+      <input
+        placeholder="초기화할 유저 Id"
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            mutateSetUser({
+              inventory: {},
+              lastActivityTime: new Date(),
+              money: 1000000,
+              stockId,
+              userId: event.currentTarget.value,
+            });
+          }
+        }}
+      />
       <table>
         <tr>
           <td>
