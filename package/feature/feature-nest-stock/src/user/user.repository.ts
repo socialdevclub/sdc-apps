@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import mongoose, {
   FilterQuery,
@@ -24,7 +24,7 @@ export class UserRepository {
     const session = await this.connection.startSession();
 
     try {
-      return session.withTransaction(async () => {
+      const result = await session.withTransaction(async () => {
         const doc = await this.findOne({ stockId: user.stockId, userId: user.userId }, null, {
           session,
         });
@@ -36,9 +36,10 @@ export class UserRepository {
         }
         return { isAlreadyExists: true, user: doc };
       });
+      return result;
     } catch (err) {
       console.error(err);
-      throw err;
+      throw new HttpException('POST /stock/user/register Unknown Error', 500, { cause: err });
     } finally {
       await session.endSession();
     }
