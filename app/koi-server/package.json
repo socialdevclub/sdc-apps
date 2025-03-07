@@ -26,6 +26,7 @@
     "@nestjs/microservices": "^11.0.7",
     "@nestjs/mongoose": "^10.0.2",
     "@nestjs/platform-express": "^10.3.0",
+    "@nestjs/schedule": "^5.0.1",
     "@toss/date": "^1.1.7",
     "@toss/utils": "^1.4.4",
     "aws-lambda": "^1.0.7",

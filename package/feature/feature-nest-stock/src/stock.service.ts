@@ -258,16 +258,6 @@ export class StockService {
         await user.save({ session });
         result = await stock.save({ session });
 
-        const transactionData = {
-          eventType: 'STOCK_TRANSACTION_SUCCESS',
-          payload: {
-            ...stockLog,
-            timestamp: new Date().toISOString(),
-          },
-        };
-
-        this.kafkaService.sendMessage('stock.transaction.topic', transactionData);
-
         // 로그 생성
         stockLog = new StockLog({
           action: 'BUY',
@@ -289,38 +279,24 @@ export class StockService {
           userId,
         });
 
-        // 아웃박스 메시지 생성 (트랜잭션 내에서)
-        await this.outboxService.createOutboxMessage(
-          OutboxEventType.STOCK_PURCHASED,
-          {
+        // 트랜잭션 성공 시 Outbox 패턴을 통해 메시지 적재
+        try {
+          const payload = {
             ...stockLog,
             timestamp: new Date().toISOString(),
-          },
-          'stock.transaction.topic',
-          { session },
-        );
-
-        // 트랜잭션 성공 시 Kafka 메시지 직접 전송
-        try {
-          const transactionData = {
-            eventType: 'STOCK_TRANSACTION_SUCCESS',
-            payload: {
-              ...stockLog,
-              timestamp: new Date().toISOString(),
-            },
           };
 
-          this.kafkaService
-            .sendMessage('stock.transaction.topic', transactionData)
-            .then(() => {
-              console.debug('Kafka 메시지 전송 성공:', transactionData.eventType);
-            })
-            .catch((kafkaError) => {
-              console.error('Kafka 메시지 전송 실패:', kafkaError);
-            });
-        } catch (kafkaError) {
-          console.error('Kafka 메시지 준비 실패:', kafkaError);
-          // Kafka 메시지 전송 실패는 전체 트랜잭션에 영향을 주지 않음
+          await this.outboxService.createOutboxMessage(
+            OutboxEventType.STOCK_PURCHASED,
+            payload,
+            'stock.transaction.topic',
+            { session },
+          );
+
+          console.debug('Outbox 메시지 생성 성공:', OutboxEventType.STOCK_PURCHASED);
+        } catch (outboxError) {
+          console.error('Outbox 메시지 생성 실패:', outboxError);
+          // Outbox 메시지 생성 실패는 전체 트랜잭션에 영향을 주지 않음
         }
       });
     } catch (error) {
@@ -502,10 +478,9 @@ export class StockService {
           userId,
         });
 
-        // 아웃박스 메시지 생성 (트랜잭션 내에서)
-        await this.outboxService.createOutboxMessage(
-          OutboxEventType.STOCK_SOLD,
-          {
+        // 트랜잭션 성공 시 Outbox 패턴을 통해 메시지 적재
+        try {
+          const payload = {
             amount,
             company,
             stockId,
@@ -513,10 +488,17 @@ export class StockService {
             totalPrice,
             unitPrice: companyPrice,
             userId,
-          },
-          'stock.transaction.topic',
-          { session },
-        );
+          };
+
+          await this.outboxService.createOutboxMessage(OutboxEventType.STOCK_SOLD, payload, 'stock.transaction.topic', {
+            session,
+          });
+
+          console.debug('Outbox 메시지 생성 성공:', OutboxEventType.STOCK_SOLD);
+        } catch (outboxError) {
+          console.error('Outbox 메시지 생성 실패:', outboxError);
+          // Outbox 메시지 생성 실패는 전체 트랜잭션에 영향을 주지 않음
+        }
       });
     } catch (error) {
       console.error(error);
@@ -580,20 +562,29 @@ export class StockService {
 
           await user.save({ session });
 
-          // 사용자별로 아웃박스 메시지 생성 (모든 판매 트랜잭션 정보 포함)
+          // 사용자별로 Outbox 패턴을 통해 메시지 적재 (모든 판매 트랜잭션 정보 포함)
           if (sellTransactions.length > 0) {
-            await this.outboxService.createOutboxMessage(
-              OutboxEventType.STOCK_SOLD,
-              {
+            try {
+              const payload = {
                 isAllSell: true,
                 stockId,
                 timestamp: new Date().toISOString(),
                 transactions: sellTransactions,
                 userId: user.userId,
-              },
-              'stock.transaction.topic',
-              { session },
-            );
+              };
+
+              await this.outboxService.createOutboxMessage(
+                OutboxEventType.STOCK_SOLD,
+                payload,
+                'stock.transaction.topic',
+                { session },
+              );
+
+              console.debug('Outbox 메시지 생성 성공:', OutboxEventType.STOCK_SOLD);
+            } catch (outboxError) {
+              console.error('Outbox 메시지 생성 실패:', outboxError);
+              // Outbox 메시지 생성 실패는 전체 트랜잭션에 영향을 주지 않음
+            }
           }
         }
         result = await stock.save({ session });

@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PollModule } from 'feature-nest-poll';
 import { StockModule } from 'feature-nest-stock';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PartyModule } from './party/party.module';
@@ -12,6 +13,7 @@ import kafkaConfig from '../config/kafka.config';
 @Module({
   controllers: [AppController],
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [kafkaConfig],

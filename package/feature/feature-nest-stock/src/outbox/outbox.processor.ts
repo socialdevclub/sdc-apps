@@ -21,7 +21,6 @@ export class OutboxProcessor {
         try {
           this.logger.debug(`Processing outbox event: ${event._id}, type: ${event.eventType}`);
 
-          await this.kafkaService.sendMessage(event.topic, event.payload);
           await this.outboxService.updateOutboxStatus(event._id, OutboxStatus.PROCESSED);
 
           this.logger.debug(`Successfully processed outbox event: ${event._id}`);
