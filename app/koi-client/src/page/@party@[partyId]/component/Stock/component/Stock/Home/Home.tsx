@@ -172,7 +172,11 @@ const Home = ({ stockId }: Props) => {
           </LeftSection>
           <H5 onClick={handlePageChange}>전체보기 &gt;</H5>
         </TitleWrapper>
-        <H4>현재 시각 이후의 정보 최대 2개가 표시됩니다</H4>
+        {futureInfos.length === 0 ? (
+          <H4>현재 시각 이후의 정보가 없습니다</H4>
+        ) : (
+          <H4>현재 시각 이후의 정보 최대 2개가 표시됩니다</H4>
+        )}
         <FutureInfoWrapper>
           {futureInfos.slice(0, 2).map(({ company, price, timeIdx }) => {
             const infoTimeInMinutes = timeIdx * stock.fluctuationsInterval;
