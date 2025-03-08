@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import styled from '@emotion/styled';
+import { Modal, message } from 'antd';
 import { useAtomValue } from 'jotai';
-import { Button, Modal, message } from 'antd';
-import { UserStore } from '../../../../../../store';
+import { useEffect, useRef, useState } from 'react';
+import * as COLOR from '../../../../../../config/color';
 import { Query } from '../../../../../../hook';
+import { UserStore } from '../../../../../../store';
 
 type Props = {
   stockId: string;
@@ -62,9 +64,9 @@ const DrawStockInfo = ({ stockId }: Props) => {
   return (
     <>
       {contextHolder}
-      <Button size="small" onClick={() => setOpen(true)} disabled={isDisabled}>
+      <InformationDrawButton onClick={() => setOpen(true)} disabled={isDisabled}>
         정보 뽑기
-      </Button>
+      </InformationDrawButton>
       <div
         css={{
           position: 'absolute',
@@ -89,5 +91,24 @@ const DrawStockInfo = ({ stockId }: Props) => {
     </>
   );
 };
+
+const InformationDrawButton = styled.button`
+  width: 100%;
+  font-family: 'DungGeunMo';
+  padding: 16px;
+  height: 56px;
+  border-radius: 4px;
+  background-color: ${COLOR.green};
+  color: white;
+  font-size: 14px;
+  border: none;
+  &:hover > span {
+    color: white;
+  }
+  &:disabled {
+    opacity: 50%;
+    cursor: not-allowed;
+  }
+`;
 
 export default DrawStockInfo;
