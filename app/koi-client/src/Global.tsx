@@ -77,6 +77,7 @@ const Global: React.FC = () => {
           },
           token: {
             colorIcon: '#A2A2A2',
+            colorIconHover: '#888888',
             fontFamily: 'DungGeunMo',
           },
         }}

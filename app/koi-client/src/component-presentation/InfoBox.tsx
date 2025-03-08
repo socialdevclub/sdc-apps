@@ -1,5 +1,5 @@
-import React, { CSSProperties } from 'react';
-import { styled } from '@linaria/react';
+import styled from '@emotion/styled';
+import { CSSProperties } from 'react';
 
 interface InfoBoxProps {
   title?: string;
@@ -9,7 +9,7 @@ interface InfoBoxProps {
   changeTime?: React.ReactNode;
 }
 
-const InfoBox: React.FC<InfoBoxProps> = ({ title, value, valueColor, leftTime, changeTime }) => {
+const InfoBox = ({ title, value, valueColor, leftTime, changeTime }: InfoBoxProps) => {
   return (
     <Container>
       <Wrapper>
@@ -48,8 +48,9 @@ const Wrapper = styled.div`
 const TimeWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  row-gap: 4px;
   background-color: #374151;
-  padding: 12px 4px;
+  padding: 10px 8px;
   border-radius: 4px;
   text-align: center;
 `;
@@ -62,8 +63,7 @@ const ContainerTitle = styled.div`
 
 const ContainerBolder = styled.div`
   font-size: 20px;
-  font-weight: bolder;
-  line-height: 22px;
+  font-weight: 400;
   display: flex;
   align-items: center;
   letter-spacing: 0.5px;

@@ -113,7 +113,7 @@ const StartLoan = ({ stockId }: Props) => {
 
 const LoanRulesList = styled.ul`
   list-style: none;
-  font-size: 11px;
+  font-size: 12px;
   color: #9ca3af;
   padding: 3px 0;
 
