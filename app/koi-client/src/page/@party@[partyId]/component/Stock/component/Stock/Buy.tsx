@@ -5,6 +5,9 @@ import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { COMPANY_NAMES } from 'shared~config/dist/stock';
+import ButtonGroup from '../../../../../../component-presentation/ButtonGroup';
+import InfoHeader from '../../../../../../component-presentation/InfoHeader';
+import MessageBalloon from '../../../../../../component-presentation/MessageBalloon';
 import { TRADE } from '../../../../../../config/stock';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
@@ -99,6 +102,24 @@ const Buy = ({ stockId }: Props) => {
 
     return reducer;
   }, [] as Array<{ company: string; timeIdx: number; price: number }>);
+
+  const stockProfitRate = selectedCompany
+    ? calculateProfitRate(
+        companiesPrice[selectedCompany],
+        calculateAveragePurchasePrice(
+          selectedCompany,
+          보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+        ),
+      )
+    : 0;
+
+  const isProfit = stockProfitRate >= 0;
+
+  const messageInfo = renderStockBalloonMessage({
+    myInfos,
+    selectedCompany,
+    timeIdx: timeIdx ?? 0,
+  });
 
   const handleOpenDrawer = (company: string) => {
     setSelectedCompany(company);
@@ -214,23 +235,18 @@ const Buy = ({ stockId }: Props) => {
           },
         }}
       >
-        <StockDetailHeader
-          selectedCompany={selectedCompany}
-          stockPrice={selectedCompany ? companiesPrice[selectedCompany] : 0}
-          stockProfitRate={
-            selectedCompany
-              ? calculateProfitRate(
-                  companiesPrice[selectedCompany],
-                  calculateAveragePurchasePrice(
-                    selectedCompany,
-                    보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-                  ),
-                )
-              : 0
-          }
-          quantity={보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0}
+        <InfoHeader
+          title={selectedCompany}
+          subtitle={`보유 주식: ${보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0}`}
+          value={selectedCompany ? companiesPrice[selectedCompany] : 0}
+          valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
+          badge={{
+            backgroundColor: '#3e4e37',
+            color: '#a3e635',
+            text: `${isProfit ? '+' : ''}${stockProfitRate}% 수익 중`,
+          }}
         />
-        <MessageBalloon {...renderStockBalloonMessage({ myInfos, selectedCompany, timeIdx: timeIdx ?? 0 })} />
+        <MessageBalloon messages={[messageInfo.firstLine, messageInfo.secondLine].filter(Boolean)} />
         <StockLineChart
           company={selectedCompany}
           priceData={selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]}
@@ -240,80 +256,46 @@ const Buy = ({ stockId }: Props) => {
             보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
           )}
         />
-        <ButtonContainer>
-          <Flex>
-            <BuyButton onClick={() => onClickBuy(selectedCompany)} disabled={isDisabled}>
-              사기
-            </BuyButton>
-            <SellButton onClick={() => onClickSell(selectedCompany)} disabled={isDisabled}>
-              팔기
-            </SellButton>
-          </Flex>
-          <SellAllButton
-            onClick={() =>
-              onClickSell(selectedCompany, 보유주식.find(({ company }) => company === selectedCompany)?.count)
-            }
-            disabled={isDisabled}
-          >
-            모두 팔기
-          </SellAllButton>
-        </ButtonContainer>
+
+        <ButtonGroup
+          buttons={[
+            {
+              backgroundColor: '#007aff',
+              disabled: isDisabled,
+              flex: 1,
+              onClick: () => onClickBuy(selectedCompany),
+              text: '사기',
+            },
+            {
+              backgroundColor: '#f63c6b',
+              disabled: isDisabled,
+              flex: 1,
+              onClick: () => onClickSell(selectedCompany),
+              text: '팔기',
+            },
+          ]}
+          direction="row"
+          padding="0 16px 8px 16px"
+        />
+
+        <ButtonGroup
+          buttons={[
+            {
+              backgroundColor: '#374151',
+              disabled: isDisabled,
+              onClick: () =>
+                onClickSell(selectedCompany, 보유주식.find(({ company }) => company === selectedCompany)?.count),
+              text: '모두 팔기',
+            },
+          ]}
+          padding="0 16px 12px 16px"
+        />
       </Drawer>
     </>
   );
 };
 
 export default Buy;
-
-interface StockDetailHeaderProps {
-  selectedCompany: string;
-  stockPrice: number;
-  stockProfitRate: number;
-  quantity: number;
-}
-
-function StockDetailHeader({ selectedCompany, stockPrice, stockProfitRate, quantity }: StockDetailHeaderProps) {
-  const isProfit = stockProfitRate >= 0;
-
-  return (
-    <Container>
-      <FlexRow>
-        <FlexColumn>
-          <CompanyName>{selectedCompany}</CompanyName>
-          <Quantity>보유 주식: {quantity}</Quantity>
-        </FlexColumn>
-        <FlexColumn style={{ alignItems: 'flex-end', rowGap: '16px' }}>
-          <StockPrice>{stockPrice.toLocaleString()}원</StockPrice>
-          <Badge>
-            <StockProfitRate>
-              {isProfit ? '+' : ''}
-              {stockProfitRate}% 수익 중
-            </StockProfitRate>
-          </Badge>
-        </FlexColumn>
-      </FlexRow>
-    </Container>
-  );
-}
-
-interface MessageBalloonProps {
-  firstLine?: string;
-  secondLine?: string;
-}
-
-function MessageBalloon({ firstLine, secondLine }: MessageBalloonProps) {
-  if (!firstLine) return null;
-
-  return (
-    <BalloonBox>
-      <Triangle />
-      <Message>
-        <span>{firstLine}</span>
-        {secondLine && <span>{secondLine}</span>}
-      </Message>
-    </BalloonBox>
-  );
-}
 
 // Buy - Section 스타일링
 const SectionTitle = styled.h4`
@@ -329,166 +311,4 @@ const Divider = styled.div`
   height: 1px;
   background-color: #374151;
   margin: 8px 0 16px 0;
-`;
-
-// StockDetailHeader 컴포넌트 스타일링
-const Container = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-`;
-
-const FlexRow = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  row-gap: 4px;
-`;
-
-const FlexColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  row-gap: 4px;
-`;
-
-const CompanyName = styled.p`
-  font-size: 20px;
-  line-height: 22px;
-  font-weight: 500;
-  margin: 0;
-  color: white;
-`;
-
-const Quantity = styled.p`
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.5px;
-  font-weight: 400;
-  color: #d1d5db;
-  margin: 0;
-`;
-
-const StockPrice = styled.span`
-  font-size: 32px;
-  line-height: 20px;
-  font-weight: 400;
-  color: white;
-`;
-
-const Badge = styled.div`
-  padding: 4px 8px;
-  background-color: #3e4e37;
-  border-radius: 100px;
-`;
-
-const StockProfitRate = styled.span`
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: 0.5px;
-  font-weight: 400;
-  color: #a3e635;
-  opacity: 1;
-`;
-
-// MessageBalloon 컴포넌트 스타일링
-const BalloonBox = styled.div`
-  padding-left: 20px;
-  position: relative;
-`;
-
-const Triangle = styled.div`
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 14px solid #111827;
-  background-color: #252836;
-  margin-left: 14px;
-`;
-
-const Message = styled.div`
-  width: fit-content;
-  height: fit-content;
-  background-color: #111827;
-  border-radius: 8px;
-  padding: 12px 18px 12px 12px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  row-gap: 6px;
-  font-size: 12px;
-  line-height: 14px;
-  letter-spacing: 0.5px;
-  font-weight: 400;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-`;
-
-// Buy - ButtonContainer 스타일링
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  row-gap: 8px;
-  padding: 0 16px 12px 16px;
-`;
-
-const Flex = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  column-gap: 6px;
-`;
-
-const BuyButton = styled.button`
-  width: 100%;
-  height: 48px;
-  background-color: #007aff;
-  color: white;
-  border-radius: 4px;
-  border: none;
-  font-family: DungGeunMo;
-  font-size: 14px;
-  line-height: 16px;
-  :disabled {
-    opacity: 0.5;
-  }
-`;
-
-const SellButton = styled.button`
-  width: 100%;
-  height: 48px;
-  background-color: #f63c6b;
-  color: white;
-  border-radius: 4px;
-  border: none;
-  font-family: DungGeunMo;
-  font-size: 14px;
-  line-height: 16px;
-  :disabled {
-    opacity: 0.5;
-  }
-`;
-
-const SellAllButton = styled.button`
-  width: 100%;
-  height: 48px;
-  background-color: #374151;
-  color: white;
-  border-radius: 4px;
-  border: none;
-  font-family: DungGeunMo;
-  font-size: 14px;
-  line-height: 16px;
-  :disabled {
-    opacity: 0.5;
-  }
 `;
