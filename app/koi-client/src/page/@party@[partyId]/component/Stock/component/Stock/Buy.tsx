@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { objectEntries, objectValues } from '@toss/utils';
 import { Drawer, message } from 'antd';
 import { useAtomValue } from 'jotai';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { COMPANY_NAMES } from 'shared~config/dist/stock';
 import ButtonGroup from '../../../../../../component-presentation/ButtonGroup';
@@ -10,10 +10,9 @@ import InfoHeader from '../../../../../../component-presentation/InfoHeader';
 import MessageBalloon from '../../../../../../component-presentation/MessageBalloon';
 import StockCard from '../../../../../../component-presentation/StockCard';
 import StockLineChart from '../../../../../../component-presentation/StockLineChart';
-import { TRADE } from '../../../../../../config/stock';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
-import { calculateProfitRate, getStockMessages } from '../../../../../../utils/stock';
+import { calculateAveragePurchasePrice, calculateProfitRate, getStockMessages } from '../../../../../../utils/stock';
 
 interface Props {
   stockId: string;
@@ -58,31 +57,6 @@ const Buy = ({ stockId }: Props) => {
     return objectValues(COMPANY_NAMES).filter((company) => !보유주식.some(({ company: c }) => c === company));
   }, [보유주식]);
 
-  const calculateAveragePurchasePrice = useCallback(
-    (company: string, currentQuantity: number) => {
-      const myCompanyTradeLog = logs?.filter(({ company: c }) => c === company);
-      const sortedTradeLog = myCompanyTradeLog?.sort((a, b) => a.date.getTime() - b.date.getTime());
-
-      let count = 0;
-
-      const 평균매입가격 = sortedTradeLog?.reduce((acc, curr) => {
-        if (curr.action === TRADE.BUY) {
-          count += curr.quantity;
-          return acc + curr.price * curr.quantity;
-        }
-        if (curr.action === TRADE.SELL) {
-          const currentCount = count;
-          count -= curr.quantity;
-          return acc - (acc / currentCount) * curr.quantity;
-        }
-        return acc;
-      }, 0);
-
-      return currentQuantity === 0 ? 0 : 평균매입가격 / currentQuantity;
-    },
-    [logs],
-  );
-
   if (!stock || !userId || !user) {
     return <>불러오는 중</>;
   }
@@ -106,10 +80,11 @@ const Buy = ({ stockId }: Props) => {
   const stockProfitRate = selectedCompany
     ? calculateProfitRate(
         companiesPrice[selectedCompany],
-        calculateAveragePurchasePrice(
-          selectedCompany,
-          보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-        ),
+        calculateAveragePurchasePrice({
+          company: selectedCompany,
+          currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+          logs,
+        }),
       )
     : 0;
 
@@ -183,25 +158,29 @@ const Buy = ({ stockId }: Props) => {
           {보유주식.map(({ company, count }) => (
             <StockCard
               key={company}
-              company={company}
+              company={company.slice(0, 4)}
               quantity={count}
               onClick={() => handleOpenDrawer(company)}
               isActive={company === selectedCompany}
             />
           ))}
-          <Divider />
+          {미보유주식.length > 0 && <Divider />}
         </>
       )}
-      <SectionTitle>보유하지 않은 주식</SectionTitle>
-      {미보유주식.map((company) => (
-        <StockCard
-          key={company}
-          company={company}
-          quantity={0}
-          onClick={() => handleOpenDrawer(company)}
-          isActive={company === selectedCompany}
-        />
-      ))}
+      {미보유주식.length > 0 && (
+        <>
+          <SectionTitle>보유하지 않은 주식</SectionTitle>
+          {미보유주식.map((company) => (
+            <StockCard
+              key={company}
+              company={company.slice(0, 4)}
+              quantity={0}
+              onClick={() => handleOpenDrawer(company)}
+              isActive={company === selectedCompany}
+            />
+          ))}
+        </>
+      )}
       <Drawer
         placement="bottom"
         onClose={handleCloseDrawer}
@@ -236,7 +215,7 @@ const Buy = ({ stockId }: Props) => {
         }}
       >
         <InfoHeader
-          title={selectedCompany}
+          title={selectedCompany.slice(0, 4)}
           subtitle={`보유 주식: ${보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0}`}
           value={selectedCompany ? companiesPrice[selectedCompany] : 0}
           valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
@@ -251,10 +230,11 @@ const Buy = ({ stockId }: Props) => {
           company={selectedCompany}
           priceData={selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]}
           fluctuationsInterval={stock.fluctuationsInterval}
-          averagePurchasePrice={calculateAveragePurchasePrice(
-            selectedCompany,
-            보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-          )}
+          averagePurchasePrice={calculateAveragePurchasePrice({
+            company: selectedCompany,
+            currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+            logs,
+          })}
         />
         <ButtonGroup
           buttons={[

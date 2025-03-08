@@ -1,5 +1,5 @@
 import { objectEntries } from '@toss/utils';
-import { REMAINING_STOCK_THRESHOLD, STOCK_PER_USER } from '../config/stock';
+import { REMAINING_STOCK_THRESHOLD, STOCK_PER_USER, TRADE } from '../config/stock';
 
 export const getLowSalesCompanies = (
   remainingStocks: Record<string, number>,
@@ -76,4 +76,34 @@ export const getStockMessages = (params: GetStockMessagesParams): string[] => {
   }
 
   return ['🤔 다음엔 오를까요...?'];
+};
+
+interface CalculateAveragePurchasePriceParams {
+  logs: Array<{ company: string; date: Date; price: number; quantity: number; action: string }>;
+  company: string;
+  currentQuantity: number;
+}
+
+export const calculateAveragePurchasePrice = (params: CalculateAveragePurchasePriceParams): number => {
+  const { logs, company, currentQuantity } = params;
+
+  const myCompanyTradeLog = logs?.filter(({ company: c }) => c === company);
+  const sortedTradeLog = myCompanyTradeLog?.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  let count = 0;
+
+  const 평균매입가격 = sortedTradeLog?.reduce((acc, curr) => {
+    if (curr.action === TRADE.BUY) {
+      count += curr.quantity;
+      return acc + curr.price * curr.quantity;
+    }
+    if (curr.action === TRADE.SELL) {
+      const currentCount = count;
+      count -= curr.quantity;
+      return acc - (acc / currentCount) * curr.quantity;
+    }
+    return acc;
+  }, 0);
+
+  return currentQuantity === 0 ? 0 : Math.round(평균매입가격 / currentQuantity);
 };
