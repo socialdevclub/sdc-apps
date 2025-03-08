@@ -33,6 +33,17 @@ export class OutboxRepository {
     return this.outboxModel.find({ status: OutboxStatus.PENDING }).sort({ createdAt: 1 }).limit(limit).exec();
   }
 
+  /**
+   * 대기 중인 메시지가 있는지 여부만 확인하는 최적화된 메서드
+   * (전체 문서를 가져오는 대신 카운트만 확인하여 DB 부하 최소화)
+   * @returns 대기 중인 메시지 존재 여부
+   */
+  async hasPendingEvents(): Promise<boolean> {
+    // countDocuments 대신 exists 사용하여 더 빠른 확인 (MongoDB 최적화)
+    const result = await this.outboxModel.exists({ status: OutboxStatus.PENDING });
+    return result !== null;
+  }
+
   async markAsProcessed(id: string): Promise<OutboxDocument> {
     return this.outboxModel.findByIdAndUpdate(
       id,
@@ -64,5 +75,20 @@ export class OutboxRepository {
       })
       .sort({ updatedAt: 1 })
       .exec();
+  }
+
+  /**
+   * 재시도 가능한 실패 메시지가 있는지 여부만 확인하는 최적화된 메서드
+   * (전체 문서를 가져오는 대신 카운트만 확인하여 DB 부하 최소화)
+   * @param maxRetries 최대 재시도 횟수
+   * @returns 재시도 가능한 실패 메시지 존재 여부
+   */
+  async hasFailedEvents(maxRetries = 3): Promise<boolean> {
+    // countDocuments 대신 exists 사용하여 더 빠른 확인 (MongoDB 최적화)
+    const result = await this.outboxModel.exists({
+      retryCount: { $lt: maxRetries },
+      status: OutboxStatus.FAILED,
+    });
+    return result !== null;
   }
 }

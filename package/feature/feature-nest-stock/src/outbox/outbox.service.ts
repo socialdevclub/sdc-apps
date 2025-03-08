@@ -98,6 +98,43 @@ export class OutboxService {
   }
 
   /**
+   * 대기 중인 메시지가 있는지 빠르게 확인합니다.
+   * 메시지 내용을 가져오지 않고 존재 여부만 확인하여 성능 최적화
+   * @returns 대기 중인 메시지가 있는지 여부 (boolean)
+   */
+  async hasPendingMessages(): Promise<boolean> {
+    try {
+      // limit 1로 설정하여 존재 여부만 빠르게 확인
+      const pendingEvents = await this.outboxRepository.findPendingEvents(1);
+      return pendingEvents.length > 0;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to check pending messages: ${errorMessage}`, errorStack);
+      return false; // 오류 발생 시 안전하게 false 반환
+    }
+  }
+
+  /**
+   * 재시도 가능한 실패한 메시지가 있는지 빠르게 확인합니다.
+   * 메시지 내용을 가져오지 않고 존재 여부만 확인하여 성능 최적화
+   * @param maxRetries 최대 재시도 횟수
+   * @returns 재시도 가능한 실패 메시지가 있는지 여부 (boolean)
+   */
+  async hasFailedMessages(maxRetries = 3): Promise<boolean> {
+    try {
+      // limit 1로 설정하여 존재 여부만 빠르게 확인
+      const failedEvents = await this.outboxRepository.findFailedEvents(maxRetries);
+      return failedEvents.length > 0;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to check failed messages: ${errorMessage}`, errorStack);
+      return false; // 오류 발생 시 안전하게 false 반환
+    }
+  }
+
+  /**
    * 배치 사이즈를 기반으로 메시지를 처리하는 필수 매개변수를 가진 메소드
    * @param batchSize 한 번에 처리할 메시지 수
    */
