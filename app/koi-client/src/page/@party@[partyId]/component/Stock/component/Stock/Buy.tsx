@@ -8,12 +8,12 @@ import { COMPANY_NAMES } from 'shared~config/dist/stock';
 import ButtonGroup from '../../../../../../component-presentation/ButtonGroup';
 import InfoHeader from '../../../../../../component-presentation/InfoHeader';
 import MessageBalloon from '../../../../../../component-presentation/MessageBalloon';
+import StockCard from '../../../../../../component-presentation/StockCard';
+import StockLineChart from '../../../../../../component-presentation/StockLineChart';
 import { TRADE } from '../../../../../../config/stock';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
 import { calculateProfitRate, getStockMessages } from '../../../../../../utils/stock';
-import StockCard from './StockCard';
-import StockLineChart from './StockLineChart';
 
 interface Props {
   stockId: string;
@@ -295,7 +295,6 @@ const Buy = ({ stockId }: Props) => {
 
 export default Buy;
 
-// Buy - Section 스타일링
 const SectionTitle = styled.h4`
   font-size: 16px;
   line-height: 22px;
