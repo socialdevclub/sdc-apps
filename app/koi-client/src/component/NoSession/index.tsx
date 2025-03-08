@@ -9,25 +9,20 @@ import authLocalization from '../../library/supabase/authLocalization';
 import EmptyProvider from '../../component-presentation/EmptyProvider';
 
 const NoSession = () => {
-  const [route, setRoute] = React.useState<'AUTH' | 'SPLASH'>('SPLASH');
-  function handleRouteChange(newRoute: string) {
-    setRoute(newRoute);
-  }
+  const [route, setRoute] = React.useState('SPLASH');
 
   return (
     <SwitchCase
       value={route}
       caseBy={{
         AUTH: (
-          <MobileLayout ScrollViewComponent={EmptyProvider} backgroundColor="#f2f2f2">
+          <MobileLayout ScrollViewComponent={EmptyProvider}>
             <Auth
               supabaseClient={supabase}
               appearance={{ theme: ThemeSupa }}
               providers={['google']}
               localization={authLocalization}
               redirectTo={window.location.origin}
-              route={route}
-              handleRouteChange={handleRouteChange}
             />
           </MobileLayout>
         ),
