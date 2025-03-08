@@ -4,7 +4,7 @@ import prependZero from '../../../../../../../../service/prependZero';
 
 interface StockInfoBoxProps {
   title: string;
-  value: string;
+  value: React.ReactNode;
   valueColor: string;
   remainingTime: number;
   changeTime: number | string;
@@ -24,6 +24,7 @@ const StockInfoBox = ({ title, value, valueColor, remainingTime, changeTime }: S
             color: #c084fc;
             min-width: 50px;
             letter-spacing: 0.5px;
+            line-height: 22px;
           `}
         >
           {remainingTime <= 1 ? `🚨 임박` : `${remainingTime}분 후`}
@@ -35,6 +36,7 @@ const StockInfoBox = ({ title, value, valueColor, remainingTime, changeTime }: S
             font-size: 12px;
             color: #9ca3af;
             letter-spacing: 0.5px;
+            line-height: 14px;
           `}
         >
           {typeof changeTime === 'number' ? `${prependZero(changeTime, 2)}:00` : changeTime}

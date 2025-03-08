@@ -3,7 +3,7 @@ import { styled } from '@linaria/react';
 
 interface InfoBoxProps {
   title?: string;
-  value: string;
+  value: React.ReactNode;
   valueColor?: CSSProperties['color'];
   leftTime?: React.ReactNode;
   changeTime?: React.ReactNode;
@@ -49,9 +49,10 @@ const TimeWrapper = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #374151;
-  padding: 12px 4px;
+  padding: 8px;
   border-radius: 4px;
   text-align: center;
+  gap: 2px;
 `;
 
 const ContainerTitle = styled.div`

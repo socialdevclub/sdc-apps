@@ -46,7 +46,7 @@ export const H5 = styled.h5`
 
 export const H6 = styled.h6`
   font-size: 10px;
-  color: #9ca3af;
+  color: #c084fc;
   margin: 0;
 `;
 
