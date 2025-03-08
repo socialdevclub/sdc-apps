@@ -1,130 +1,113 @@
-import { objectEntries } from '@toss/utils';
-import { useAtomValue } from 'jotai';
-import { Drawer, message } from 'antd';
 import styled from '@emotion/styled';
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import * as echarts from 'echarts';
+import { objectEntries, objectValues } from '@toss/utils';
+import { Drawer, message } from 'antd';
+import { useAtomValue } from 'jotai';
+import { useCallback, useMemo, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { UserStore } from '../../../../../../store';
+import { COMPANY_NAMES } from 'shared~config/dist/stock';
+import { TRADE } from '../../../../../../config/stock';
 import { Query } from '../../../../../../hook';
+import { UserStore } from '../../../../../../store';
+import { calculateProfitRate, renderStockBalloonMessage } from '../../../../../../utils/stock';
 import StockCard from './StockCard';
+import StockLineChart from './StockLineChart';
 
 interface Props {
   stockId: string;
 }
-
-// constants
-// COMPANY_NAMES
 
 const Buy = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
-  const { isFreezed } = Query.Stock.useUser({ stockId, userId });
+  const { data: logs } = Query.Stock.useQueryLog({ stockId, userId });
+  const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
 
   const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
   const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
-  const [messageApi, contextHolder] = message.useMessage();
 
-  const [open, setOpen] = useState(false);
-  const [selectedCompany, setSelectedCompany] = useState('');
-
-  // Drawer 모바일 버전 렌더링 제어
   const isDesktop = useMediaQuery({ query: `(min-width: 800px)` });
 
-  // 차트 DOM 요소 참조
-  const chartRef = useRef<HTMLDivElement>(null);
-  // echarts 인스턴스 참조
-  const chartInstance = useRef<echarts.ECharts>();
+  const [messageApi, contextHolder] = message.useMessage();
 
-  // 드래그 기능을 위한 ref와 상태 추가
-  const drawerContentRef = useRef<HTMLDivElement | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startY, setStartY] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState('');
 
-  const handleCloseDrawer = useCallback(() => {
-    setSelectedCompany('');
-    setOpen(false);
-  }, []);
+  const priceData = useMemo(() => {
+    const result: Record<string, number[]> = {};
+    objectEntries(stock?.companies ?? {}).forEach(([company, companyInfos]) => {
+      result[company] = companyInfos.map(({ 가격 }) => 가격);
+    });
+    return result;
+  }, [stock?.companies]);
 
-  // 드래그 이벤트 핸들러
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    setIsDragging(true);
-    setStartY(e.touches[0].clientY);
-  }, []);
+  const 보유주식 = useMemo(() => {
+    return objectEntries(user?.inventory ?? {})
+      .filter(([, count]) => count > 0)
+      .map(([company, count]) => ({
+        company,
+        count,
+      }));
+  }, [user?.inventory]);
 
-  const handleTouchMove = useCallback(
-    (e: TouchEvent) => {
-      if (!isDragging || !drawerContentRef.current) return;
+  const 미보유주식 = useMemo(() => {
+    return objectValues(COMPANY_NAMES).filter((company) => !보유주식.some(({ company: c }) => c === company));
+  }, [보유주식]);
 
-      const currentY = e.touches[0].clientY;
-      const deltaY = currentY - startY;
+  const calculateAveragePurchasePrice = useCallback(
+    (company: string, currentQuantity: number) => {
+      const myCompanyTradeLog = logs?.filter(({ company: c }) => c === company);
+      const sortedTradeLog = myCompanyTradeLog?.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-      if (deltaY > 0) {
-        drawerContentRef.current.style.transform = `translateY(${deltaY}px)`;
-        drawerContentRef.current.style.transition = 'none';
-      }
+      let count = 0;
+
+      const 평균매입가격 = sortedTradeLog?.reduce((acc, curr) => {
+        if (curr.action === TRADE.BUY) {
+          count += curr.quantity;
+          return acc + curr.price * curr.quantity;
+        }
+        if (curr.action === TRADE.SELL) {
+          const currentCount = count;
+          count -= curr.quantity;
+          return acc - (acc / currentCount) * curr.quantity;
+        }
+        return acc;
+      }, 0);
+
+      return currentQuantity === 0 ? 0 : 평균매입가격 / currentQuantity;
     },
-    [isDragging, startY],
+    [logs],
   );
 
-  const handleTouchEnd = useCallback(() => {
-    if (!isDragging || !drawerContentRef.current) return;
-
-    const translateY = drawerContentRef.current.style.transform;
-    const match = translateY.match(/translateY\((\d+)px\)/);
-    const deltaY = match ? parseInt(match[1], 10) : 0;
-
-    if (deltaY > 100) {
-      // 충분히 아래로 드래그했을 때 Drawer 닫기
-      handleCloseDrawer();
-    } else {
-      // 원래 위치로 돌아가기
-      drawerContentRef.current.style.transform = 'translateY(0)';
-      drawerContentRef.current.style.transition = 'transform 0.3s';
-    }
-
-    setIsDragging(false);
-  }, [isDragging, handleCloseDrawer]);
-
-  // Drawer가 열릴 때 이벤트 리스너 등록
-  useEffect(() => {
-    if (open) {
-      // Drawer가 열린 후 DOM 요소 참조 가져오기
-      setTimeout(() => {
-        const drawerContent = document.querySelector('.ant-drawer-content');
-        const drawerHeader = document.querySelector('.ant-drawer-header');
-
-        if (drawerContent && drawerHeader) {
-          drawerContentRef.current = drawerContent as HTMLDivElement;
-
-          // 헤더에만 드래그 이벤트 리스너 등록
-          drawerHeader.addEventListener('touchstart', handleTouchStart as EventListener);
-          document.addEventListener('touchmove', handleTouchMove as EventListener, { passive: false });
-          document.addEventListener('touchend', handleTouchEnd as EventListener);
-        }
-      }, 300);
-    }
-
-    return () => {
-      // 이벤트 리스너 제거
-      const drawerHeader = document.querySelector('.ant-drawer-header');
-      if (drawerHeader) {
-        drawerHeader.removeEventListener('touchstart', handleTouchStart as EventListener);
-        document.removeEventListener('touchmove', handleTouchMove as EventListener);
-        document.removeEventListener('touchend', handleTouchEnd as EventListener);
-      }
-    };
-  }, [open, handleTouchStart, handleTouchMove, handleTouchEnd]);
-
-  if (!stock || !userId) {
+  if (!stock || !userId || !user) {
     return <>불러오는 중</>;
   }
 
+  const myInfos = objectEntries(stock.companies).reduce((reducer, [company, companyInfos]) => {
+    const myInfos = reducer;
+
+    companyInfos.forEach((companyInfo, idx) => {
+      if (companyInfos[idx].정보.some((name) => name === userId)) {
+        myInfos.push({
+          company,
+          price: companyInfo.가격 - companyInfos[idx - 1].가격,
+          timeIdx: idx,
+        });
+      }
+    });
+
+    return reducer;
+  }, [] as Array<{ company: string; timeIdx: number; price: number }>);
+
   const handleOpenDrawer = (company: string) => {
     setSelectedCompany(company);
-    setOpen(true);
+    setDrawerOpen(true);
+  };
+
+  const handleCloseDrawer = () => {
+    setSelectedCompany('');
+    setDrawerOpen(false);
   };
 
   const onClickBuy = (company: string) => {
@@ -147,32 +130,12 @@ const Buy = ({ stockId }: Props) => {
       });
   };
 
-  const onClickSell = (company: string) => {
-    sellStock({ amount: 1, company, stockId, unitPrice: companiesPrice[company], userId })
+  const onClickSell = (company: string, amount = 1) => {
+    sellStock({ amount, company, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
         messageApi.destroy();
         messageApi.open({
-          content: '주식을 판매하였습니다.',
-          duration: 2,
-          type: 'success',
-        });
-      })
-      .catch((reason: Error) => {
-        messageApi.destroy();
-        messageApi.open({
-          content: `${reason.message}`,
-          duration: 2,
-          type: 'error',
-        });
-      });
-  };
-
-  const onClickSellAll = (company: string) => {
-    sellStock({ amount: 1, company, stockId, unitPrice: companiesPrice[company], userId })
-      .then(() => {
-        messageApi.destroy();
-        messageApi.open({
-          content: '주식을 판매하였습니다.',
+          content: `주식을 ${amount > 1 ? `${amount}주 ` : ''}판매하였습니다.`,
           duration: 2,
           type: 'success',
         });
@@ -190,27 +153,30 @@ const Buy = ({ stockId }: Props) => {
   const isLoading = isBuyLoading || isFreezed || isSellLoading;
   const isDisabled = timeIdx === undefined || timeIdx >= 9 || !stock.isTransaction || isLoading;
 
-  // console.log({ stock }, stock?.remainingStocks);
-  // console.log({ companiesPrice });
-
-  const handleAfterOpenChange = (visible: boolean) => {
-    if (visible) {
-      setTimeout(() => {
-        if (chartRef.current && chartInstance.current && !chartInstance.current.isDisposed()) {
-          chartInstance.current.resize();
-        }
-      }, 400);
-    }
-  };
-
   return (
     <>
       {contextHolder}
-      {objectEntries(stock.remainingStocks).map(([company, count]) => (
+      {보유주식.length > 0 && (
+        <>
+          <SectionTitle>보유 중인 주식</SectionTitle>
+          {보유주식.map(({ company, count }) => (
+            <StockCard
+              key={company}
+              company={company}
+              quantity={count}
+              onClick={() => handleOpenDrawer(company)}
+              isActive={company === selectedCompany}
+            />
+          ))}
+          <Divider />
+        </>
+      )}
+      <SectionTitle>보유하지 않은 주식</SectionTitle>
+      {미보유주식.map((company) => (
         <StockCard
           key={company}
           company={company}
-          quantity={count}
+          quantity={0}
           onClick={() => handleOpenDrawer(company)}
           isActive={company === selectedCompany}
         />
@@ -218,61 +184,80 @@ const Buy = ({ stockId }: Props) => {
       <Drawer
         placement="bottom"
         onClose={handleCloseDrawer}
-        open={open}
+        open={drawerOpen}
         height="auto"
-        keyboard
+        closeIcon={false}
+        afterOpenChange={(visible) => {
+          if (visible) {
+            const timer = setTimeout(() => {
+              window.dispatchEvent(new Event('resize'));
+            }, 300);
+            return () => clearTimeout(timer);
+          }
+          return () => {};
+        }}
         styles={{
           body: {
-            padding: '6px 0 0 0',
+            padding: '28px 0 0 0',
           },
           content: {
             backgroundColor: '#252836',
             borderRadius: '16px 16px 0 0',
-            height: 'auto',
             margin: '0 auto',
             maxWidth: isDesktop ? '400px' : '100%',
           },
           header: {
-            borderBottom: 'none',
-            cursor: 'grab',
-            padding: '11px',
+            padding: '0',
           },
           mask: {
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
           },
         }}
-        destroyOnClose={false}
-        closeIcon={<div />}
-        afterOpenChange={handleAfterOpenChange}
       >
-        <div style={{ width: '100%' }}>
-          <StockDetailHeader
-            selectedCompany={selectedCompany}
-            stockPrice={selectedCompany ? companiesPrice[selectedCompany] : 0}
-            stockReturnRate={-12}
-            quantity={100}
-          />
-          <StockInfoBalloon firstLine="✨ 제 정보에 의하면..." secondLine="다음 주기에 주가가 오를 것 같아요!" />
-          <LineChart
-            company={selectedCompany}
-            priceData={[100000, 124700, 537000, 7300, 3200, 200000, 203000, 200000, 103000, 79000, 89000]}
-            fluctuationsInterval={5}
-            averagePurchasePrice={100000}
-          />
-          <ButtonContainer>
-            <Flex>
-              <BuyButton onClick={() => onClickBuy(selectedCompany)} disabled={isDisabled}>
-                사기
-              </BuyButton>
-              <SellButton onClick={() => onClickSell(selectedCompany)} disabled={isDisabled}>
-                팔기
-              </SellButton>
-            </Flex>
-            <SellAllButton onClick={() => onClickSellAll(selectedCompany)} disabled={isDisabled}>
-              모두 팔기
-            </SellAllButton>
-          </ButtonContainer>
-        </div>
+        <StockDetailHeader
+          selectedCompany={selectedCompany}
+          stockPrice={selectedCompany ? companiesPrice[selectedCompany] : 0}
+          stockProfitRate={
+            selectedCompany
+              ? calculateProfitRate(
+                  companiesPrice[selectedCompany],
+                  calculateAveragePurchasePrice(
+                    selectedCompany,
+                    보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+                  ),
+                )
+              : 0
+          }
+          quantity={보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0}
+        />
+        <MessageBalloon {...renderStockBalloonMessage({ myInfos, selectedCompany, timeIdx: timeIdx ?? 0 })} />
+        <StockLineChart
+          company={selectedCompany}
+          priceData={selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]}
+          fluctuationsInterval={stock.fluctuationsInterval}
+          averagePurchasePrice={calculateAveragePurchasePrice(
+            selectedCompany,
+            보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+          )}
+        />
+        <ButtonContainer>
+          <Flex>
+            <BuyButton onClick={() => onClickBuy(selectedCompany)} disabled={isDisabled}>
+              사기
+            </BuyButton>
+            <SellButton onClick={() => onClickSell(selectedCompany)} disabled={isDisabled}>
+              팔기
+            </SellButton>
+          </Flex>
+          <SellAllButton
+            onClick={() =>
+              onClickSell(selectedCompany, 보유주식.find(({ company }) => company === selectedCompany)?.count)
+            }
+            disabled={isDisabled}
+          >
+            모두 팔기
+          </SellAllButton>
+        </ButtonContainer>
       </Drawer>
     </>
   );
@@ -283,12 +268,12 @@ export default Buy;
 interface StockDetailHeaderProps {
   selectedCompany: string;
   stockPrice: number;
-  stockReturnRate: number;
+  stockProfitRate: number;
   quantity: number;
 }
 
-function StockDetailHeader({ selectedCompany, stockPrice, stockReturnRate, quantity }: StockDetailHeaderProps) {
-  const isPositive = stockReturnRate >= 0;
+function StockDetailHeader({ selectedCompany, stockPrice, stockProfitRate, quantity }: StockDetailHeaderProps) {
+  const isProfit = stockProfitRate >= 0;
 
   return (
     <Container>
@@ -300,10 +285,10 @@ function StockDetailHeader({ selectedCompany, stockPrice, stockReturnRate, quant
         <FlexColumn style={{ alignItems: 'flex-end', rowGap: '16px' }}>
           <StockPrice>{stockPrice.toLocaleString()}원</StockPrice>
           <Badge>
-            <StockReturnRate>
-              {isPositive ? '+' : ''}
-              {stockReturnRate}% 수익 중
-            </StockReturnRate>
+            <StockProfitRate>
+              {isProfit ? '+' : ''}
+              {stockProfitRate}% 수익 중
+            </StockProfitRate>
           </Badge>
         </FlexColumn>
       </FlexRow>
@@ -311,269 +296,40 @@ function StockDetailHeader({ selectedCompany, stockPrice, stockReturnRate, quant
   );
 }
 
-interface StockInfoBalloonProps {
-  firstLine: string;
+interface MessageBalloonProps {
+  firstLine?: string;
   secondLine?: string;
 }
 
-function StockInfoBalloon({ firstLine, secondLine }: StockInfoBalloonProps) {
+function MessageBalloon({ firstLine, secondLine }: MessageBalloonProps) {
+  if (!firstLine) return null;
+
   return (
-    <Balloon>
+    <BalloonBox>
       <Triangle />
-      <StockInfo>
+      <Message>
         <span>{firstLine}</span>
         {secondLine && <span>{secondLine}</span>}
-      </StockInfo>
-    </Balloon>
+      </Message>
+    </BalloonBox>
   );
 }
 
-interface LineChartProps {
-  company: string;
-  priceData: number[];
-  fluctuationsInterval: number;
-  averagePurchasePrice?: number;
-}
+// Buy - Section 스타일링
+const SectionTitle = styled.h4`
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  margin: 4px 0 12px 4px;
+  color: white;
+`;
 
-/**
- * 주식 가격 차트 컴포넌트
- *
- * @param company - 회사명
- * @param priceData - 시간별 주식 가격 데이터 배열
- * @param fluctuationsInterval - 라운드 간 시간 간격(분)
- * @param averagePurchasePrice - 사용자의 평균 구매 가격 (선택적)
- */
-const LineChart = ({
-  company,
-  priceData = [100000],
-  fluctuationsInterval = 5,
-  averagePurchasePrice,
-}: LineChartProps) => {
-  // 차트 DOM 요소 참조
-  const chartRef = useRef<HTMLDivElement>(null);
-  // echarts 인스턴스 참조
-  const chartInstance = useRef<echarts.ECharts>();
-
-  // 라운드 시간 목록 생성 (x축 데이터)
-  const roundTimeList = useMemo(
-    () => Array.from({ length: 10 }, (_, i) => i * fluctuationsInterval),
-    [fluctuationsInterval],
-  );
-
-  /**
-   * 차트 옵션 생성 함수
-   * 데이터나 설정이 변경될 때마다 새로운 옵션 객체 생성
-   */
-  const getChartOption = useCallback(() => {
-    // 평균 구매가 표시를 위한 마커라인 옵션 생성
-    const markLineOpts = averagePurchasePrice
-      ? {
-          markLine: {
-            animation: false, // 애니메이션 비활성화
-            animationDuration: 0, // 애니메이션 지속 시간 0
-            data: [
-              {
-                lineStyle: {
-                  color: '#F59E0B', // 주황색 라인
-                },
-                yAxis: averagePurchasePrice, // y축 위치 (평균 구매가)
-              },
-            ],
-            label: {
-              backgroundColor: 'rgba(37, 40, 54, 0.7)', // 라벨 배경색
-              borderRadius: 2,
-              color: '#F59E0B', // 라벨 텍스트 색상
-              distance: [0, -5], // 라벨 위치 조정
-              fontSize: 12,
-              formatter: `평균 구매가: ${averagePurchasePrice.toLocaleString()}원`, // 라벨 텍스트
-              padding: [2, 4],
-              position: 'insideEndTop', // 라벨 위치
-            },
-            lineStyle: {
-              color: '#F59E0B', // 주황색 라인
-              type: 'solid',
-              width: 1.5,
-            },
-            silent: true, // 마커라인 이벤트 비활성화
-            symbol: 'none', // 양쪽 끝 심볼 제거
-          },
-        }
-      : {};
-
-    return {
-      animation: true, // 차트 기본 애니메이션 활성화
-      grid: {
-        bottom: '8%', // 차트 영역 여백 설정
-        containLabel: true, // 라벨 포함 여부
-        left: '5%',
-        right: '2%',
-        top: '8%',
-      },
-      series: [
-        {
-          data: priceData, // 주식 가격 데이터
-          emphasis: {
-            // 호버 시 데이터 포인트 스타일
-            itemStyle: {
-              borderColor: '#fff',
-              borderWidth: 2,
-              color: '#007AFF',
-              shadowBlur: 10,
-              shadowColor: 'rgba(0, 122, 255, 0.5)',
-            },
-            scale: true, // 호버 시 약간 확대
-          },
-          itemStyle: {
-            color: '#007AFF', // 데이터 포인트 색상
-          },
-          smooth: true, // 곡선 그래프
-          symbol: 'circle', // 데이터 포인트 모양
-          symbolSize: 12, // 데이터 포인트 크기
-          type: 'line', // 라인 차트 타입
-          ...markLineOpts, // 평균 구매가 마커라인 옵션 추가
-        },
-      ],
-      tooltip: {
-        // 툴팁 설정
-        backgroundColor: 'rgba(37, 40, 54, 0.9)', // 툴팁 배경색
-        borderColor: '#374151', // 툴팁 테두리 색상
-        borderWidth: 1,
-        confine: true, // 툴팁이 차트 영역을 벗어나지 않도록 함
-        enterable: true, // 툴팁에 마우스 진입 가능
-        formatter: (params: { dataIndex: number; value: number }) => {
-          // 라운드 번호와 가격 정보 표시
-          const roundNumber = roundTimeList[params.dataIndex];
-          const price = params.value.toLocaleString();
-
-          // 평균 구매가와 비교하여 수익률 계산 (평균 구매가가 있을 경우)
-          let profitInfo = '';
-          if (averagePurchasePrice && params.value) {
-            const profitRate = (((params.value - averagePurchasePrice) / averagePurchasePrice) * 100).toFixed(2);
-            const isProfit = params.value >= averagePurchasePrice;
-            profitInfo = `<div style="margin-top: 4px; color: ${isProfit ? '#34D399' : '#F87171'}">
-                            ${isProfit ? '+' : ''}${profitRate}%
-                          </div>`;
-          }
-
-          return `<div style="padding: 8px;">
-                    <div style="margin-bottom: 4px;">${company}</div>
-                    <div style="font-weight: bold; font-size: 16px;">
-                      <span style="color: #007AFF;">${roundNumber}분</span> ${price}원
-                    </div>
-                    ${profitInfo}
-                  </div>`;
-        },
-        textStyle: {
-          color: '#fff', // 툴팁 텍스트 색상
-          fontSize: 14, // 텍스트 크기
-        },
-        trigger: 'item', // 데이터 포인트에 호버할 때만 툴팁 표시
-      },
-      xAxis: {
-        // x축 설정
-        axisLabel: {
-          color: '#9CA3AF', // x축 라벨 색상
-        },
-        axisLine: {
-          lineStyle: {
-            color: '#374151', // x축 선 색상
-          },
-        },
-        axisTick: {
-          show: false, // x축 눈금 숨김
-        },
-        data: roundTimeList, // x축 데이터 (라운드 시간)
-        splitLine: {
-          lineStyle: {
-            color: '#374151', // 격자 색상
-            type: 'dashed', // 격자 스타일
-            width: 1,
-          },
-          show: true, // 격자 표시
-        },
-        type: 'category', // x축 타입
-      },
-      yAxis: {
-        // y축 설정
-        axisLabel: {
-          color: '#9CA3AF', // y축 라벨 색상
-          formatter: (value: number) => {
-            return `${(value / 10000).toLocaleString()}만`; // 단위 변환 (만 단위)
-          },
-        },
-        splitLine: {
-          lineStyle: {
-            color: '#374151', // 격자 색상
-            type: 'dashed', // 격자 스타일
-          },
-        },
-        type: 'value', // y축 타입
-      },
-    };
-  }, [company, priceData, roundTimeList, averagePurchasePrice]);
-
-  /**
-   * 차트 초기화 함수
-   * 차트 옵션이 변경될 때마다 차트를 다시 그림
-   */
-  const initChart = useCallback(() => {
-    if (chartRef.current) {
-      // 기존 차트가 있다면 제거
-      if (chartInstance.current) {
-        chartInstance.current.dispose();
-      }
-
-      // 새로운 차트 인스턴스 생성
-      chartInstance.current = echarts.init(chartRef.current);
-      chartInstance.current.setOption(getChartOption());
-    }
-  }, [getChartOption]);
-
-  /**
-   * Drawer가 열릴 때마다 차트 재초기화
-   * 애니메이션 완료 후 차트를 그리기 위해 setTimeout 사용
-   */
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    // 컴포넌트가 마운트된 상태일 때만 타이머 설정
-    if (chartRef.current) {
-      timer = setTimeout(() => {
-        // 타이머 실행 시점에 컴포넌트가 여전히 마운트되어 있는지 확인
-        if (chartRef.current) {
-          initChart();
-        }
-      }, 300);
-    }
-
-    return () => {
-      clearTimeout(timer);
-      // 컴포넌트 언마운트 시 차트 정리
-      if (chartInstance.current && !chartInstance.current.isDisposed()) {
-        chartInstance.current.dispose();
-      }
-    };
-  }, [initChart]);
-
-  /**
-   * 윈도우 리사이즈 이벤트 처리
-   * 화면 크기 변경 시 차트 크기 조정
-   */
-  useEffect(() => {
-    const handleResize = () => {
-      // 차트 인스턴스가 존재하고 dispose되지 않았는지 확인
-      if (chartInstance.current && !chartInstance.current.isDisposed()) {
-        chartInstance.current.resize();
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // 차트 컨테이너 렌더링
-  return <div ref={chartRef} style={{ height: '300px', padding: '0 16px 0 0', width: 'calc(100% - 16px)' }} />;
-};
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #374151;
+  margin: 8px 0 16px 0;
+`;
 
 // StockDetailHeader 컴포넌트 스타일링
 const Container = styled.div`
@@ -630,7 +386,7 @@ const Badge = styled.div`
   border-radius: 100px;
 `;
 
-const StockReturnRate = styled.span`
+const StockProfitRate = styled.span`
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.5px;
@@ -639,8 +395,8 @@ const StockReturnRate = styled.span`
   opacity: 1;
 `;
 
-// StockInfoBalloon 컴포넌트 스타일링
-const Balloon = styled.div`
+// MessageBalloon 컴포넌트 스타일링
+const BalloonBox = styled.div`
   padding-left: 20px;
   position: relative;
 `;
@@ -648,32 +404,33 @@ const Balloon = styled.div`
 const Triangle = styled.div`
   width: 0;
   height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 20px solid #111827;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 14px solid #111827;
   background-color: #252836;
   margin-left: 14px;
 `;
 
-const StockInfo = styled.div`
+const Message = styled.div`
   width: fit-content;
-  height: 64px;
+  height: fit-content;
   background-color: #111827;
   border-radius: 8px;
-  padding: 12px 20px 12px 12px;
+  padding: 12px 18px 12px 12px;
   color: white;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   row-gap: 6px;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 12px;
+  line-height: 14px;
   letter-spacing: 0.5px;
   font-weight: 400;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
+// Buy - ButtonContainer 스타일링
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -693,26 +450,45 @@ const Flex = styled.div`
 
 const BuyButton = styled.button`
   width: 100%;
-  height: 52px;
+  height: 48px;
   background-color: #007aff;
   color: white;
   border-radius: 4px;
   border: none;
+  font-family: DungGeunMo;
+  font-size: 14px;
+  line-height: 16px;
+  :disabled {
+    opacity: 0.5;
+  }
 `;
 
 const SellButton = styled.button`
   width: 100%;
-  height: 52px;
+  height: 48px;
   background-color: #f63c6b;
   color: white;
   border-radius: 4px;
   border: none;
+  font-family: DungGeunMo;
+  font-size: 14px;
+  line-height: 16px;
+  :disabled {
+    opacity: 0.5;
+  }
 `;
+
 const SellAllButton = styled.button`
   width: 100%;
-  height: 52px;
+  height: 48px;
   background-color: #374151;
   color: white;
   border-radius: 4px;
   border: none;
+  font-family: DungGeunMo;
+  font-size: 14px;
+  line-height: 16px;
+  :disabled {
+    opacity: 0.5;
+  }
 `;
