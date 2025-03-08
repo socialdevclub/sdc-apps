@@ -11,7 +11,7 @@ import MessageBalloon from '../../../../../../component-presentation/MessageBall
 import { TRADE } from '../../../../../../config/stock';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
-import { calculateProfitRate, renderStockBalloonMessage } from '../../../../../../utils/stock';
+import { calculateProfitRate, getStockMessages } from '../../../../../../utils/stock';
 import StockCard from './StockCard';
 import StockLineChart from './StockLineChart';
 
@@ -115,10 +115,10 @@ const Buy = ({ stockId }: Props) => {
 
   const isProfit = stockProfitRate >= 0;
 
-  const messageInfo = renderStockBalloonMessage({
-    myInfos,
-    selectedCompany,
-    timeIdx: timeIdx ?? 0,
+  const stockMessages = getStockMessages({
+    companyName: selectedCompany,
+    currentTimeIdx: timeIdx ?? 0,
+    stockInfos: myInfos,
   });
 
   const handleOpenDrawer = (company: string) => {
@@ -246,7 +246,7 @@ const Buy = ({ stockId }: Props) => {
             text: `${isProfit ? '+' : ''}${stockProfitRate}% 수익 중`,
           }}
         />
-        <MessageBalloon messages={[messageInfo.firstLine, messageInfo.secondLine].filter(Boolean)} />
+        <MessageBalloon messages={stockMessages} />
         <StockLineChart
           company={selectedCompany}
           priceData={selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]}
@@ -256,7 +256,6 @@ const Buy = ({ stockId }: Props) => {
             보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
           )}
         />
-
         <ButtonGroup
           buttons={[
             {
@@ -277,7 +276,6 @@ const Buy = ({ stockId }: Props) => {
           direction="row"
           padding="0 16px 8px 16px"
         />
-
         <ButtonGroup
           buttons={[
             {

@@ -24,38 +24,56 @@ export function calculateProfitRate(currentPrice: number, averagePrice: number):
   return Math.round(profitRate * 100) / 100;
 }
 
-interface RenderStockBalloonMessageParams {
-  myInfos: Array<{ company: string; timeIdx: number; price: number }>;
-  timeIdx: number;
-  selectedCompany: string;
+/**
+ * 주식 정보 메시지 타입
+ */
+export enum StockMessageType {
+  RISE = 'RISE', // 주가 상승 예상
+  FALL = 'FALL', // 주가 하락 예상
+  UNKNOWN = 'UNKNOWN', // 정보 없음
 }
-export const renderStockBalloonMessage = (
-  params: RenderStockBalloonMessageParams,
-): { firstLine?: string; secondLine?: string } => {
-  const { myInfos, timeIdx, selectedCompany } = params;
 
-  if (!selectedCompany) return {};
+/**
+ * 주식 정보 메시지 생성 함수 파라미터
+ */
+export interface GetStockMessagesParams {
+  stockInfos: Array<{
+    company: string;
+    timeIdx: number;
+    price: number;
+  }>;
+  currentTimeIdx: number;
+  companyName: string;
+}
 
-  const info = myInfos.find((info) => info.timeIdx === (timeIdx ?? 0) + 1 && info.company === selectedCompany);
+/**
+ * 주식 정보에 따른 메시지 배열을 생성합니다.
+ *
+ * @param params 메시지 생성에 필요한 파라미터
+ * @returns 메시지 문자열 배열
+ */
+export const getStockMessages = (params: GetStockMessagesParams): string[] => {
+  const { stockInfos, currentTimeIdx, companyName } = params;
 
-  const renderFirstLine = (): string => {
-    return info?.price
-      ? info?.price > 0
-        ? '✨ 제 정보에 의하면...'
-        : '🧐 제 정보에 의하면...'
-      : '🤔 다음엔 오를까요...?';
-  };
+  if (!companyName) return [];
 
-  const renderSecondLine = (): string => {
-    return info?.price
-      ? info?.price > 0
-        ? '다음 주기에 주가가 오를 것 같아요!'
-        : '다음 주기에 주가가 떨어질 것 같아요!'
-      : '';
-  };
+  // 다음 주기의 주식 정보 찾기
+  const nextInfo = stockInfos.find((info) => info.timeIdx === currentTimeIdx + 1 && info.company === companyName);
 
-  return {
-    firstLine: renderFirstLine(),
-    secondLine: renderSecondLine(),
-  };
+  // 정보가 없는 경우
+  if (!nextInfo) {
+    return ['🤔 다음엔 오를까요...?'];
+  }
+
+  // 주가 상승 예상
+  if (nextInfo.price > 0) {
+    return ['✨ 제 정보에 의하면...', '다음 주기에 주가가 오를 것 같아요!'];
+  }
+
+  // 주가 하락 예상
+  if (nextInfo.price < 0) {
+    return ['🧐 제 정보에 의하면...', '다음 주기에 주가가 떨어질 것 같아요!'];
+  }
+
+  return ['🤔 다음엔 오를까요...?'];
 };
