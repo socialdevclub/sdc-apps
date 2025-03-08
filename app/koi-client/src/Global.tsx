@@ -69,8 +69,8 @@ const Global: React.FC = () => {
         theme={{
           components: {
             Modal: {
-              contentBg: '#252836',
-              headerBg: '#252836',
+              contentBg: '#1f2028',
+              headerBg: '#1f2028',
               titleColor: '#ffffff',
               titleFontSize: 18,
             },

@@ -70,7 +70,7 @@ const PartnerList = styled.ul`
 `;
 
 const PartnerItem = styled.li`
-  background-color: rgb(47, 51, 72);
+  background-color: #2a2d3a;
   border-radius: 6px;
   padding: 8px;
   display: flex;

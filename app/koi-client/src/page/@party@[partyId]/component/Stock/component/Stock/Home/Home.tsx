@@ -218,7 +218,12 @@ const Home = ({ stockId }: Props) => {
         </FutureInfoWrapper>
       </Wrapper>
       <StickyBottom>
-        <StartLoan stockId={stockId} />
+        <StartLoan
+          stockId={stockId}
+          money={user.money}
+          loanCount={user.loanCount}
+          allSellPrice={commaizeNumber(allSellPrice)}
+        />
       </StickyBottom>
     </>
   );
