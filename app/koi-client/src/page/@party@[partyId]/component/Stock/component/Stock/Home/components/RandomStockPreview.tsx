@@ -1,5 +1,6 @@
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
+import { css } from '@emotion/react';
 import { UserStore } from '../../../../../../../../store';
 import { useStockInfo } from '../hooks/useStockInfo';
 import { useRandomStockPreview } from '../hooks/useRandomStockPreview';
@@ -38,12 +39,22 @@ const RandomStockPreview = ({ stockId }: Props) => {
           <H3>오를락 내릴락 라일락 💜🫧</H3>
         </LeftSection>
       </TitleWrapper>
-      <H4>현재 시각 이후의 정보 최대 2개가 표시됩니다</H4>
-
+      <H4>가격이 오를지 내릴지는 운에 맡겨보세요!</H4>
       <StockInfoBox
         key={`${nextRoundPredict.companyName}`}
         title={nextRoundPredict.companyName}
-        value={`${Intl.NumberFormat().format(nextRoundPredict.priceVariation)}`}
+        value={
+          <div
+            css={css`
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            `}
+          >
+            <img src="/assets/li_trending-up-down.svg" alt="랜덤 주식 정보" />
+            {Intl.NumberFormat().format(nextRoundPredict.priceVariation)}
+          </div>
+        }
         valueColor="#c6c6c6"
         remainingTime={remainingTime}
         changeTime={`${nextRoundPredict.predictTime}:00`}
