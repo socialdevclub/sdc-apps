@@ -33,7 +33,7 @@ services:
       - 8080:8080
     environment:
       - DYNAMIC_CONFIG_ENABLED=true
-      - KAFKA_CLUSTERS_0_NAME=koi_kafka
+      - KAFKA_CLUSTERS_0_NAME=stock-service
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
 
   mongo:
