@@ -1,16 +1,26 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { UserService } from 'feature-nest-stock';
+import { StockUser, UserProcessor } from 'feature-nest-stock';
 import { SqsService, SqsMessage } from 'lib-nest-sqs';
-import { StockUser } from 'feature-nest-stock/dist/user/user.schema';
 
 @Injectable()
 export class SqsConsumerService implements OnModuleInit {
   private readonly logger = new Logger(SqsConsumerService.name);
 
-  constructor(private readonly sqsService: SqsService, private readonly userService: UserService) {}
+  constructor(private readonly sqsService: SqsService, private readonly userProcessor: UserProcessor) {}
 
-  onModuleInit(): void {
-    this.startConsumer();
+  async onModuleInit(): Promise<void> {
+    // eslint-disable-next-line no-return-await
+    return await this.startConsumer();
+  }
+
+  async handleMessage(message: SqsMessage): Promise<void> {
+    switch (message.action) {
+      case 'registerUser':
+        await this.handleUserRegistration(message.data as StockUser);
+        break;
+      default:
+        this.logger.warn(`알 수 없는 액션: ${message.action}`);
+    }
   }
 
   private async startConsumer(): Promise<void> {
@@ -24,8 +34,6 @@ export class SqsConsumerService implements OnModuleInit {
       } else {
         this.logger.error(`SQS Consumer 오류: ${error}`);
       }
-      // 오류 발생 시 잠시 대기 후 재시도
-      setTimeout(() => this.startConsumer(), 5000);
     }
   }
 
@@ -51,7 +59,9 @@ export class SqsConsumerService implements OnModuleInit {
         await this.handleMessage(sqsMessage);
 
         // 성공적으로 처리된 메시지 삭제
-        await this.sqsService.deleteMessage(message.ReceiptHandle);
+        if (message.ReceiptHandle) {
+          await this.sqsService.deleteMessage(message.ReceiptHandle);
+        }
         this.logger.log(`메시지 처리 완료: ${sqsMessage.id}`);
       } catch (error) {
         if (error instanceof Error) {
@@ -64,18 +74,8 @@ export class SqsConsumerService implements OnModuleInit {
     }
   }
 
-  private async handleMessage(message: SqsMessage): Promise<void> {
-    switch (message.action) {
-      case 'registerUser':
-        await this.handleUserRegistration(message.data as StockUser);
-        break;
-      default:
-        this.logger.warn(`알 수 없는 액션: ${message.action}`);
-    }
-  }
-
   private async handleUserRegistration(userData: StockUser): Promise<void> {
     this.logger.log(`사용자 등록 처리: ${userData.userId} (${userData.stockId})`);
-    await this.userService.registerUser(userData);
+    await this.userProcessor.registerUser(userData);
   }
 }

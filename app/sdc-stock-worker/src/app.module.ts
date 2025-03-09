@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SqsModule } from 'lib-nest-sqs';
+import { MongooseModule } from '@nestjs/mongoose';
 import { SqsConsumerModule } from './sqs-consumer/sqs-consumer.module';
 
 @Module({
@@ -9,13 +10,15 @@ import { SqsConsumerModule } from './sqs-consumer/sqs-consumer.module';
       envFilePath: ['.env.local', '.env'],
       isGlobal: true,
     }),
+    MongooseModule.forRoot(process.env.MONGO_URI!, {
+      ignoreUndefined: true,
+      maxIdleTimeMS: 60000,
+    }),
     SqsModule.forRoot({
       isGlobal: true,
       options: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         queueUrl: process.env.AWS_SQS_QUEUE_URL,
-        region: process.env.AWS_REGION || 'ap-northeast-2',
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        region: 'ap-northeast-2',
       },
     }),
     SqsConsumerModule,

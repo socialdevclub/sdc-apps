@@ -35,6 +35,5 @@ export type Common = {
 export type SetIntroduce = StockUserSchema;
 
 export type GetCreateUser = {
-  isAlreadyExists: boolean;
-  user: StockUserSchema;
+  messageId: string;
 };

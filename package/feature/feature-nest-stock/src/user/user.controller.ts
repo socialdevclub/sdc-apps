@@ -2,10 +2,11 @@ import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { Request, Response } from 'shared~type-stock';
 import { UserService } from './user.service';
 import { StockUser } from './user.schema';
+import { UserRepository } from './user.repository';
 
 @Controller('/stock/user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, private readonly userRepository: UserRepository) {}
 
   @Get()
   async getUsers(@Query('stockId') stockId: string): Promise<Response.GetStockUser[]> {
@@ -20,7 +21,12 @@ export class UserController {
 
   @Post('/register')
   async registerUser(@Body() body: StockUser): Promise<Response.GetCreateUser> {
-    return this.userService.registerUser(body);
+    if (!process.env.AWS_SQS_QUEUE_URL) {
+      await this.userRepository.create(body);
+      return { messageId: 'success' };
+    }
+
+    return this.userService.lazyRegisterUser(body);
   }
 
   @Post('/introduce')
