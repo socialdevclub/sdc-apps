@@ -18,6 +18,9 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
   const { data: profiles } = Query.Supabase.useQueryProfileById(users.map((v) => v.userId));
   const { data: results } = Query.Stock.useQueryResult(stockId);
 
+  // 주식 가치 계산을 위한 훅 추가
+  const { allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId });
+
   // 각 테이블의 접기/펼치기 상태 관리
   const [firstPriceTableCollapsed, setFirstPriceTableCollapsed] = useState(false);
   const [secondPriceTableCollapsed, setSecondPriceTableCollapsed] = useState(false);
@@ -29,9 +32,22 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
     return <></>;
   }
 
-  const sortedUsers = [...users].sort((a, b) => b.money - a.money) || [];
   const { companies, remainingStocks } = game;
   const companyNames = Object.keys(companies) as StockConfig.CompanyNames[];
+
+  // 각 유저별 주식 가치 맵 생성
+  const userStockValueMap = allUserSellPriceDesc().reduce((acc, { userId, allSellPrice }) => {
+    acc[userId] = allSellPrice;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // 주식 가치를 포함한 총 자산 기준으로 유저 정렬
+  const sortedUsers =
+    [...users].sort((a, b) => {
+      const aTotalValue = a.money + (userStockValueMap[a.userId] || 0);
+      const bTotalValue = b.money + (userStockValueMap[b.userId] || 0);
+      return bTotalValue - aTotalValue;
+    }) || [];
 
   // 회사 이름을 5개씩 2개 그룹으로 분할
   const firstHalfCompanies = companyNames.slice(0, Math.ceil(companyNames.length / 2));
@@ -187,14 +203,20 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
               <tr>
                 <StyledTh>순위</StyledTh>
                 <StyledTh>닉네임</StyledTh>
-                <StyledTh>현재금액</StyledTh>
-                <StyledTh>초기금액 대비</StyledTh>
+                <StyledTh>현재 소지금</StyledTh>
+                <StyledTh>주식 가치</StyledTh>
+                <StyledTh>총 자산</StyledTh>
+                <StyledTh>이익/손해</StyledTh>
+                <StyledTh>수익률</StyledTh>
               </tr>
             </thead>
             <tbody>
               {sortedUsers.map((user, i) => {
-                const profit = user.money - 1000000;
-                const percentage = ((profit / 1000000) * 100).toFixed(1);
+                const stockValue = userStockValueMap[user.userId] || 0;
+                const totalValue = user.money + stockValue;
+                const profit = totalValue - 1000000; // 초기 자금(1백만) 대비 이익
+                const profitPercentage = ((profit / 1000000) * 100).toFixed(1);
+
                 return (
                   <StyledTr key={user.userId} isAlternate={i % 2 === 1}>
                     <StyledTd>
@@ -202,8 +224,15 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
                     </StyledTd>
                     <StyledTd isBold>{profiles?.data?.find((v) => v.id === user.userId)?.username}</StyledTd>
                     <StyledTd isBold>{commaizeNumber(user.money)}</StyledTd>
+                    <StyledTd>{commaizeNumber(stockValue)}</StyledTd>
+                    <StyledTd isBold>{commaizeNumber(totalValue)}</StyledTd>
                     <StyledTd isPositive={profit > 0} isNegative={profit < 0}>
-                      {commaizeNumber(profit)} ({percentage}%)
+                      {profit > 0 ? '+' : ''}
+                      {commaizeNumber(profit)}
+                    </StyledTd>
+                    <StyledTd isPositive={profit > 0} isNegative={profit < 0}>
+                      {profit > 0 ? '+' : ''}
+                      {profitPercentage}%
                     </StyledTd>
                   </StyledTr>
                 );
@@ -275,6 +304,9 @@ const StyledWrapper = styled.div`
   gap: 2rem;
   width: 100%;
   min-width: min-content;
+  padding-bottom: 4rem;
+  margin-bottom: 1rem;
+  min-height: 100%;
 `;
 
 const TableContainer = styled.div`
@@ -400,24 +432,7 @@ const RankBadge = styled.span`
   margin-right: 5px;
 `;
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  row-gap: 20px;
-`;
-
-const TableElement = styled.table`
-  width: 100%;
-  max-width: 800px;
-  border-collapse: collapse;
-  text-align: center;
-  border: 1px solid #000;
-`;
-
-const Td = styled.td`
-  border: 1px solid #000;
-  padding: 5px;
-  text-align: center;
+const SmallText = styled.span`
+  font-size: 0.8rem;
+  opacity: 0.8;
 `;
