@@ -49,7 +49,7 @@ const Wrapper = styled.div`
   background: linear-gradient(to bottom, #111827, #000000);
 `;
 
-const Content = styled.div<{ isDesktop: boolean }>`
+const Content = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;

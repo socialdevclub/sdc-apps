@@ -14,7 +14,7 @@ const Splash = ({ onAuthDetail }: Props) => {
   return (
     <Layout>
       <Content>
-        <Logo src="/remove-bg-animal/hamster.webp" alt="hamster" />
+        <Logo src="/no_bg_animal/hamster.webp" alt="hamster" />
         <Title>소셜데브클럽</Title>
         <Description>{`사람과 사람을 연결시켜주는\n소셜 게임을 함께 만들고 즐겨요`}</Description>
       </Content>

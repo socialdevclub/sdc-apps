@@ -1,26 +1,28 @@
 import React from 'react';
 import { styled } from '@linaria/react';
 import { ChevronLeft } from 'lucide-react';
-import { VIEWS } from '@supabase/auth-ui-shared';
+import { VIEWS, ViewType } from '@supabase/auth-ui-shared';
 
 function Header({
   authView,
   handleAuthView,
   handleRouteChange,
 }: {
-  authView: VIEWS;
-  handleAuthView: (newView: string) => void;
-  handleRouteChange: (newRoute: string) => void;
+  authView: ViewType;
+  handleAuthView: (newView: ViewType) => void;
+  handleRouteChange?: (newRoute: string) => void;
 }) {
   const isEmailAuth = authView === VIEWS.SIGN_IN;
 
-  function handleClickBackButton() {
+  const handleClickBackButton = () => {
     if (isEmailAuth) {
-      handleRouteChange('SPLASH');
+      if (handleRouteChange) {
+        handleRouteChange('SPLASH');
+      }
     } else {
       handleAuthView(VIEWS.SIGN_IN);
     }
-  }
+  };
 
   return (
     <Wrapper>

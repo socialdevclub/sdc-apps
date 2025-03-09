@@ -61,7 +61,7 @@ const buttonDefaultStyles = css({
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   icon?: React.ReactNode;
-  color?: 'default' | 'primary';
+  color?: 'default' | 'primary' | 'discord';
   loading?: boolean;
   appearance?: Appearance;
 }

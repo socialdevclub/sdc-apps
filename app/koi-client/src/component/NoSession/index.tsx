@@ -9,10 +9,10 @@ import authLocalization from '../../library/supabase/authLocalization';
 import EmptyProvider from '../../component-presentation/EmptyProvider';
 
 const NoSession = () => {
-  const [route, setRoute] = React.useState<'AUTH' | 'SPLASH'>('SPLASH');
-  function handleRouteChange(newRoute: string) {
+  const [route, setRoute] = React.useState('SPLASH');
+  const handleRouteChange = (newRoute: string) => {
     setRoute(newRoute);
-  }
+  };
 
   return (
     <SwitchCase
