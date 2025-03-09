@@ -76,7 +76,7 @@ const Home = ({ stockId }: Props) => {
   }, [stock?.startedTime, refetch]);
 
   if (!user || !stock) {
-    return <div>불러오는 중.</div>;
+    return <div>불러오는 중..</div>;
   }
 
   const gameTimeInSeconds = parseInt(gameTime.split(':')[0], 10) * 60 + parseInt(gameTime.split(':')[1], 10);
@@ -218,7 +218,12 @@ const Home = ({ stockId }: Props) => {
         </FutureInfoWrapper>
       </Wrapper>
       <StickyBottom>
-        <StartLoan stockId={stockId} />
+        <StartLoan
+          stockId={stockId}
+          money={user.money}
+          loanCount={user.loanCount}
+          allSellPrice={commaizeNumber(allSellPrice)}
+        />
       </StickyBottom>
     </>
   );
@@ -253,6 +258,7 @@ const LeftSection = styled.div`
 const H3 = styled.h3`
   font-size: 16px;
   margin: 0;
+  font-weight: 400;
 `;
 
 const H5 = styled.h5`
@@ -261,16 +267,20 @@ const H5 = styled.h5`
   margin: 0;
   padding: 8px 8px;
   cursor: pointer;
+  font-weight: 400;
 `;
 
 const H4 = styled.h4`
   font-size: 10px;
+  color: #d4d4d8;
+  font-weight: 400;
 `;
 
 const H6 = styled.h6`
   font-size: 12px;
   margin: 0;
   color: #c084fc;
+  font-weight: 400;
 `;
 
 const H6Wrapper = styled.div`

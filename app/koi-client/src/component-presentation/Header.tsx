@@ -1,4 +1,4 @@
-import { styled } from '@linaria/react';
+import styled from '@emotion/styled';
 import { Avatar } from 'antd';
 import { UserRound } from 'lucide-react';
 import React from 'react';
@@ -56,15 +56,16 @@ const Header = ({ title, avatar = { isVisible: false }, CenterComponent, LeftCom
         <Title>{title}</Title>
       </LeftSection>
       {CenterComponent && <CenterSection>{CenterComponent}</CenterSection>}
-      <RightSection>{RightComponent}</RightSection>
+      <RightSection hasCenter={!!CenterComponent}>{RightComponent}</RightSection>
     </Container>
   );
 };
 
 const Title = styled.div`
   color: white;
-  flex: 1 0 auto;
   font-size: 24px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 `;
 
 const LeftSection = styled.div`
@@ -82,10 +83,10 @@ const CenterSection = styled.div`
   white-space: nowrap;
 `;
 
-const RightSection = styled.div`
-  flex: 1;
+const RightSection = styled.div<{ hasCenter: boolean }>`
   display: flex;
   justify-content: flex-end;
+  ${(props) => props.hasCenter && `flex: 1;`}
 `;
 
 const Container = styled.div`
