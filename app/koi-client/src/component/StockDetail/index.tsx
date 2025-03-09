@@ -29,6 +29,10 @@ export default function StockDetail({ stockId }: Props) {
   const { data: users } = Query.Stock.useUserList(stockId);
   const { data: stock } = Query.Stock.useQueryStock(stockId);
 
+  // 주식 가치 계산을 위한 훅 추가
+  const { allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId });
+  const isAllSellPriceZero = allUserSellPriceDesc().every((v) => v.allSellPrice === 0);
+
   const companies = stock?.companies ?? {};
   const companyNames = objectKeys(companies).length > 0 ? objectKeys(companies) : StockConfig.getRandomCompanyNames();
   const startedTime = dayjs(stock?.startedTime).toDate();
@@ -311,6 +315,10 @@ export default function StockDetail({ stockId }: Props) {
                 </ControlButton>
                 <ControlButton
                   onClick={() => {
+                    if (!isAllSellPriceZero) {
+                      alert('주식 종료 및 정산을 먼저 해주세요');
+                      return;
+                    }
                     mutateSetResult({});
                   }}
                   color="info"

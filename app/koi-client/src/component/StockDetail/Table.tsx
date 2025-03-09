@@ -219,17 +219,30 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
 
                 return (
                   <StyledTr key={user.userId} isAlternate={i % 2 === 1}>
+                    {/* 순위 */}
                     <StyledTd>
                       <RankBadge>{i + 1}</RankBadge>
                     </StyledTd>
+
+                    {/* 닉네임 */}
                     <StyledTd isBold>{profiles?.data?.find((v) => v.id === user.userId)?.username}</StyledTd>
+
+                    {/* 현재 소지금 */}
                     <StyledTd isBold>{commaizeNumber(user.money)}</StyledTd>
+
+                    {/* 주식 가치 */}
                     <StyledTd>{commaizeNumber(stockValue)}</StyledTd>
+
+                    {/* 총 자산 */}
                     <StyledTd isBold>{commaizeNumber(totalValue)}</StyledTd>
+
+                    {/* 이익/손해 */}
                     <StyledTd isPositive={profit > 0} isNegative={profit < 0}>
                       {profit > 0 ? '+' : ''}
                       {commaizeNumber(profit)}
                     </StyledTd>
+
+                    {/* 수익률 */}
                     <StyledTd isPositive={profit > 0} isNegative={profit < 0}>
                       {profit > 0 ? '+' : ''}
                       {profitPercentage}%

@@ -10,6 +10,10 @@ const RoundSetter = ({ stockId }: Props) => {
   const { data: game } = Query.Stock.useQueryStock(stockId);
   const { mutateAsync: mutateUpdateGame } = Query.Stock.useUpdateStock();
 
+  // 주식 가치 계산을 위한 훅 추가
+  const { allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId });
+  const isAllSellPriceZero = allUserSellPriceDesc().every((v) => v.allSellPrice === 0);
+
   if (!game) return <></>;
 
   return (
@@ -17,6 +21,10 @@ const RoundSetter = ({ stockId }: Props) => {
       <RoundControls>
         <RoundButton
           onClick={() => {
+            if (!isAllSellPriceZero) {
+              alert('주식 종료 및 정산을 먼저 해주세요');
+              return;
+            }
             mutateUpdateGame({
               _id: stockId,
               round: Math.max(0, game.round - 1),
@@ -28,6 +36,10 @@ const RoundSetter = ({ stockId }: Props) => {
         <RoundDisplay>{game.round}</RoundDisplay>
         <RoundButton
           onClick={() => {
+            if (!isAllSellPriceZero) {
+              alert('주식 종료 및 정산을 먼저 해주세요');
+              return;
+            }
             mutateUpdateGame({
               _id: stockId,
               round: game.round + 1,
