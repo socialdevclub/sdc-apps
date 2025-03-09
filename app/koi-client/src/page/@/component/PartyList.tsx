@@ -85,15 +85,15 @@ const PartyInformation = styled.div`
   justify-content: center;
   row-gap: 12px;
   overflow: hidden;
+  flex: 1;
+  min-width: 0;
 `;
 const PartyTitle = styled.h2`
   color: white;
   font-size: 20px;
   font-weight: 400;
-  margin: 0;
-  word-wrap: break-word;
+  word-break: break-word;
   overflow-wrap: break-word;
-  white-space: normal;
 `;
 const ParticipantCount = styled.div`
   display: flex;
@@ -114,6 +114,7 @@ const ParticipateButton = styled.button`
   font-family: DungGeunMo;
 
   padding: 4px 12px;
+  margin-left: 12px;
   background-color: #2d3244;
   color: #ffffff;
   font-size: 14px;
