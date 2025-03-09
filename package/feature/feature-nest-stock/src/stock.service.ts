@@ -259,6 +259,7 @@ export class StockService {
           date: user.lastActivityTime,
           price: companyPrice,
           quantity: amount,
+          round: stock.round,
           stockId,
           userId,
         });
@@ -437,6 +438,7 @@ export class StockService {
           date: user.lastActivityTime,
           price: companyPrice,
           quantity: amount,
+          round: stock.round,
           stockId,
           userId,
         });
