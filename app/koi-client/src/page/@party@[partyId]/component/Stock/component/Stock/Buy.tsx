@@ -107,17 +107,18 @@ const Buy = ({ stockId }: Props) => {
     return acc;
   });
 
-  const stockProfitRate = selectedCompany
-    ? calculateProfitRate(
-        companiesPrice[selectedCompany],
-        calculateAveragePurchasePrice({
-          company: selectedCompany,
-          currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-          logs,
-          round,
-        }),
-      )
-    : null;
+  const stockProfitRate =
+    selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
+      ? calculateProfitRate(
+          companiesPrice[selectedCompany],
+          calculateAveragePurchasePrice({
+            company: selectedCompany,
+            currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+            logs,
+            round,
+          }),
+        )
+      : null;
 
   const stockMessages = getStockMessages({
     companyName: selectedCompany,
