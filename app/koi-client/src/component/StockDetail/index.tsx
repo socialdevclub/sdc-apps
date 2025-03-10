@@ -356,7 +356,7 @@ export default function StockDetail({ stockId }: Props) {
               onClick={() => setTimeControlsCollapsed(!timeControlsCollapsed)}
               isCollapsed={timeControlsCollapsed}
             >
-              시간 제어
+              경과 시간 제어
               <CollapseIndicator isCollapsed={timeControlsCollapsed} />
             </CollapsibleSectionTitle>
             {!timeControlsCollapsed && (
@@ -369,7 +369,7 @@ export default function StockDetail({ stockId }: Props) {
                     });
                   }}
                 >
-                  -1분
+                  +1분
                 </TimeButton>
                 <TimeButton
                   onClick={() => {
@@ -379,7 +379,7 @@ export default function StockDetail({ stockId }: Props) {
                     });
                   }}
                 >
-                  -10초
+                  +10초
                 </TimeButton>
                 <TimeButton
                   onClick={() => {
@@ -389,7 +389,7 @@ export default function StockDetail({ stockId }: Props) {
                     });
                   }}
                 >
-                  +10초
+                  -10초
                 </TimeButton>
                 <TimeButton
                   onClick={() => {
@@ -399,7 +399,7 @@ export default function StockDetail({ stockId }: Props) {
                     });
                   }}
                 >
-                  +1분
+                  -1분
                 </TimeButton>
               </TimeControlGroup>
             )}
