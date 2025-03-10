@@ -61,12 +61,12 @@ const Buy = ({ stockId }: Props) => {
     return <>불러오는 중</>;
   }
 
-  const myInfos = objectEntries(stock.companies).reduce((reducer, [company, companyInfos]) => {
-    const myInfos = reducer;
+  const myInfos = objectEntries(stock.companies).flatMap(([company, companyInfos]) => {
+    const acc: Array<{ company: string; timeIdx: number; price: number }> = [];
 
     companyInfos.forEach((companyInfo, idx) => {
       if (companyInfos[idx].정보.some((name) => name === userId)) {
-        myInfos.push({
+        acc.push({
           company,
           price: companyInfo.가격 - companyInfos[idx - 1].가격,
           timeIdx: idx,
@@ -74,8 +74,8 @@ const Buy = ({ stockId }: Props) => {
       }
     });
 
-    return reducer;
-  }, [] as Array<{ company: string; timeIdx: number; price: number }>);
+    return acc;
+  });
 
   const stockProfitRate = selectedCompany
     ? calculateProfitRate(
