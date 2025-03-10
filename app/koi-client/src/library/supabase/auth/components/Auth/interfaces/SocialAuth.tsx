@@ -2,7 +2,7 @@ import { Provider, SupabaseClient } from '@supabase/supabase-js';
 import { useState } from 'react';
 import { I18nVariables, ProviderScopes, SocialLayout, template } from '@supabase/auth-ui-shared';
 import { Appearance } from '../../../types';
-import { Button, Container, Divider } from '../../UI/index.js';
+import { Button, Container } from '../../UI/index.js';
 import { Icons } from '../Icons.js';
 
 interface SocialAuthProps {
@@ -65,6 +65,11 @@ function SocialAuth({
     return word.charAt(0).toUpperCase() + lower.slice(1);
   }
 
+  function getButtonColor(provider: Provider) {
+    if (provider === 'discord') return 'discord';
+    return 'default';
+  }
+
   return (
     <>
       {providers && providers.length > 0 && (
@@ -79,7 +84,7 @@ function SocialAuth({
                 return (
                   <Button
                     key={provider}
-                    color="default"
+                    color={getButtonColor(provider)}
                     loading={loading}
                     onClick={() => handleProviderSignIn(provider)}
                     appearance={appearance}
@@ -94,7 +99,6 @@ function SocialAuth({
               })}
             </Container>
           </Container>
-          {!onlyThirdPartyProviders && <Divider appearance={appearance} />}
         </>
       )}
     </>
