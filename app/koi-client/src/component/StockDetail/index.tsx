@@ -303,7 +303,7 @@ export default function StockDetail({ stockId }: Props) {
                   }}
                   color="success"
                 >
-                  거래 활성화
+                  시간 초기화 + 거래 활성화
                 </ControlButton>
                 <ControlButton
                   onClick={() => {
