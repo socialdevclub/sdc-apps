@@ -1,6 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SqsModule } from 'lib-nest-sqs';
+import { HttpModule } from '@nestjs/axios';
 import { UserService } from './user.service';
 import { StockUser, userSchema } from './user.schema';
 import { UserController } from './user.controller';
@@ -12,12 +12,9 @@ import { UserProcessor } from './user.processor';
   controllers: [UserController],
   exports: [UserService, UserRepository, UserProcessor],
   imports: [
+    HttpModule,
     MongooseModule.forFeature([{ name: StockUser.name, schema: userSchema }]),
     forwardRef(() => StockModule),
-    SqsModule.forFeature({
-      queueUrl: process.env.AWS_SQS_QUEUE_URL,
-      region: 'ap-northeast-2',
-    }),
   ],
   providers: [UserService, UserRepository, UserProcessor],
 })

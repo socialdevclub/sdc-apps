@@ -6,8 +6,8 @@ import { SqsProducerService } from './sqs-producer.service';
 export class SqsProducerController {
   constructor(private readonly sqsProducerService: SqsProducerService) {}
 
-  @Post('/stock/register')
-  registerStock(@Body() body: Request.PostCreateUser): Promise<Response.GetCreateUser> {
+  @Post('/stock/user/register')
+  registerStockUser(@Body() body: Request.PostCreateUser): Promise<Response.GetCreateUser> {
     return this.sqsProducerService.registerStockUser(body);
   }
 }
