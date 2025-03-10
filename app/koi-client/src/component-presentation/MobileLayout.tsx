@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import { styled } from '@linaria/react';
+import styled from '@emotion/styled';
 import { ScrollView } from './ScrollView';
 
 interface Props {

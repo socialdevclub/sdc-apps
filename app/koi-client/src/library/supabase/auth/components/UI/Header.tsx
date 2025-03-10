@@ -1,9 +1,8 @@
-import React from 'react';
-import { styled } from '@linaria/react';
+import styled from '@emotion/styled';
 import { ChevronLeft } from 'lucide-react';
 import { VIEWS, ViewType } from '@supabase/auth-ui-shared';
 
-function Header({
+function AuthHeader({
   authView,
   handleAuthView,
   handleRouteChange,
@@ -35,7 +34,7 @@ function Header({
   );
 }
 
-export default Header;
+export default AuthHeader;
 
 const Wrapper = styled.div`
   width: 100%;
