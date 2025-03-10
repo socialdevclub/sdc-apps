@@ -123,7 +123,7 @@ const Information = ({ stockId }: Props) => {
                   letter-spacing: 0.5px;
                 `}
               >
-                {remainingTime <= 1 ? `🚨 임박` : `${remainingTime}분 후`}
+                {remainingTime <= 1 ? <span style={{ color: '#f96257' }}>🚨 임박</span> : `${remainingTime}분 후`}
               </div>
             }
             changeTime={
@@ -196,6 +196,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding-bottom: 100px;
 `;
 
 const TitleWrapper = styled.div`

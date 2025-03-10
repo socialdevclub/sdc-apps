@@ -8,9 +8,15 @@ import { LogRepository } from './log.repository';
 export class LogService {
   constructor(private readonly stockLogRepository: LogRepository) {}
 
-  async find(stockId: string, userId: string, options?: QueryOptions<StockLog>): Promise<StockLogDocument[]> {
+  async find(
+    stockId: string,
+    userId: string,
+    round: number,
+    options?: QueryOptions<StockLog>,
+  ): Promise<StockLogDocument[]> {
     const logs = await this.stockLogRepository.find(
       {
+        round,
         stockId,
         userId,
       },

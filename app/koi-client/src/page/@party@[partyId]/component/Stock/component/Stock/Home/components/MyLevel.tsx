@@ -174,9 +174,6 @@ const NextLevel = styled.div`
   color: #a1a1aa;
   flex: auto;
   white-space: nowrap;
-  span {
-    font-weight: 600;
-  }
 `;
 
 const PercentValue = styled.div`

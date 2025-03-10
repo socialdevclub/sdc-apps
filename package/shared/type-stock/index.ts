@@ -67,6 +67,7 @@ export type StockLogSchema = {
   stockId: string;
   userId: string;
   date: Date;
+  round: number;
   action: StockLogAction;
   company: string;
   price: number;

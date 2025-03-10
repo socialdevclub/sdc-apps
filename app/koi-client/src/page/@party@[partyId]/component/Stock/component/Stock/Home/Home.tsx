@@ -1,3 +1,4 @@
+import { commaizeNumber } from '@toss/utils';
 import StartLoan from '../StartLoan';
 import RandomStockPreview from './components/RandomStockPreview';
 import { useStockInfo } from './hooks/useStockInfo';
@@ -26,7 +27,7 @@ const Home = ({ stockId }: Props) => {
   } = useStockInfo(stockId);
 
   if (!user || !stock) {
-    return <div>불러오는 중.</div>;
+    return <div>불러오는 중..</div>;
   }
 
   return (
@@ -58,7 +59,12 @@ const Home = ({ stockId }: Props) => {
         <RandomStockPreview stockId={stockId} />
       </Wrapper>
       <StickyBottom>
-        <StartLoan stockId={stockId} />
+        <StartLoan
+          stockId={stockId}
+          money={user.money}
+          loanCount={user.loanCount}
+          allSellPrice={commaizeNumber(allSellPrice)}
+        />
       </StickyBottom>
     </>
   );
