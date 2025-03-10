@@ -99,7 +99,6 @@ function SocialAuth({
               })}
             </Container>
           </Container>
-          {/* {!onlyThirdPartyProviders && <Divider appearance={appearance} />} */}
         </>
       )}
     </>

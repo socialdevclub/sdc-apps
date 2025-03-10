@@ -1,32 +1,11 @@
 import styled from '@emotion/styled';
 import { ChevronLeft } from 'lucide-react';
-import { VIEWS, ViewType } from '@supabase/auth-ui-shared';
 
-function AuthHeader({
-  authView,
-  handleAuthView,
-  handleRouteChange,
-}: {
-  authView: ViewType;
-  handleAuthView: (newView: ViewType) => void;
-  handleRouteChange?: (newRoute: string) => void;
-}) {
-  const isEmailAuth = authView === VIEWS.SIGN_IN;
-
-  const handleClickBackButton = () => {
-    if (isEmailAuth) {
-      if (handleRouteChange) {
-        handleRouteChange('SPLASH');
-      }
-    } else {
-      handleAuthView(VIEWS.SIGN_IN);
-    }
-  };
-
+function AuthHeader({ onClickBack }: { onClickBack: () => void }) {
   return (
     <Wrapper>
       <Content>
-        <Button onClick={handleClickBackButton}>
+        <Button onClick={onClickBack}>
           <ChevronLeft size={35} color="gray" />
         </Button>
       </Content>

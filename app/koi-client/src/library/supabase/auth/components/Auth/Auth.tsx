@@ -50,6 +50,15 @@ function Auth({
     setAuthView(newView);
   };
 
+  // 헤더 뒤로가기 버튼 클릭 핸들러
+  const onClickBack = () => {
+    if (authView === VIEWS.SIGN_IN && handleRouteChange) {
+      handleRouteChange('SPLASH');
+    } else {
+      handleAuthView(VIEWS.SIGN_IN);
+    }
+  };
+
   /**
    * Simple boolean to detect if authView 'sign_in' or 'sign_up' or 'magic_link' is used
    *
@@ -79,9 +88,7 @@ function Auth({
     // @ts-ignore
     <>
       {/* AuthHeader를 상위 컴포넌트로 빼고 싶었으나, authView 상태가 필요한 컴포넌트라 불가피하게 해당 위치에 작업함 */}
-      {route === 'AUTH' && (
-        <AuthHeader authView={authView} handleAuthView={handleAuthView} handleRouteChange={handleRouteChange} />
-      )}
+      {route === 'AUTH' && <AuthHeader onClickBack={onClickBack} />}
       <div
         className={
           theme !== 'default'
