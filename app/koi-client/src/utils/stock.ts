@@ -79,15 +79,16 @@ export const getStockMessages = (params: GetStockMessagesParams): string[] => {
 };
 
 interface CalculateAveragePurchasePriceParams {
-  logs: Array<{ company: string; date: Date; price: number; quantity: number; action: string }>;
+  logs: Array<{ company: string; date: Date; price: number; quantity: number; action: string; round: number }>;
   company: string;
   currentQuantity: number;
+  round: number;
 }
 
 export const calculateAveragePurchasePrice = (params: CalculateAveragePurchasePriceParams): number => {
-  const { logs, company, currentQuantity } = params;
+  const { logs, company, currentQuantity, round } = params;
 
-  const myCompanyTradeLog = logs?.filter(({ company: c }) => c === company);
+  const myCompanyTradeLog = logs?.filter(({ company: c, round: r }) => c === company && r === round);
   const sortedTradeLog = myCompanyTradeLog?.sort((a, b) => a.date.getTime() - b.date.getTime());
 
   let count = 0;

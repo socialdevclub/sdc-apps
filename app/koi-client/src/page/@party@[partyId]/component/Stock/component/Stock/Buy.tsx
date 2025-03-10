@@ -23,7 +23,8 @@ const Buy = ({ stockId }: Props) => {
   const userId = supabaseSession?.user.id;
 
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
-  const { data: logs } = Query.Stock.useQueryLog({ stockId, userId });
+  const round = stock?.round;
+  const { data: logs } = Query.Stock.useQueryLog({ round, stockId, userId });
   const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
 
   const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
@@ -84,6 +85,7 @@ const Buy = ({ stockId }: Props) => {
           company: selectedCompany,
           currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
           logs,
+          round,
         }),
       )
     : 0;
