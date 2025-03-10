@@ -1,5 +1,5 @@
 import { StockConfig } from 'shared~config';
-import React from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import { commaizeNumber } from '@toss/utils';
 import { Query } from '../../hook';
@@ -18,265 +18,434 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
   const { data: profiles } = Query.Supabase.useQueryProfileById(users.map((v) => v.userId));
   const { data: results } = Query.Stock.useQueryResult(stockId);
 
+  // 주식 가치 계산을 위한 훅 추가
+  const { allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId });
+
+  // 각 테이블의 접기/펼치기 상태 관리
+  const [firstPriceTableCollapsed, setFirstPriceTableCollapsed] = useState(false);
+  const [secondPriceTableCollapsed, setSecondPriceTableCollapsed] = useState(false);
+  const [remainingStocksCollapsed, setRemainingStocksCollapsed] = useState(false);
+  const [moneyStatusCollapsed, setMoneyStatusCollapsed] = useState(false);
+  const [roundResultsCollapsed, setRoundResultsCollapsed] = useState(false);
+
   if (!game?.companies) {
     return <></>;
   }
 
-  const sortedUsers = [...users].sort((a, b) => b.money - a.money) || [];
   const { companies, remainingStocks } = game;
   const companyNames = Object.keys(companies) as StockConfig.CompanyNames[];
 
-  return (
-    <Wrapper>
-      <TableElement>
-        <thead>
-          <tr>
-            <Td rowSpan={2}>게임시각</Td>
-            {companyNames.map((company) => (
-              <Td colSpan={3} key={company}>
-                {company}
-              </Td>
-            ))}
-          </tr>
-          <tr>
-            {companyNames.map((company) => (
-              <React.Fragment key={company}>
-                <Td>등락</Td>
-                <Td>가격</Td>
-                <Td>정보</Td>
-              </React.Fragment>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {Array.from({ length: 10 }, (_, idx) => {
-            return (
-              <tr key={idx}>
-                <Td>{`${prependZero(idx * game.fluctuationsInterval, 2)}분`}</Td>
-                {companyNames.map((key) => {
-                  const company = key as StockConfig.CompanyNames;
-                  const diff = idx === 0 ? 0 : companies[company][idx].가격 - companies[company][idx - 1].가격;
-                  const 등락 = diff > 0 ? `${Math.abs(diff)}▲` : diff < 0 ? `${Math.abs(diff)}▼` : '-';
-                  const 정보 = companies[company][idx].정보.join('/');
+  // 각 유저별 주식 가치 맵 생성
+  const userStockValueMap = allUserSellPriceDesc().reduce((acc, { userId, allSellPrice }) => {
+    acc[userId] = allSellPrice;
+    return acc;
+  }, {} as Record<string, number>);
 
-                  if (elapsedTime.getMinutes() >= idx * game.fluctuationsInterval || pov === 'host') {
+  // 주식 가치를 포함한 총 자산 기준으로 유저 정렬
+  const sortedUsers =
+    [...users].sort((a, b) => {
+      const aTotalValue = a.money + (userStockValueMap[a.userId] || 0);
+      const bTotalValue = b.money + (userStockValueMap[b.userId] || 0);
+      return bTotalValue - aTotalValue;
+    }) || [];
+
+  // 회사 이름을 5개씩 2개 그룹으로 분할
+  const firstHalfCompanies = companyNames.slice(0, Math.ceil(companyNames.length / 2));
+  const secondHalfCompanies = companyNames.slice(Math.ceil(companyNames.length / 2));
+
+  // 공통 테이블 렌더링 함수 - 시세 현황용
+  const renderPriceTable = (
+    companyList: StockConfig.CompanyNames[],
+    isCollapsed: boolean,
+    setCollapsed: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => (
+    <TableContainer>
+      <CollapsibleTableTitle onClick={() => setCollapsed(!isCollapsed)} isCollapsed={isCollapsed}>
+        시세 현황 ({companyList.join(', ')})
+        <CollapseIndicator isCollapsed={isCollapsed} />
+      </CollapsibleTableTitle>
+
+      {!isCollapsed && (
+        <StyledTable>
+          <thead>
+            <tr>
+              <StyledTh rowSpan={2}>게임시각</StyledTh>
+              {companyList.map((company) => (
+                <StyledTh colSpan={3} key={company} isCompany>
+                  {company}
+                </StyledTh>
+              ))}
+            </tr>
+            <tr>
+              {companyList.map((company) => (
+                <React.Fragment key={company}>
+                  <StyledTh>등락</StyledTh>
+                  <StyledTh>가격</StyledTh>
+                  <StyledTh>정보</StyledTh>
+                </React.Fragment>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 10 }, (_, idx) => {
+              return (
+                <StyledTr key={idx} isAlternate={idx % 2 === 1}>
+                  <StyledTd>{`${prependZero(idx * game.fluctuationsInterval, 2)}분`}</StyledTd>
+                  {companyList.map((company) => {
+                    const diff = idx === 0 ? 0 : companies[company][idx].가격 - companies[company][idx - 1].가격;
+                    const 등락 = diff > 0 ? `${Math.abs(diff)}▲` : diff < 0 ? `${Math.abs(diff)}▼` : '-';
+
+                    const 정보 = companies[company][idx].정보
+                      .map((userId: string) => {
+                        const nickname = users.find((v) => v.userId === userId)?.userInfo.nickname;
+                        return nickname;
+                      })
+                      .join(' / ');
+
+                    if (elapsedTime.getMinutes() >= idx * game.fluctuationsInterval || pov === 'host') {
+                      return (
+                        <React.Fragment key={company}>
+                          <StyledTd isPositive={diff > 0} isNegative={diff < 0}>
+                            {commaizeNumber(등락)}
+                          </StyledTd>
+                          <StyledTd isBold>{commaizeNumber(companies[company][idx]?.가격)}</StyledTd>
+                          <StyledTd>{pov === 'host' ? 정보 : '.'}</StyledTd>
+                        </React.Fragment>
+                      );
+                    }
+
                     return (
                       <React.Fragment key={company}>
-                        <Td>{commaizeNumber(등락)}</Td>
-                        <Td key={company}>
-                          {commaizeNumber(companies[company as StockConfig.CompanyNames][idx]?.가격)}
-                        </Td>
-                        <Td>{pov === 'host' ? 정보 : '.'}</Td>
+                        <StyledTd isHidden>?</StyledTd>
+                        <StyledTd isHidden>?</StyledTd>
+                        <StyledTd isHidden>.</StyledTd>
                       </React.Fragment>
                     );
-                  }
+                  })}
+                </StyledTr>
+              );
+            })}
+          </tbody>
+        </StyledTable>
+      )}
+    </TableContainer>
+  );
 
-                  return (
-                    <React.Fragment key={company}>
-                      <Td>?</Td>
-                      <Td key={company}>?</Td>
-                      <Td>.</Td>
-                    </React.Fragment>
-                  );
-                })}
+  return (
+    <StyledWrapper>
+      {/* 시세 현황 테이블 - 상위 5개 회사 */}
+      {firstHalfCompanies.length > 0 &&
+        renderPriceTable(firstHalfCompanies, firstPriceTableCollapsed, setFirstPriceTableCollapsed)}
+
+      {/* 시세 현황 테이블 - 하위 5개 회사 */}
+      {secondHalfCompanies.length > 0 &&
+        renderPriceTable(secondHalfCompanies, secondPriceTableCollapsed, setSecondPriceTableCollapsed)}
+
+      {/* 잔여 주식 현황 테이블 - 접기/펼치기 기능 */}
+      <TableContainer>
+        <CollapsibleTableTitle
+          onClick={() => setRemainingStocksCollapsed(!remainingStocksCollapsed)}
+          isCollapsed={remainingStocksCollapsed}
+        >
+          잔여 주식 현황
+          <CollapseIndicator isCollapsed={remainingStocksCollapsed} />
+        </CollapsibleTableTitle>
+
+        {!remainingStocksCollapsed && (
+          <StyledTable>
+            <thead>
+              <tr>
+                <StyledTh>잔여주식</StyledTh>
+                {companyNames.map((company) => (
+                  <StyledTh key={company} isCompany>
+                    {company}
+                  </StyledTh>
+                ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </TableElement>
+            </thead>
+            <tbody>
+              <StyledTr>
+                <StyledTd isBold>시장</StyledTd>
+                {companyNames.map((company) => (
+                  <StyledTd key={company} isBold>
+                    {remainingStocks[company]}
+                  </StyledTd>
+                ))}
+              </StyledTr>
+              {users.map((user, index) => {
+                return (
+                  <StyledTr key={user.userId} isAlternate={index % 2 === 1}>
+                    <StyledTd>{profiles?.data?.find((v) => v.id === user.userId)?.username}</StyledTd>
+                    {companyNames.map((company) => {
+                      return <StyledTd key={company}>{user.inventory[company] || ''}</StyledTd>;
+                    })}
+                  </StyledTr>
+                );
+              })}
+            </tbody>
+          </StyledTable>
+        )}
+      </TableContainer>
 
-      <TableElement>
-        <thead>
-          <tr>
-            <Td>잔여주식</Td>
-            {companyNames.map((company) => (
-              <Td key={company}>{company}</Td>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <Td>시장</Td>
-            {companyNames.map((company) => (
-              <Td key={company}>{remainingStocks[company]}</Td>
-            ))}
-          </tr>
-          {users.map((user) => {
-            return (
-              <tr key={user.userId}>
-                <Td>{profiles?.data?.find((v) => v.id === user.userId)?.username}</Td>
-                {companyNames.map((company) => {
-                  return <Td key={company}>{user.inventory[company] || ''}</Td>;
-                })}
+      {/* 소지금 현황 테이블 - 접기/펼치기 기능 */}
+      <TableContainer>
+        <CollapsibleTableTitle
+          onClick={() => setMoneyStatusCollapsed(!moneyStatusCollapsed)}
+          isCollapsed={moneyStatusCollapsed}
+        >
+          소지금 현황
+          <CollapseIndicator isCollapsed={moneyStatusCollapsed} />
+        </CollapsibleTableTitle>
+
+        {!moneyStatusCollapsed && (
+          <StyledTable>
+            <thead>
+              <tr>
+                <StyledTh>순위</StyledTh>
+                <StyledTh>닉네임</StyledTh>
+                <StyledTh>현재 소지금</StyledTh>
+                <StyledTh>주식 가치</StyledTh>
+                <StyledTh>총 자산</StyledTh>
+                <StyledTh>이익/손해</StyledTh>
+                <StyledTh>수익률</StyledTh>
               </tr>
-            );
-          })}
-        </tbody>
-      </TableElement>
+            </thead>
+            <tbody>
+              {sortedUsers.map((user, i) => {
+                const stockValue = userStockValueMap[user.userId] || 0;
+                const totalValue = user.money + stockValue;
+                const profit = totalValue - 1000000; // 초기 자금(1백만) 대비 이익
+                const profitPercentage = ((profit / 1000000) * 100).toFixed(1);
 
-      <TableElement>
-        <thead>
-          <tr>
-            <Td>소지금</Td>
-            {sortedUsers.map((user, i) => {
-              return (
-                <Td key={user.userId}>
-                  {i + 1}위, {profiles?.data?.find((v) => v.id === user.userId)?.username}
-                </Td>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <Td />
-            {sortedUsers.map((user) => {
-              return <Td key={user.userId}>{commaizeNumber(user.money)}</Td>;
-            })}
-          </tr>
-          <tr>
-            <Td />
-            {sortedUsers.map((user) => {
-              return <Td key={user.userId}>{commaizeNumber(user.money - 1000000)}</Td>;
-            })}
-          </tr>
-        </tbody>
-      </TableElement>
+                return (
+                  <StyledTr key={user.userId} isAlternate={i % 2 === 1}>
+                    {/* 순위 */}
+                    <StyledTd>
+                      <RankBadge>{i + 1}</RankBadge>
+                    </StyledTd>
 
-      <TableElement>
-        <thead>
-          <tr>
-            <Td>닉네임</Td>
-            {sortedUsers.map((user) => {
-              return <Td key={user.userId}>{profiles?.data?.find((v) => v.id === user.userId)?.username}</Td>;
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <Td>0라운드</Td>
-            {sortedUsers.map((user) => {
-              return (
-                <Td key={user.userId}>
-                  {commaizeNumber(results?.filter((v) => v.userId === user.userId && v.round === 0)[0]?.money ?? '')}
-                </Td>
-              );
-            })}
-          </tr>
-          <tr>
-            <Td>1라운드</Td>
-            {sortedUsers.map((user) => {
-              return (
-                <Td key={user.userId}>
-                  {commaizeNumber(results?.filter((v) => v.userId === user.userId && v.round === 1)[0]?.money ?? '')}
-                </Td>
-              );
-            })}
-          </tr>
-          <tr>
-            <Td>2라운드</Td>
-            {sortedUsers.map((user) => {
-              return (
-                <Td key={user.userId}>
-                  {commaizeNumber(results?.filter((v) => v.userId === user.userId && v.round === 2)[0]?.money ?? '')}
-                </Td>
-              );
-            })}
-          </tr>
-          <tr>
-            <Td>1+2라운드 합계</Td>
-            {sortedUsers.map((user) => {
-              return (
-                <Td key={user.userId}>
-                  {commaizeNumber(
-                    results
-                      ?.filter((v) => v.userId === user.userId && v.round > 0)
-                      .reduce((acc, v) => acc + v.money, 0),
-                  )}
-                </Td>
-              );
-            })}
-          </tr>
-          <tr>
-            <Td>1+2라운드 평균</Td>
-            {sortedUsers.map((user) => {
-              return (
-                <Td key={user.userId}>
-                  {commaizeNumber(
-                    (results
-                      ?.filter((v) => v.userId === user.userId && v.round > 0)
-                      .reduce((acc, v) => acc + v.money, 0) ?? 0) / 2,
-                  )}
-                </Td>
-              );
-            })}
-          </tr>
-        </tbody>
-      </TableElement>
+                    {/* 닉네임 */}
+                    <StyledTd isBold>{profiles?.data?.find((v) => v.id === user.userId)?.username}</StyledTd>
 
-      {/* <TableElement>
-        <thead>
-          <tr>
-            <Td rowSpan={2}>회사</Td>
-            {users.map((user) => (
-              <Td colSpan={3} key={user.nickname}>
-                {user.nickname}
-              </Td>
-            ))}
-          </tr>
-          <tr>
-            {users.map((user) => (
-              <React.Fragment key={user.nickname}>
-                <Td>소지금액</Td>
-                <Td>팔고난후금액</Td>
-                <Td>팔고난후수익률</Td>
-              </React.Fragment>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {companyNames.map((company) => {
-            return (
-              <tr key={company}>
-                <Td>{company}</Td>
-                {users.map((user) => {
-                  return (
-                    <React.Fragment key={user.nickname}>
-                      <Td>{commaizeNumber(user.money)}</Td>
-                      <Td />
-                      <Td />
-                    </React.Fragment>
-                  );
-                })}
+                    {/* 현재 소지금 */}
+                    <StyledTd isBold>{commaizeNumber(user.money)}</StyledTd>
+
+                    {/* 주식 가치 */}
+                    <StyledTd>{commaizeNumber(stockValue)}</StyledTd>
+
+                    {/* 총 자산 */}
+                    <StyledTd isBold>{commaizeNumber(totalValue)}</StyledTd>
+
+                    {/* 이익/손해 */}
+                    <StyledTd isPositive={profit > 0} isNegative={profit < 0}>
+                      {profit > 0 ? '+' : ''}
+                      {commaizeNumber(profit)}
+                    </StyledTd>
+
+                    {/* 수익률 */}
+                    <StyledTd isPositive={profit > 0} isNegative={profit < 0}>
+                      {profit > 0 ? '+' : ''}
+                      {profitPercentage}%
+                    </StyledTd>
+                  </StyledTr>
+                );
+              })}
+            </tbody>
+          </StyledTable>
+        )}
+      </TableContainer>
+
+      {/* 라운드별 결과 테이블 - 접기/펼치기 기능 */}
+      <TableContainer>
+        <CollapsibleTableTitle
+          onClick={() => setRoundResultsCollapsed(!roundResultsCollapsed)}
+          isCollapsed={roundResultsCollapsed}
+        >
+          라운드별 결과
+          <CollapseIndicator isCollapsed={roundResultsCollapsed} />
+        </CollapsibleTableTitle>
+
+        {!roundResultsCollapsed && (
+          <StyledTable>
+            <thead>
+              <tr>
+                <StyledTh>순위</StyledTh>
+                <StyledTh>닉네임</StyledTh>
+                <StyledTh>0라운드</StyledTh>
+                <StyledTh>1라운드</StyledTh>
+                <StyledTh>2라운드</StyledTh>
+                <StyledTh isHighlighted>1+2 합계</StyledTh>
+                <StyledTh isHighlighted>1+2 평균</StyledTh>
               </tr>
-            );
-          })}
-        </tbody>
-      </TableElement> */}
-    </Wrapper>
+            </thead>
+            <tbody>
+              {sortedUsers.map((user, i) => {
+                const round0 = results?.filter((v) => v.userId === user.userId && v.round === 0)[0]?.money ?? 0;
+                const round1 = results?.filter((v) => v.userId === user.userId && v.round === 1)[0]?.money ?? 0;
+                const round2 = results?.filter((v) => v.userId === user.userId && v.round === 2)[0]?.money ?? 0;
+                const roundSum = round1 + round2 || 0;
+                const roundAvg = roundSum / (round1 && round2 ? 2 : round1 || round2 ? 1 : 1) || 0;
+
+                return (
+                  <StyledTr key={user.userId} isAlternate={i % 2 === 1}>
+                    <StyledTd>
+                      <RankBadge>{i + 1}</RankBadge>
+                    </StyledTd>
+                    <StyledTd isBold>{profiles?.data?.find((v) => v.id === user.userId)?.username}</StyledTd>
+                    <StyledTd>{commaizeNumber(round0)}</StyledTd>
+                    <StyledTd>{commaizeNumber(round1)}</StyledTd>
+                    <StyledTd>{commaizeNumber(round2)}</StyledTd>
+                    <StyledTd isHighlighted>{commaizeNumber(roundSum)}</StyledTd>
+                    <StyledTd isHighlighted>{commaizeNumber(roundAvg)}</StyledTd>
+                  </StyledTr>
+                );
+              })}
+            </tbody>
+          </StyledTable>
+        )}
+      </TableContainer>
+    </StyledWrapper>
   );
 };
 
-const Wrapper = styled.div`
-  margin: 20px;
-  width: 1200px;
-  overflow-x: scroll;
-  gap: 20px;
+export default Table;
 
+// 스타일 컴포넌트
+const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-const TableElement = styled.table`
+  gap: 2rem;
   width: 100%;
+  min-width: min-content;
+  padding-bottom: 4rem;
+  margin-bottom: 1rem;
+  min-height: 100%;
 `;
 
-const Td = styled.td`
-  border: 1px solid black;
-  padding: 10px;
+const TableContainer = styled.div`
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  min-width: min-content;
+`;
 
-  /* 1줄 텍스트 */
+const TableTitle = styled.h3`
+  margin: 0;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  color: #3f51b5;
+`;
+
+const CollapsibleTableTitle = styled(TableTitle)<{ isCollapsed: boolean }>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #e9ecef;
+  }
+`;
+
+const CollapseIndicator = styled.div<{ isCollapsed: boolean }>`
+  width: 20px;
+  height: 20px;
+  position: relative;
+
+  &:before,
+  &:after {
+    content: '';
+    position: absolute;
+    background-color: #3f51b5;
+    transition: transform 0.2s ease;
+  }
+
+  &:before {
+    top: 9px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+  }
+
+  &:after {
+    top: 0;
+    left: 9px;
+    width: 2px;
+    height: 100%;
+    transform: ${({ isCollapsed }) => (isCollapsed ? 'none' : 'scaleY(0)')};
+  }
+`;
+
+const StyledTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  table-layout: auto;
   white-space: nowrap;
 `;
 
-export default Table;
+const StyledTh = styled.th<{ isCompany?: boolean; isHighlighted?: boolean }>`
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid #e9ecef;
+  background-color: ${({ isCompany, isHighlighted }) => {
+    if (isCompany) return 'rgba(63, 81, 181, 0.08)';
+    if (isHighlighted) return 'rgba(63, 81, 181, 0.05)';
+    return '#f8f9fa';
+  }};
+  color: ${({ isCompany, isHighlighted }) => {
+    if (isCompany || isHighlighted) return '#3f51b5';
+    return '#495057';
+  }};
+  font-weight: 600;
+  white-space: nowrap;
+`;
+
+const StyledTr = styled.tr<{ isAlternate?: boolean }>`
+  background-color: ${({ isAlternate }) => (isAlternate ? 'rgba(0, 0, 0, 0.02)' : 'white')};
+`;
+
+const StyledTd = styled.td<{
+  isPositive?: boolean;
+  isNegative?: boolean;
+  isBold?: boolean;
+  isHidden?: boolean;
+  isHighlighted?: boolean;
+}>`
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid #e9ecef;
+  color: ${({ isPositive, isNegative, isHidden, isHighlighted }) => {
+    if (isPositive) return '#f44336';
+    if (isNegative) return '#4caf50';
+    if (isHidden) return '#adb5bd';
+    if (isHighlighted) return '#3f51b5';
+    return '#495057';
+  }};
+  font-weight: ${({ isBold, isHighlighted }) => (isBold || isHighlighted ? '600' : '400')};
+  background-color: ${({ isHighlighted }) => (isHighlighted ? 'rgba(63, 81, 181, 0.05)' : 'inherit')};
+  white-space: nowrap;
+`;
+
+const RankBadge = styled.span`
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  background-color: #3f51b5;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  margin-right: 5px;
+`;
+
+const SmallText = styled.span`
+  font-size: 0.8rem;
+  opacity: 0.8;
+`;
