@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { Request, Response } from 'shared~type-stock';
+import type { Request, Response } from 'shared~type-stock';
 import { SqsProducerService } from './sqs-producer.service';
 
 @Controller('queue')

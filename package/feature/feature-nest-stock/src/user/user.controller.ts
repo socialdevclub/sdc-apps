@@ -26,14 +26,11 @@ export class UserController {
 
   @Post('/register')
   async registerUser(@Body() body: StockUser): Promise<Response.GetCreateUser> {
-    if (!process.env.AWS_SQS_QUEUE_URL) {
-      await this.userRepository.create(body);
-      return { messageId: 'direct' };
-    }
-
     return this.httpService.axiosRef
       .post<Response.GetCreateUser>('https://api.socialdev.club/queue/stock/user/register', body)
-      .then((res) => res.data)
+      .then((res) => {
+        return res.data;
+      })
       .catch(async (error) => {
         console.error(error);
         await this.userRepository.create(body);
