@@ -1,0 +1,9 @@
+{
+  "extends": "../../__config__/tsconfig.common.nest.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "noEmit": true,
+    "strictNullChecks": true
+  },
+}
