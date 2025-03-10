@@ -13,6 +13,9 @@ export class StockLog implements StockLogSchema {
   @Prop()
   date: Date;
 
+  @Prop()
+  round: number;
+
   @Prop({ type: SchemaTypes.String })
   action: StockLogAction;
 
@@ -25,8 +28,8 @@ export class StockLog implements StockLogSchema {
   @Prop()
   quantity: number;
 
-  constructor(partial: Partial<StockLog>) {
-    Object.assign(this, partial);
+  constructor(stockLog: StockLog) {
+    Object.assign(this, stockLog);
   }
 }
 

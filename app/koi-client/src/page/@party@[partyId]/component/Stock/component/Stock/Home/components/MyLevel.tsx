@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Image } from 'antd';
-import * as COLOR from '../../../../../../../config/color';
-import { LEVEL_INFO, type LevelInfoType } from '../../../../../../../config/level';
+import * as COLOR from '../../../../../../../../config/color';
+import { LEVEL_INFO, type LevelInfoType } from '../../../../../../../../config/level';
 
 type Props = {
   moneyRatio: string | number;
@@ -174,14 +174,10 @@ const NextLevel = styled.div`
   color: #a1a1aa;
   flex: auto;
   white-space: nowrap;
-  span {
-    font-weight: 600;
-  }
 `;
 
 const PercentValue = styled.div`
   font-size: 30px;
-  font-weight: 700;
   color: ${COLOR.pastelGreen};
 `;
 

@@ -1,6 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import { useSearchParams } from 'react-router-dom';
 
 export type TabsProps = {
   items: {
@@ -12,7 +13,14 @@ export type TabsProps = {
 };
 
 export const Tabs = ({ items, defaultActiveKey, onChange }: TabsProps) => {
-  const [currentTab, setCurrentTab] = React.useState(() => defaultActiveKey);
+  const [searchParams] = useSearchParams();
+  const pageFromURL = searchParams.get('page') || defaultActiveKey; // ✅ URL에서 page 값 가져오기
+
+  const [currentTab, setCurrentTab] = useState(pageFromURL);
+
+  useEffect(() => {
+    setCurrentTab(pageFromURL);
+  }, [pageFromURL]);
 
   const handleTabClick = useCallback(
     (key: string) => {

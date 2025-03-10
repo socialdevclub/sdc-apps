@@ -100,8 +100,8 @@ export class StockService {
 
     // 플레이어에게 줄 정보의 절반 개수
     // 플레이어 수 00명 ~ 30명 : 3개 (*2 = 6개)
-    // 플레이어 수 31명 ~ 60명 : 2개 (*2 = 4개)
-    // 플레이어 수 61명 ~     : 1개 (*2 = 2개)
+    // 플레이어 수 31명 ~ 45명 : 2개 (*2 = 4개)
+    // 플레이어 수 46명 ~     : 1개 (*2 = 2개)
     const halfInfoCount = Math.min(Math.max(Math.floor(90 / players.length), 1), 3);
 
     // 플레이어에게 줄 정보를 랜덤하게 주기 위한 배열
@@ -259,6 +259,7 @@ export class StockService {
           date: user.lastActivityTime,
           price: companyPrice,
           quantity: amount,
+          round: stock.round,
           stockId,
           userId,
         });
@@ -437,6 +438,7 @@ export class StockService {
           date: user.lastActivityTime,
           price: companyPrice,
           quantity: amount,
+          round: stock.round,
           stockId,
           userId,
         });

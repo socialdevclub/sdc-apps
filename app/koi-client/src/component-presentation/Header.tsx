@@ -1,6 +1,6 @@
-import { styled } from '@linaria/react';
+import styled from '@emotion/styled';
 import { Avatar } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { UserRound } from 'lucide-react';
 import React from 'react';
 
 interface AvatarProp {
@@ -16,65 +16,87 @@ type Props = {
   | {
       avatar?: AvatarProp;
       LeftComponent?: never;
+      CenterComponent?: never;
     }
   | {
       avatar?: never;
       LeftComponent?: React.ReactNode;
+      CenterComponent?: never;
+    }
+  | {
+      avatar?: AvatarProp;
+      LeftComponent?: never;
+      CenterComponent?: React.ReactNode;
     }
 );
 
-const Header = ({ title, avatar = { isVisible: false }, LeftComponent, RightComponent }: Props) => {
+const Header = ({ title, avatar = { isVisible: false }, CenterComponent, LeftComponent, RightComponent }: Props) => {
   const { isVisible, src, onClick } = avatar;
 
   return (
     <Container>
       <LeftSection>
-        <AvatarWrapper>
-          {LeftComponent || (
-            <Avatar
-              size="large"
-              style={{ cursor: onClick ? 'pointer' : 'default', visibility: isVisible ? 'visible' : 'hidden' }}
-              icon={<UserOutlined />}
-              src={src}
-              onClick={onClick}
-            />
-          )}
-        </AvatarWrapper>
+        {LeftComponent || (
+          <Avatar
+            size="large"
+            style={{
+              alignItems: 'center',
+              backgroundColor: '#4B5563',
+              color: '#D1D5DB',
+              cursor: onClick ? 'pointer' : 'default',
+              display: 'flex',
+              justifyContent: 'center',
+              visibility: isVisible ? 'visible' : 'hidden',
+            }}
+            icon={<UserRound />}
+            src={src}
+            onClick={onClick}
+          />
+        )}
         <Title>{title}</Title>
       </LeftSection>
-      <RIghtSection>{RightComponent}</RIghtSection>
+      {CenterComponent && <CenterSection>{CenterComponent}</CenterSection>}
+      <RightSection hasCenter={!!CenterComponent}>{RightComponent}</RightSection>
     </Container>
   );
 };
 
 const Title = styled.div`
   color: white;
-  flex: 1 0 auto;
   font-size: 24px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 `;
 
 const LeftSection = styled.div`
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 4px;
 `;
 
-const RIghtSection = styled.div`
-  flex: 80px;
+const CenterSection = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+`;
+
+const RightSection = styled.div<{ hasCenter: boolean }>`
   display: flex;
   justify-content: flex-end;
+  ${(props) => props.hasCenter && `flex: 1;`}
 `;
 
 const Container = styled.div`
   position: relative;
-  padding: 24px 12px;
+  padding: 16px 16px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
-`;
-
-const AvatarWrapper = styled.div`
-  flex: 80px;
+  justify-content: space-between;
+  color: white;
 `;
 
 export default Header;

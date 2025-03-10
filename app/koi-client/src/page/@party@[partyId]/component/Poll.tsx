@@ -42,7 +42,7 @@ const Poll = () => {
       {contextHolder}
       <List
         itemLayout="horizontal"
-        header={<span>{poll.title}</span>}
+        header={<span style={{ color: '#ffffff', fontSize: '24px' }}>{poll.title}</span>}
         dataSource={poll.votes}
         renderItem={(vote) => {
           const selectedVote = selectedVoteList.find((selectedVote) => selectedVote.title === vote.title);
@@ -109,7 +109,7 @@ const Poll = () => {
                   disabled={countAll === 0}
                   key={vote.title}
                 >
-                  <span>
+                  <span style={{ color: 'white' }}>
                     {countAll}명 <CaretDownFilled />
                   </span>
                 </Dropdown>,
@@ -155,8 +155,8 @@ const Poll = () => {
                     />
                   )
                 }
-                title={vote.title}
-                description={<Progress percent={ratio * 100} showInfo={false} />}
+                title={<span style={{ color: 'white' }}>{vote.title}</span>}
+                description={<Progress trailColor="#2f2f2f" percent={ratio * 100} showInfo={false} />}
               />
             </List.Item>
           );

@@ -5,6 +5,7 @@ import { Appearance } from '../../types';
 const containerDefaultStyles = css({
   display: 'flex',
   gap: '4px',
+  position: 'relative',
   variants: {
     direction: {
       horizontal: {

@@ -33,3 +33,7 @@ export type Common = {
 };
 
 export type SetIntroduce = StockUserSchema;
+
+export type GetCreateUser = {
+  messageId: string;
+};

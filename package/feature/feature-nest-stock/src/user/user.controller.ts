@@ -1,11 +1,17 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { Request, Response } from 'shared~type-stock';
+import { HttpService } from '@nestjs/axios';
 import { UserService } from './user.service';
 import { StockUser } from './user.schema';
+import { UserRepository } from './user.repository';
 
 @Controller('/stock/user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly userService: UserService,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   @Get()
   async getUsers(@Query('stockId') stockId: string): Promise<Response.GetStockUser[]> {
@@ -14,8 +20,22 @@ export class UserController {
   }
 
   @Post()
-  setUser(@Body() body: StockUser): Promise<StockUser> {
+  setUser(@Body() body: StockUser): Promise<boolean> {
     return this.userService.setUser(body);
+  }
+
+  @Post('/register')
+  async registerUser(@Body() body: StockUser): Promise<Response.GetCreateUser> {
+    return this.httpService.axiosRef
+      .post<Response.GetCreateUser>('https://api.socialdev.club/queue/stock/user/register', body)
+      .then((res) => {
+        return res.data;
+      })
+      .catch(async (error) => {
+        console.error(error);
+        await this.userRepository.create(body);
+        return { messageId: 'direct' };
+      });
   }
 
   @Post('/introduce')

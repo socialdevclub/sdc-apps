@@ -1,15 +1,45 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, MongooseQueryOptions, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+import { HttpException, Injectable } from '@nestjs/common';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import mongoose, {
+  FilterQuery,
+  Model,
+  MongooseQueryOptions,
+  ProjectionType,
+  QueryOptions,
+  UpdateQuery,
+} from 'mongoose';
 import { DeleteOptions, UpdateOptions } from 'mongodb';
 import { StockUser, UserDocument } from './user.schema';
 
 @Injectable()
 export class UserRepository {
   constructor(
+    @InjectConnection() private readonly connection: mongoose.Connection,
     @InjectModel(StockUser.name)
     private readonly userModel: Model<StockUser>,
   ) {}
+
+  async create(user: StockUser): Promise<void> {
+    const session = await this.connection.startSession();
+
+    try {
+      await session.withTransaction(async () => {
+        const doc = await this.findOne({ stockId: user.stockId, userId: user.userId }, null, {
+          session,
+        });
+        if (!doc) {
+          const newStockUser = new StockUser(user, user);
+          const newDoc = new this.userModel(newStockUser);
+          await newDoc.save({ session });
+        }
+      });
+    } catch (err) {
+      console.error(err);
+      throw new HttpException('POST /stock/user/register Unknown Error', 500, { cause: err });
+    } finally {
+      await session.endSession();
+    }
+  }
 
   find(
     filter?: FilterQuery<StockUser>,
@@ -47,6 +77,14 @@ export class UserRepository {
     options?: DeleteOptions & Omit<MongooseQueryOptions<StockUser>, 'lean' | 'timestamps'>,
   ): Promise<boolean> {
     return !!(await this.userModel.deleteMany(filter, options));
+  }
+
+  async updateOne(
+    filter: FilterQuery<StockUser>,
+    update: UpdateQuery<StockUser>,
+    options?: UpdateOptions & Omit<MongooseQueryOptions<StockUser>, 'lean'>,
+  ): Promise<boolean> {
+    return !!(await this.userModel.updateOne(filter, update, options));
   }
 
   async updateMany(

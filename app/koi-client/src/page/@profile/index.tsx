@@ -2,6 +2,7 @@ import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Button, Form, Input, Radio } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import styled from '@emotion/styled';
 import { UserStore } from '../../store';
 import { Query } from '../../hook';
 import AvatarSetter from './component/AvatarSetter';
@@ -75,15 +76,19 @@ export default function Profile() {
           hasFeedback={isDuplicatedUsername}
           validateStatus={isDuplicatedUsername ? 'error' : undefined}
           help={isDuplicatedUsername ? '이미 사용중인 닉네임입니다' : undefined}
-          label="닉네임"
+          label={<Label>닉네임</Label>}
         >
           <Input type="text" name="nickname" required value={username} onChange={(e) => setUsername(e.target.value)} />
         </Form.Item>
 
-        <Form.Item required label="성별">
+        <Form.Item required label={<Label>성별</Label>}>
           <Radio.Group value={gender} onChange={(e) => setGender(e.target.value)}>
-            <Radio value="M">남성</Radio>
-            <Radio value="F">여성</Radio>
+            <Radio value="M">
+              <Label>남성</Label>
+            </Radio>
+            <Radio value="F">
+              <Label>여성</Label>
+            </Radio>
           </Radio.Group>
         </Form.Item>
 
@@ -116,3 +121,8 @@ export default function Profile() {
     </MobileLayout>
   );
 }
+
+// Form.Item의 라벨은 style={{color: 색상}}으로 폰트색이 바뀌지 않아서 span 태그로 대체해서 사용
+const Label = styled.span`
+  color: white;
+`;

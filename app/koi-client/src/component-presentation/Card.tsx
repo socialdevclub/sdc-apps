@@ -48,8 +48,8 @@ const ContainerTitle = styled.div`
 
 const ContainerBolder = styled.div`
   font-size: 24px;
-  font-weight: bolder;
   line-height: 22px;
+  font-weight: 400;
 `;
 
 export default Card;
