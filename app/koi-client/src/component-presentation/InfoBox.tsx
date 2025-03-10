@@ -3,7 +3,7 @@ import { CSSProperties } from 'react';
 
 interface InfoBoxProps {
   title?: string;
-  value: string;
+  value: React.ReactNode;
   valueColor?: CSSProperties['color'];
   leftTime?: React.ReactNode;
   changeTime?: React.ReactNode;
@@ -53,6 +53,7 @@ const TimeWrapper = styled.div`
   padding: 10px 8px;
   border-radius: 4px;
   text-align: center;
+  gap: 2px;
 `;
 
 const ContainerTitle = styled.div`

@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Image } from 'antd';
-import * as COLOR from '../../../../../../../config/color';
-import { LEVEL_INFO, type LevelInfoType } from '../../../../../../../config/level';
+import * as COLOR from '../../../../../../../../config/color';
+import { LEVEL_INFO, type LevelInfoType } from '../../../../../../../../config/level';
 
 type Props = {
   moneyRatio: string | number;
