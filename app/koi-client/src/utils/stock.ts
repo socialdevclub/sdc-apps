@@ -21,7 +21,7 @@ export function calculateProfitRate(currentPrice: number, averagePrice: number):
 
   const profitRate = ((currentPrice - averagePrice) / averagePrice) * 100;
 
-  return Math.round(profitRate * 100) / 100;
+  return Math.round(profitRate * 10) / 10;
 }
 
 /**
@@ -82,7 +82,7 @@ interface CalculateAveragePurchasePriceParams {
   logs: Array<{ company: string; date: Date; price: number; quantity: number; action: string; round: number }>;
   company: string;
   currentQuantity: number;
-  round: number;
+  round?: number;
 }
 
 export const calculateAveragePurchasePrice = (params: CalculateAveragePurchasePriceParams): number => {

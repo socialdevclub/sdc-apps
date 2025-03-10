@@ -14,6 +14,35 @@ import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
 import { calculateAveragePurchasePrice, calculateProfitRate, getStockMessages } from '../../../../../../utils/stock';
 
+const renderProfitBadge = (stockProfitRate: number | null) => {
+  if (stockProfitRate === null) {
+    return {
+      backgroundColor: 'rgba(148, 163, 184, 0.2)',
+      color: '#94A3B8',
+      text: '해당 주식이 없어요',
+    };
+  }
+  if (stockProfitRate > 0) {
+    return {
+      backgroundColor: 'rgba(163, 230, 53, 0.2)',
+      color: '#a3e635',
+      text: `+${stockProfitRate}% 수익 중`,
+    };
+  }
+  if (stockProfitRate < 0) {
+    return {
+      backgroundColor: 'rgba(220, 38, 38, 0.2)',
+      color: '#DC2626',
+      text: `${stockProfitRate}% 손실 중`,
+    };
+  }
+  return {
+    backgroundColor: 'rgba(148, 163, 184, 0.2)',
+    color: '#94A3B8',
+    text: '0% 변동 없음',
+  };
+};
+
 interface Props {
   stockId: string;
 }
@@ -88,9 +117,7 @@ const Buy = ({ stockId }: Props) => {
           round,
         }),
       )
-    : 0;
-
-  const isProfit = stockProfitRate >= 0;
+    : null;
 
   const stockMessages = getStockMessages({
     companyName: selectedCompany,
@@ -221,11 +248,7 @@ const Buy = ({ stockId }: Props) => {
           subtitle={`보유 주식: ${보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0}`}
           value={selectedCompany ? companiesPrice[selectedCompany] : 0}
           valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
-          badge={{
-            backgroundColor: '#3e4e37',
-            color: '#a3e635',
-            text: `${isProfit ? '+' : ''}${stockProfitRate}% 수익 중`,
-          }}
+          badge={renderProfitBadge(stockProfitRate)}
         />
         <MessageBalloon messages={stockMessages} />
         <StockLineChart
@@ -236,6 +259,7 @@ const Buy = ({ stockId }: Props) => {
             company: selectedCompany,
             currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
             logs,
+            round,
           })}
         />
         <ButtonGroup
