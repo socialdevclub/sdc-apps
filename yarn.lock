@@ -205,7 +205,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-sqs@npm:^3.414.0, @aws-sdk/client-sqs@npm:^3.758.0":
+"@aws-sdk/client-sqs@npm:^3.414.0":
   version: 3.758.0
   resolution: "@aws-sdk/client-sqs@npm:3.758.0"
   dependencies:
@@ -2703,6 +2703,17 @@ __metadata:
   dependencies:
     sparse-bitfield: "npm:^3.0.3"
   checksum: 1a631b92d21691626a508e5eafafb43229d2d9bdafc454cda182ed8626f046df0ef8cf4fe545403f75bbeb991954dcef0554a51f2551dbadc54ced35f1df0192
+  languageName: node
+  linkType: hard
+
+"@nestjs/axios@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@nestjs/axios@npm:4.0.0"
+  peerDependencies:
+    "@nestjs/common": ^10.0.0 || ^11.0.0
+    axios: ^1.3.1
+    rxjs: ^7.0.0
+  checksum: 9a61ac8a2fdbf304961696148945ba9e19c0ed73256767b0a643bbafe77106b2f738cb2f35f2fc63bff09a8abcd18365d2f8c772484e2fdd70b455bceb7b5822
   languageName: node
   linkType: hard
 
@@ -5957,6 +5968,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.8.2":
+  version: 1.8.2
+  resolution: "axios@npm:1.8.2"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: d4328758128d0602cc809a8e7627622cb7839b379eae5e4d6b9d603dd4d5fb89159985630243ec107cf5c675cd8825dba737a319dff9499f3b7688d9a69ec9ed
+  languageName: node
+  linkType: hard
+
 "axobject-query@npm:^3.1.1":
   version: 3.1.1
   resolution: "axobject-query@npm:3.1.1"
@@ -8536,7 +8558,6 @@ __metadata:
     eslint-plugin-sort-keys-fix: "npm:^1.1.2"
     eslint-plugin-unused-imports: "npm:^2.0.0"
     jest: "npm:29.5.0"
-    lib-nest-socket: "workspace:*"
     lodash: "npm:^4.17.21"
     mongoose: "npm:^8.1.0"
     prettier: "npm:^2.6.1"
@@ -8557,7 +8578,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "feature-nest-stock@workspace:package/feature/feature-nest-stock"
   dependencies:
-    "@aws-sdk/client-sqs": "npm:^3.758.0"
+    "@nestjs/axios": "npm:^4.0.0"
     "@nestjs/common": "npm:^10.3.0"
     "@nestjs/config": "npm:^3.1.1"
     "@nestjs/core": "npm:^10.3.0"
@@ -8569,11 +8590,11 @@ __metadata:
     "@toss/utils": "npm:^1.4.4"
     "@types/express": "npm:^4.17.13"
     "@types/jest": "npm:29.5.0"
-    "@types/lodash": "npm:^4.14.202"
     "@types/multer": "npm:^1.4.7"
     "@types/node": "npm:^18.5.5"
     "@types/supertest": "npm:^2.0.11"
     "@typescript-eslint/eslint-plugin": "npm:^5.59.8"
+    axios: "npm:^1.8.2"
     class-transformer: "npm:^0.5.1"
     cross-env: "npm:^7.0.3"
     dayjs: "npm:^1.11.10"
@@ -8590,8 +8611,6 @@ __metadata:
     eslint-plugin-sort-keys-fix: "npm:^1.1.2"
     eslint-plugin-unused-imports: "npm:^2.0.0"
     jest: "npm:29.5.0"
-    lib-nest-sqs: "workspace:*"
-    lodash: "npm:^4.17.21"
     mongodb: "npm:6.3.0"
     mongoose: "npm:^8.1.0"
     openai: "npm:^4.85.1"
@@ -8757,6 +8776,16 @@ __metadata:
   version: 3.3.2
   resolution: "flatted@npm:3.3.2"
   checksum: ac3c159742e01d0e860a861164bcfd35bb567ccbebb8a0dd041e61cf3c64a435b917dd1e7ed1c380c2ebca85735fb16644485ec33665bc6aafc3b316aa1eed44
+  languageName: node
+  linkType: hard
+
+"follow-redirects@npm:^1.15.6":
+  version: 1.15.9
+  resolution: "follow-redirects@npm:1.15.9"
+  peerDependenciesMeta:
+    debug:
+      optional: true
+  checksum: e3ab42d1097e90d28b913903841e6779eb969b62a64706a3eb983e894a5db000fbd89296f45f08885a0e54cd558ef62e81be1165da9be25a6c44920da10f424c
   languageName: node
   linkType: hard
 
@@ -10929,7 +10958,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"lib-nest-socket@workspace:*, lib-nest-socket@workspace:package/library/lib-nest-socket":
+"lib-nest-socket@workspace:package/library/lib-nest-socket":
   version: 0.0.0-use.local
   resolution: "lib-nest-socket@workspace:package/library/lib-nest-socket"
   dependencies:
@@ -12541,6 +12570,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"proxy-from-env@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "proxy-from-env@npm:1.1.0"
+  checksum: f0bb4a87cfd18f77bc2fba23ae49c3b378fb35143af16cc478171c623eebe181678f09439707ad80081d340d1593cd54a33a0113f3ccb3f4bc9451488780ee23
+  languageName: node
+  linkType: hard
+
 "punycode@npm:1.3.2":
   version: 1.3.2
   resolution: "punycode@npm:1.3.2"
@@ -13869,7 +13905,6 @@ __metadata:
     "@nestjs/common": "npm:^10.3.0"
     "@nestjs/config": "npm:^3.1.1"
     "@nestjs/core": "npm:^10.3.0"
-    "@nestjs/mongoose": "npm:^10.0.2"
     "@nestjs/platform-express": "npm:^10.3.0"
     "@nestjs/schematics": "npm:^10.0.2"
     "@nestjs/testing": "npm:^10.3.0"
@@ -13897,11 +13932,8 @@ __metadata:
     eslint-plugin-sort-keys-fix: "npm:^1.1.2"
     eslint-plugin-unused-imports: "npm:^2.0.0"
     express: "npm:^4.18.2"
-    fastify: "npm:^4.21.0"
-    feature-nest-stock: "workspace:*"
     jest: "npm:29.5.0"
     lib-nest-sqs: "workspace:*"
-    mongoose: "npm:^8.1.0"
     prettier: "npm:^2.6.1"
     reflect-metadata: "npm:^0.1.13"
     rimraf: "npm:^5.0.1"
@@ -13920,7 +13952,6 @@ __metadata:
     webpack: "npm:^5.89.0"
     webpack-bundle-analyzer: "npm:^4.8.0"
     webpack-pnp-externals: "npm:^1.1.0"
-    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
