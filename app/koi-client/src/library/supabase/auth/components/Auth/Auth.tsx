@@ -1,6 +1,7 @@
 import { createStitches, createTheme } from '@stitches/core';
 import { I18nVariables, merge, VIEWS, en, ViewType } from '@supabase/auth-ui-shared';
 import React, { useEffect, useState } from 'react';
+import styled from '@emotion/styled';
 import { Auth as AuthProps } from '../../types';
 import {
   EmailAuth,
@@ -12,7 +13,7 @@ import {
   VerifyOtp,
 } from './interfaces';
 import { UserContextProvider, useUser } from './UserContext';
-import Header from '../UI/Header';
+import AuthHeader from '../UI/AuthHeader';
 
 function Auth({
   supabaseClient,
@@ -77,9 +78,9 @@ function Auth({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     <>
-      {/* Header를 상위 컴포넌트로 빼고 싶었으나, authView 상태가 필요한 컴포넌트라 불가피하게 해당 위치에 작업함 */}
+      {/* AuthHeader를 상위 컴포넌트로 빼고 싶었으나, authView 상태가 필요한 컴포넌트라 불가피하게 해당 위치에 작업함 */}
       {route === 'AUTH' && (
-        <Header authView={authView} handleAuthView={handleAuthView} handleRouteChange={handleRouteChange} />
+        <AuthHeader authView={authView} handleAuthView={handleAuthView} handleRouteChange={handleRouteChange} />
       )}
       <div
         className={
@@ -97,18 +98,21 @@ function Auth({
       >
         {!onlyThirdPartyProviders && children}
         {SignView && (
-          <SocialAuth
-            appearance={appearance}
-            supabaseClient={supabaseClient}
-            providers={providers}
-            providerScopes={providerScopes}
-            queryParams={queryParams}
-            socialLayout={socialLayout}
-            redirectTo={redirectTo}
-            onlyThirdPartyProviders={onlyThirdPartyProviders}
-            i18n={i18n}
-            view={authView}
-          />
+          <>
+            {route === 'AUTH' && <Divider />}
+            <SocialAuth
+              appearance={appearance}
+              supabaseClient={supabaseClient}
+              providers={providers}
+              providerScopes={providerScopes}
+              queryParams={queryParams}
+              socialLayout={socialLayout}
+              redirectTo={redirectTo}
+              onlyThirdPartyProviders={onlyThirdPartyProviders}
+              i18n={i18n}
+              view={authView}
+            />
+          </>
         )}
       </div>
     </>
@@ -240,3 +244,11 @@ Auth.UserContextProvider = UserContextProvider;
 Auth.useUser = useUser;
 
 export default Auth;
+
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #c7c7c7;
+  margin: 20px 0;
+  opacity: 0.5;
+`;
