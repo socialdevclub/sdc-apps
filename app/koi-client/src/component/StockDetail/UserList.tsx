@@ -2,6 +2,7 @@ import React from 'react';
 import styled from '@emotion/styled';
 import { Query } from '../../hook';
 import { fetchProfileByUsername } from '../../hook/query/Supabase/useQueryProfileByUsername';
+import { ControlButton, ControlButtonGroup } from '.';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface UserListProps {
@@ -16,6 +17,7 @@ const UserList: React.FC<UserListProps> = ({ stockId }) => {
 
   const { mutateAsync: mutateRemoveUser } = Query.Stock.useRemoveUser();
   const { mutateAsync: mutateRegisterUser } = Query.Stock.useRegisterUser();
+  const { mutateAsync: mutateUserAlignIndex } = Query.Stock.useUserAlignIndex(stockId);
 
   return (
     <UserListContainer>
@@ -56,6 +58,16 @@ const UserList: React.FC<UserListProps> = ({ stockId }) => {
         }}
       />
 
+      <ControlButtonGroup>
+        <ControlButton
+          onClick={() => {
+            mutateUserAlignIndex({});
+          }}
+        >
+          인덱스 정렬
+        </ControlButton>
+      </ControlButtonGroup>
+
       <UserStats>
         <StatItem>
           <StatLabel>참가자</StatLabel>
@@ -71,7 +83,10 @@ const UserList: React.FC<UserListProps> = ({ stockId }) => {
         {users?.map((user) => (
           <UserCard key={user.userId}>
             <UserCardContent>
-              <UserName>{profiles?.data?.find((v) => v.id === user.userId)?.username || '사용자'}</UserName>
+              <UserName>
+                <UserIndex>{user.index}</UserIndex>
+                {profiles?.data?.find((v) => v.id === user.userId)?.username || '사용자'}
+              </UserName>
               {!user.userInfo.introduction && <MissingIntro>자기소개 미작성</MissingIntro>}
             </UserCardContent>
             <RemoveButton
@@ -112,15 +127,16 @@ const UserListContainer = styled.div`
 `;
 
 const StyledInput = styled.input`
-  padding: 0.6rem;
+  padding: 0.8rem 1rem;
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #3f51b5;
-    box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+    border-color: #5c6bc0;
+    box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.2);
   }
 
   &::placeholder {
@@ -131,116 +147,148 @@ const StyledInput = styled.input`
 const UserStats = styled.div`
   display: flex;
   gap: 1rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
 `;
 
 const StatItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background-color: #f5f5f5;
-  padding: 0.5rem 0.8rem;
-  border-radius: 4px;
+  gap: 0.6rem;
+  background-color: #f5f7ff;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 `;
 
 const StatLabel = styled.span`
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 0.9rem;
+  color: #5c6bc0;
 `;
 
 const StatValue = styled.span`
-  font-weight: 600;
-  color: #3f51b5;
+  font-weight: 700;
+  color: #3949ab;
+  font-size: 1.1rem;
 `;
 
 const UserGridContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1rem;
 `;
 
 const UserCard = styled.div`
   display: flex;
   flex-direction: column;
   background-color: white;
-  border-radius: 6px;
+  border-radius: 12px;
   border: 1px solid #e0e0e0;
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    border-color: #3f51b5;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: #c5cae9;
   }
 `;
 
 const UserCardContent = styled.div`
-  padding: 0.7rem;
+  padding: 1rem;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.6rem;
 `;
 
 const UserName = styled.div`
   font-weight: 600;
-  font-size: 0.9rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const UserIndex = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #5c6bc0;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
 `;
 
 const MissingIntro = styled.div`
-  font-size: 0.7rem;
-  background-color: #ffebee;
-  color: #f44336;
-  padding: 0.2rem 0.4rem;
-  border-radius: 3px;
+  font-size: 0.75rem;
+  background-color: #fff5f5;
+  color: #ff6b6b;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
   display: inline-block;
+  font-weight: 500;
 `;
 
 const RemoveButton = styled.button`
   width: 100%;
-  padding: 0.4rem;
-  font-size: 0.8rem;
-  background-color: #f5f5f5;
+  padding: 0.7rem;
+  font-size: 0.85rem;
+  background-color: #f8f9fa;
   border: none;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #eaeaea;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-weight: 500;
+  color: #495057;
 
   &:hover {
-    background-color: #ffebee;
-    color: #f44336;
+    background-color: #ff6b6b;
+    color: white;
   }
 `;
 
 const WarningSection = styled.div`
-  margin-top: 1rem;
-  padding: 0.8rem;
+  margin-top: 1.5rem;
+  padding: 1.2rem;
   background-color: #fff8e1;
   border: 1px solid #ffe082;
-  border-radius: 4px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(255, 224, 130, 0.2);
 `;
 
 const WarningTitle = styled.div`
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #ff8f00;
-  margin-bottom: 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #f57c00;
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+
+  &:before {
+    content: '⚠️';
+    margin-right: 0.5rem;
+  }
 `;
 
 const WarningList = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.8rem;
 `;
 
 const WarningItem = styled.div`
-  font-size: 0.8rem;
-  padding: 0.3rem 0.6rem;
-  background-color: #fff;
-  border: 1px solid #ffe082;
-  border-radius: 4px;
-  color: #ff8f00;
+  background-color: rgba(255, 224, 130, 0.4);
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #e65100;
+  font-weight: 500;
 `;

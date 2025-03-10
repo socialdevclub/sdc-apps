@@ -48,7 +48,7 @@ export default function StockDetail({ stockId }: Props) {
   const [elapsedTime, setElapsedTime] = useState<Date>(new Date(new Date().getTime() - startedTime.getTime()));
 
   // 사이드 패널 너비 상태 관리
-  const [sidePanelWidth, setSidePanelWidth] = useState(300);
+  const [sidePanelWidth, setSidePanelWidth] = useState(500);
   const [isDragging, setIsDragging] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
 
@@ -712,13 +712,13 @@ const PhaseButton = styled.button<{ isActive?: boolean }>`
   }
 `;
 
-const ControlButtonGroup = styled.div`
+export const ControlButtonGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 `;
 
-const ControlButton = styled.button<{ isActive?: boolean; color?: string }>`
+export const ControlButton = styled.button<{ isActive?: boolean; color?: string }>`
   padding: 0.6rem;
   border: none;
   border-radius: 4px;

@@ -21,3 +21,4 @@ export { default as useDrawStockInfo } from './useDrawStockInfo';
 export { default as useStartLoan } from './useStartLoan';
 export { default as useSetPhase } from './useSetPhase';
 export { default as useRegisterUser } from './useRegisterUser';
+export { default as useUserAlignIndex } from './useUserAlignIndex';
