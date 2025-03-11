@@ -9,9 +9,10 @@ import { Wrapper, TitleWrapper, LeftSection, H3, H4 } from '../Home.styles';
 
 interface Props {
   stockId: string;
+  onClick?: (company: string) => void;
 }
 
-const RandomStockPreview = ({ stockId }: Props) => {
+const RandomStockPreview = ({ stockId, onClick }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
@@ -58,6 +59,7 @@ const RandomStockPreview = ({ stockId }: Props) => {
         valueColor="#c6c6c6"
         remainingTime={remainingTime}
         changeTime={`${nextRoundPredict.predictTime}:00`}
+        onClick={() => onClick?.(nextRoundPredict.companyName)}
       />
     </Wrapper>
   );

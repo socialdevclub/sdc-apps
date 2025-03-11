@@ -1,5 +1,8 @@
 import { objectEntries } from '@toss/utils';
+import { getDateDistance } from '@toss/date';
+import dayjs from 'dayjs';
 import { REMAINING_STOCK_THRESHOLD, STOCK_PER_USER, TRADE } from '../config/stock';
+import prependZero from '../service/prependZero';
 
 export const getLowSalesCompanies = (
   remainingStocks: Record<string, number>,
@@ -10,6 +13,15 @@ export const getLowSalesCompanies = (
   return objectEntries(remainingStocks)
     .filter(([, remaining]) => remaining > maxQuantity * REMAINING_STOCK_THRESHOLD)
     .map(([company]) => company);
+};
+
+export const getFormattedGameTime = (startTime?: string): string => {
+  if (!startTime) return '00:00';
+
+  return `${prependZero(getDateDistance(dayjs(startTime).toDate(), new Date()).minutes, 2)}:${prependZero(
+    getDateDistance(dayjs(startTime).toDate(), new Date()).seconds,
+    2,
+  )}`;
 };
 
 export const generateNumberFromString = (str: string): number => {
@@ -107,4 +119,35 @@ export const calculateAveragePurchasePrice = (params: CalculateAveragePurchasePr
   }, 0);
 
   return currentQuantity === 0 ? 0 : Math.round(평균매입가격 / currentQuantity);
+};
+
+export const renderProfitBadge = (
+  stockProfitRate: number | null,
+): { backgroundColor: string; color: string; text: string } => {
+  if (stockProfitRate === null) {
+    return {
+      backgroundColor: 'rgba(148, 163, 184, 0.2)',
+      color: '#94A3B8',
+      text: '해당 주식이 없어요',
+    };
+  }
+  if (stockProfitRate > 0) {
+    return {
+      backgroundColor: 'rgba(163, 230, 53, 0.2)',
+      color: '#a3e635',
+      text: `+${stockProfitRate}% 수익 중`,
+    };
+  }
+  if (stockProfitRate < 0) {
+    return {
+      backgroundColor: 'rgba(220, 38, 38, 0.2)',
+      color: '#DC2626',
+      text: `${stockProfitRate}% 손실 중`,
+    };
+  }
+  return {
+    backgroundColor: 'rgba(148, 163, 184, 0.2)',
+    color: '#94A3B8',
+    text: '0% 변동 없음',
+  };
 };

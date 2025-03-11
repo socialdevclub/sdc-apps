@@ -9,6 +9,7 @@ interface FutureInfoSectionProps {
   futureInfos: { company: string; timeIdx: number; price: number }[];
   gameTimeInMinutes: number;
   fluctuationsInterval: number;
+  onClick?: (company: string) => void;
 }
 
 const FutureInfoSection = ({
@@ -16,6 +17,7 @@ const FutureInfoSection = ({
   futureInfos,
   gameTimeInMinutes,
   fluctuationsInterval,
+  onClick,
 }: FutureInfoSectionProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,6 +53,7 @@ const FutureInfoSection = ({
             <StockInfoBox
               key={`${company}_${timeIdx}`}
               title={company}
+              onClick={() => onClick?.(company)}
               value={`${price >= 0 ? '▲' : '▼'}${commaizeNumber(Math.abs(price))}`}
               valueColor={price >= 0 ? colorUp : colorDown}
               remainingTime={remainingTime}

@@ -7,11 +7,13 @@ interface InfoBoxProps {
   valueColor?: CSSProperties['color'];
   leftTime?: React.ReactNode;
   changeTime?: React.ReactNode;
+  onClick?: () => void;
+  opacity?: number;
 }
 
-const InfoBox = ({ title, value, valueColor, leftTime, changeTime }: InfoBoxProps) => {
+const InfoBox = ({ title, value, valueColor, leftTime, changeTime, onClick, opacity = 1 }: InfoBoxProps) => {
   return (
-    <Container>
+    <Container onClick={onClick} opacity={opacity}>
       <Wrapper>
         <TimeWrapper>
           {leftTime}
@@ -30,13 +32,14 @@ const InfoBox = ({ title, value, valueColor, leftTime, changeTime }: InfoBoxProp
   );
 };
 
-const Container = styled.div`
+const Container = styled.div<{ opacity?: number }>`
   display: flex;
   justify-content: space-between;
   background-color: #252836;
   border-radius: 8px;
   padding: 16px;
   overflow: hidden;
+  opacity: ${({ opacity }) => opacity};
 `;
 
 const Wrapper = styled.div`

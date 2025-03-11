@@ -8,15 +8,17 @@ interface StockInfoBoxProps {
   valueColor: string;
   remainingTime: number;
   changeTime: number | string;
+  onClick?: () => void;
 }
 
-const StockInfoBox = ({ title, value, valueColor, remainingTime, changeTime }: StockInfoBoxProps) => {
+const StockInfoBox = ({ title, value, valueColor, remainingTime, changeTime, onClick }: StockInfoBoxProps) => {
   return (
     <InfoBox
       key={`${title}_${changeTime}`}
       title={title}
       value={value}
       valueColor={valueColor}
+      onClick={onClick}
       leftTime={
         <div
           css={css`
