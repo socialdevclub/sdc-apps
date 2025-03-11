@@ -6,7 +6,7 @@ import { getDateDistance } from '@toss/date';
 import { StockConfig } from 'shared~config';
 import dayjs from 'dayjs';
 import { Query } from '../../hook';
-import { POV } from '../../type';
+import type { POV } from '../../type';
 import UserList from './UserList';
 import Table from './Table';
 import RoundSetter from './RoundSetter';
@@ -405,95 +405,99 @@ export default function StockDetail({ stockId }: Props) {
             )}
           </PanelSection>
 
-          <PanelSection>
-            <CollapsibleSectionTitle
-              onClick={() => setDebuggingCollapsed(!debuggingCollapsed)}
-              isCollapsed={debuggingCollapsed}
-            >
-              디버깅 거래
-              <CollapseIndicator isCollapsed={debuggingCollapsed} />
-            </CollapsibleSectionTitle>
-            {!debuggingCollapsed && (
-              <DebugTradeContainer>
-                <DebugTradeRow>
-                  <DebugTradeLabel>유저 선택:</DebugTradeLabel>
-                  <UserSelect value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)}>
-                    <option value="">유저 선택...</option>
-                    {users?.map((user) => (
-                      <option key={user.userId} value={user.userId}>
-                        {user.userInfo.nickname || '익명'}
-                      </option>
-                    ))}
-                  </UserSelect>
-                </DebugTradeRow>
+          {stock && (
+            <PanelSection>
+              <CollapsibleSectionTitle
+                onClick={() => setDebuggingCollapsed(!debuggingCollapsed)}
+                isCollapsed={debuggingCollapsed}
+              >
+                디버깅 거래
+                <CollapseIndicator isCollapsed={debuggingCollapsed} />
+              </CollapsibleSectionTitle>
+              {!debuggingCollapsed && (
+                <DebugTradeContainer>
+                  <DebugTradeRow>
+                    <DebugTradeLabel>유저 선택:</DebugTradeLabel>
+                    <UserSelect value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)}>
+                      <option value="">유저 선택...</option>
+                      {users?.map((user) => (
+                        <option key={user.userId} value={user.userId}>
+                          {user.userInfo.nickname || '익명'}
+                        </option>
+                      ))}
+                    </UserSelect>
+                  </DebugTradeRow>
 
-                <DebugTradeRow>
-                  <DebugTradeLabel>회사 선택:</DebugTradeLabel>
-                  <CompanySelect value={selectedCompany} onChange={(e) => setSelectedCompany(e.target.value)}>
-                    {companyNames.map((company) => (
-                      <option key={company} value={company}>
-                        {company}
-                      </option>
-                    ))}
-                  </CompanySelect>
-                </DebugTradeRow>
+                  <DebugTradeRow>
+                    <DebugTradeLabel>회사 선택:</DebugTradeLabel>
+                    <CompanySelect value={selectedCompany} onChange={(e) => setSelectedCompany(e.target.value)}>
+                      {companyNames.map((company) => (
+                        <option key={company} value={company}>
+                          {company}
+                        </option>
+                      ))}
+                    </CompanySelect>
+                  </DebugTradeRow>
 
-                <DebugTradeRow>
-                  <DebugTradeLabel>거래 수량:</DebugTradeLabel>
-                  <TradeAmountInput
-                    type="number"
-                    min="1"
-                    value={tradeAmount}
-                    onChange={(e) => setTradeAmount(parseInt(e.target.value, 10) || 1)}
-                  />
-                </DebugTradeRow>
+                  <DebugTradeRow>
+                    <DebugTradeLabel>거래 수량:</DebugTradeLabel>
+                    <TradeAmountInput
+                      type="number"
+                      min="1"
+                      value={tradeAmount}
+                      onChange={(e) => setTradeAmount(parseInt(e.target.value, 10) || 1)}
+                    />
+                  </DebugTradeRow>
 
-                <DebugTradeRow>
-                  <DebugTradeLabel>현재 가격:</DebugTradeLabel>
-                  <TradePrice>
-                    {selectedCompany && companies[selectedCompany] && currentPriceIdx >= 0
-                      ? `${companies[selectedCompany][currentPriceIdx]?.가격.toLocaleString()}원`
-                      : '정보 없음'}
-                  </TradePrice>
-                </DebugTradeRow>
+                  <DebugTradeRow>
+                    <DebugTradeLabel>현재 가격:</DebugTradeLabel>
+                    <TradePrice>
+                      {selectedCompany && companies[selectedCompany] && currentPriceIdx >= 0
+                        ? `${companies[selectedCompany][currentPriceIdx]?.가격.toLocaleString()}원`
+                        : '정보 없음'}
+                    </TradePrice>
+                  </DebugTradeRow>
 
-                <DebugTradeButtonGroup>
-                  <BuyButton
-                    disabled={!selectedUser || !selectedCompany}
-                    onClick={() => {
-                      if (!selectedUser || !selectedCompany || currentPriceIdx < 0) return;
+                  <DebugTradeButtonGroup>
+                    <BuyButton
+                      disabled={!selectedUser || !selectedCompany}
+                      onClick={() => {
+                        if (!selectedUser || !selectedCompany || currentPriceIdx < 0) return;
 
-                      mutateBuyStock({
-                        amount: tradeAmount,
-                        company: selectedCompany,
-                        stockId,
-                        unitPrice: companies[selectedCompany][currentPriceIdx].가격,
-                        userId: selectedUser,
-                      });
-                    }}
-                  >
-                    매수
-                  </BuyButton>
-                  <SellButton
-                    disabled={!selectedUser || !selectedCompany}
-                    onClick={() => {
-                      if (!selectedUser || !selectedCompany || currentPriceIdx < 0) return;
+                        mutateBuyStock({
+                          amount: tradeAmount,
+                          company: selectedCompany,
+                          round: stock?.round,
+                          stockId,
+                          unitPrice: companies[selectedCompany][currentPriceIdx].가격,
+                          userId: selectedUser,
+                        });
+                      }}
+                    >
+                      매수
+                    </BuyButton>
+                    <SellButton
+                      disabled={!selectedUser || !selectedCompany}
+                      onClick={() => {
+                        if (!selectedUser || !selectedCompany || currentPriceIdx < 0) return;
 
-                      mutateSellStock({
-                        amount: tradeAmount,
-                        company: selectedCompany,
-                        stockId,
-                        unitPrice: companies[selectedCompany][currentPriceIdx].가격,
-                        userId: selectedUser,
-                      });
-                    }}
-                  >
-                    매도
-                  </SellButton>
-                </DebugTradeButtonGroup>
-              </DebugTradeContainer>
-            )}
-          </PanelSection>
+                        mutateSellStock({
+                          amount: tradeAmount,
+                          company: selectedCompany,
+                          round: stock.round,
+                          stockId,
+                          unitPrice: companies[selectedCompany][currentPriceIdx].가격,
+                          userId: selectedUser,
+                        });
+                      }}
+                    >
+                      매도
+                    </SellButton>
+                  </DebugTradeButtonGroup>
+                </DebugTradeContainer>
+              )}
+            </PanelSection>
+          )}
         </SidePanel>
 
         <ResizeHandle onMouseDown={handleDragStart} isDragging={isDragging} />

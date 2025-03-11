@@ -14,6 +14,7 @@ export type PostBuyStock = {
   company: string;
   amount: number;
   unitPrice: number;
+  round: number;
 };
 
 export type PostDrawStockInfo = {
@@ -27,6 +28,7 @@ export type PostSellStock = {
   company: string;
   amount: number;
   unitPrice: number;
+  round: number;
 };
 
 export type PostLoan = {

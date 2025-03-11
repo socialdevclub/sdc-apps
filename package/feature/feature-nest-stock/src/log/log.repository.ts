@@ -1,8 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import type { DeleteOptions } from 'mongodb';
-import { FilterQuery, Model, MongooseQueryOptions, ProjectionType, QueryOptions } from 'mongoose';
-import { StockLog, StockLogDocument } from './log.schema';
+import type { DeleteOptions, UpdateOptions } from 'mongodb';
+import type {
+  FilterQuery,
+  Model,
+  MongooseQueryOptions,
+  ProjectionType,
+  QueryOptions,
+  UpdateQuery,
+  UpdateWriteOpResult,
+} from 'mongoose';
+import type { StockLogDocument } from './log.schema';
+import { StockLog } from './log.schema';
 
 @Injectable()
 export class LogRepository {
@@ -19,8 +28,24 @@ export class LogRepository {
     return this.stockLogModel.find(filter, projection, options);
   }
 
+  findOne(
+    filter: FilterQuery<StockLog>,
+    projection: ProjectionType<StockLog>,
+    options: QueryOptions<StockLog>,
+  ): Promise<StockLogDocument> {
+    return this.stockLogModel.findOne(filter, projection, options);
+  }
+
   create(log: StockLog): Promise<StockLogDocument> {
     return this.stockLogModel.create(log);
+  }
+
+  async updateOne(
+    filter: FilterQuery<StockLog>,
+    update: UpdateQuery<StockLog>,
+    options?: UpdateOptions & Omit<MongooseQueryOptions<StockLog>, 'lean'>,
+  ): Promise<UpdateWriteOpResult> {
+    return this.stockLogModel.updateOne(filter, update, options);
   }
 
   async deleteMany(
