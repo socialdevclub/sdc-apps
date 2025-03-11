@@ -105,7 +105,22 @@ export class StockController {
   sellStock(@Body() body: Request.PostSellStock): Promise<StockSchema> {
     return this.httpService.axiosRef
       .post('https://api.socialdev.club/queue/stock/sell', body)
-      .then((res) => res.data)
+      .then(async (res) => {
+        await this.logService.addLog(
+          new StockLog({
+            action: 'SELL',
+            company: body.company,
+            date: new Date(),
+            price: body.unitPrice * body.amount,
+            quantity: body.amount,
+            round: body.round,
+            status: 'SUCCESS',
+            stockId: body.stockId,
+            userId: body.userId,
+          }),
+        );
+        return res.data;
+      })
       .catch(async (error) => {
         console.error(error);
         await this.stockProcessor.sellStock(body.stockId, body);
