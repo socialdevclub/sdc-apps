@@ -1,7 +1,13 @@
-import { objectEntries } from '@toss/utils';
 import { getDateDistance } from '@toss/date';
+import { objectEntries } from '@toss/utils';
 import dayjs from 'dayjs';
-import { REMAINING_STOCK_THRESHOLD, STOCK_PER_USER, TRADE } from '../config/stock';
+import {
+  REMAINING_STOCK_THRESHOLD,
+  STOCK_PER_USER,
+  STOCK_TRADE_STATUS,
+  StockTradeStatus,
+  TRADE,
+} from '../config/stock';
 import prependZero from '../service/prependZero';
 
 export const getLowSalesCompanies = (
@@ -91,7 +97,15 @@ export const getStockMessages = (params: GetStockMessagesParams): string[] => {
 };
 
 interface CalculateAveragePurchasePriceParams {
-  logs: Array<{ company: string; date: Date; price: number; quantity: number; action: string; round: number }>;
+  logs: Array<{
+    company: string;
+    date: Date;
+    price: number;
+    quantity: number;
+    action: string;
+    round: number;
+    status: StockTradeStatus;
+  }>;
   company: string;
   currentQuantity: number;
   round?: number;
@@ -100,7 +114,9 @@ interface CalculateAveragePurchasePriceParams {
 export const calculateAveragePurchasePrice = (params: CalculateAveragePurchasePriceParams): number => {
   const { logs, company, currentQuantity, round } = params;
 
-  const myCompanyTradeLog = logs?.filter(({ company: c, round: r }) => c === company && r === round);
+  const myCompanyTradeLog = logs?.filter(
+    ({ company: c, round: r, status }) => c === company && r === round && status === STOCK_TRADE_STATUS.SUCCESS,
+  );
   const sortedTradeLog = myCompanyTradeLog?.sort((a, b) => a.date.getTime() - b.date.getTime());
 
   let count = 0;

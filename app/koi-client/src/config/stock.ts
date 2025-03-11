@@ -13,6 +13,15 @@ export const TRADE = {
 
 export type Trade = (typeof TRADE)[keyof typeof TRADE];
 
+export const STOCK_TRADE_STATUS = {
+  CANCEL: 'CANCEL',
+  FAILED: 'FAILED',
+  QUEUING: 'QUEUING',
+  SUCCESS: 'SUCCESS',
+} as const;
+
+export type StockTradeStatus = (typeof STOCK_TRADE_STATUS)[keyof typeof STOCK_TRADE_STATUS];
+
 export const ANIMAL_NAME: Record<string, string> = {
   고양기획: 'cat',
   꿀벌생명: 'honeyBee',
