@@ -1,11 +1,11 @@
-import { Suspense, useCallback } from 'react';
 import styled from '@emotion/styled';
-import { useSearchParams } from 'react-router-dom';
 import { SwitchCase } from '@toss/react';
-import Buy from './Buy';
-import Information from './Information';
-import { Tabs, type TabsProps } from './Tabs';
+import { Suspense, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Home from './Home/Home';
+import Information from './Information';
+import StockList from './StockList';
+import { Tabs, type TabsProps } from './Tabs';
 
 const items: TabsProps['items'] = [
   {
@@ -58,7 +58,7 @@ const Stock = ({ stockId }: Props) => {
             caseBy={{
               // 룰: <Rule stockId={stockId} />,
               정보: <Information stockId={stockId} />,
-              주식: <Buy stockId={stockId} />,
+              주식: <StockList stockId={stockId} />,
               홈: <Home stockId={stockId} />,
             }}
             defaultComponent={<Home stockId={stockId} />}
