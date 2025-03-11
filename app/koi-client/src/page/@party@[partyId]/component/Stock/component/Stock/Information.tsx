@@ -421,7 +421,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-bottom: 100px;
+  padding-bottom: 108px;
 `;
 
 const TitleWrapper = styled.div`
@@ -451,14 +451,6 @@ const Divider = styled.div`
   margin-bottom: 8px;
 `;
 
-const DimContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  opacity: 0.5;
-  pointer-events: none;
-`;
-
 const StickyBottom = styled.div`
   position: absolute;
   bottom: 0;
@@ -466,6 +458,6 @@ const StickyBottom = styled.div`
   width: 100%;
   background-color: #252836;
   border-top: 1px solid #374151;
-  padding: 20px;
+  padding: 16px;
   box-sizing: border-box;
 `;

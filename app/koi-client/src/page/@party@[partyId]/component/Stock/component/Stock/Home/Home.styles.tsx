@@ -79,6 +79,6 @@ export const StickyBottom = styled.div`
   width: 100%;
   background-color: #252836;
   border-top: 1px solid #374151;
-  padding: 20px;
+  padding: 16px;
   box-sizing: border-box;
 `;

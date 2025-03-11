@@ -83,9 +83,9 @@ const ContentContainer = styled.section`
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
-
   box-sizing: border-box;
-  padding: 12px;
+  padding: 16px;
+  padding-bottom: 108px;
 `;
 
 export default Stock;
