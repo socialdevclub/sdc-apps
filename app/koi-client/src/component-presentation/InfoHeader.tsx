@@ -1,5 +1,6 @@
-import React from 'react';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import React from 'react';
 
 interface InfoHeaderProps {
   title: string;
@@ -12,16 +13,29 @@ interface InfoHeaderProps {
     backgroundColor: string;
   };
   rightContent?: React.ReactNode;
+  src?: string;
+  width?: number;
 }
 
-const InfoHeader = ({ title, subtitle, value, valueFormatted, badge, rightContent }: InfoHeaderProps) => {
+const InfoHeader = (props: InfoHeaderProps) => {
+  const { title, subtitle, value, valueFormatted, badge, rightContent, src, width = 50 } = props;
+
   return (
     <Container>
       <FlexRow>
-        <FlexColumn>
-          <Title>{title}</Title>
-          {subtitle && <Subtitle>{subtitle}</Subtitle>}
-        </FlexColumn>
+        <div
+          css={css`
+            display: flex;
+            align-items: center;
+            column-gap: 8px;
+          `}
+        >
+          {src && <img src={src} alt={title} width={width} />}
+          <FlexColumn>
+            <Title>{title}</Title>
+            {subtitle && <Subtitle>{subtitle}</Subtitle>}
+          </FlexColumn>
+        </div>
         <FlexColumn style={{ alignItems: 'flex-end', rowGap: '16px' }}>
           <Value>{valueFormatted || value}</Value>
           {badge && (

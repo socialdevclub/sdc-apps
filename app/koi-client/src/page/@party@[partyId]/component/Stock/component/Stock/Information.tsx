@@ -208,6 +208,8 @@ const Information = ({ stockId }: Props) => {
           value={selectedCompany ? companiesPrice[selectedCompany] : 0}
           valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
           badge={renderProfitBadge(stockProfitRate)}
+          src={`/no_bg_animal/${ANIMAL_NAME[selectedCompany.slice(0, 4)]}.webp`}
+          width={50}
         />
         <MessageBalloon messages={stockMessages} />
         <StockLineChart

@@ -1,8 +1,9 @@
-import { useNavigate, useLocation } from 'react-router-dom';
 import { commaizeNumber } from '@toss/utils';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { colorDown, colorUp } from '../../../../../../../../config/color';
+import { ANIMAL_NAME } from '../../../../../../../../config/stock';
+import { FutureInfoWrapper, H3, H4, H5, H6, H6Wrapper, LeftSection, TitleWrapper } from '../Home.styles';
 import StockInfoBox from './StockInfoBox';
-import { TitleWrapper, LeftSection, H3, H6Wrapper, H6, H5, H4, FutureInfoWrapper } from '../Home.styles';
 
 interface FutureInfoSectionProps {
   myInfos: { company: string; timeIdx: number; price: number }[];
@@ -52,12 +53,14 @@ const FutureInfoSection = ({
           return (
             <StockInfoBox
               key={`${company}_${timeIdx}`}
-              title={company}
+              title={company.slice(0, 4)}
               onClick={() => onClick?.(company)}
               value={`${price >= 0 ? '▲' : '▼'}${commaizeNumber(Math.abs(price))}`}
               valueColor={price >= 0 ? colorUp : colorDown}
               remainingTime={remainingTime}
               changeTime={timeIdx * fluctuationsInterval}
+              src={`/no_bg_animal/${ANIMAL_NAME[company.slice(0, 4)]}.webp`}
+              width={36}
             />
           );
         })}

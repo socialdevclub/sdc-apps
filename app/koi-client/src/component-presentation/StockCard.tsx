@@ -6,14 +6,19 @@ interface StockCardProps {
   quantity: number;
   onClick?: () => void;
   isActive?: boolean;
+  src?: string;
+  width?: number;
 }
 
-const StockCard = ({ company, quantity, onClick, isActive = false }: StockCardProps) => {
+const StockCard = ({ company, quantity, onClick, isActive = false, src, width = 50 }: StockCardProps) => {
   return (
     <StockCardContainer onClick={onClick} isActive={isActive}>
-      <Flex>
-        <CompanyName>{company}</CompanyName>
-        <Quantity>보유 주식: {quantity}</Quantity>
+      <Flex style={{ alignItems: 'center', columnGap: 16, flexDirection: 'row' }}>
+        {src && <img src={src} alt={company} width={width} />}
+        <Flex>
+          <CompanyName>{company}</CompanyName>
+          <Quantity>보유 주식: {quantity}</Quantity>
+        </Flex>
       </Flex>
       <ChevronRight size={32} color="#9CA3AF" />
     </StockCardContainer>
@@ -51,6 +56,9 @@ const CompanyName = styled.p`
   font-weight: 500;
   margin: 0;
   color: white;
+  display: flex;
+  align-items: center;
+  column-gap: 16px;
 `;
 
 const Quantity = styled.p`

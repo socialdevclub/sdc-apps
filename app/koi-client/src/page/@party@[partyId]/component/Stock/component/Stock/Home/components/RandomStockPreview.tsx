@@ -6,6 +6,7 @@ import { useStockInfo } from '../hooks/useStockInfo';
 import { useRandomStockPreview } from '../hooks/useRandomStockPreview';
 import StockInfoBox from './StockInfoBox';
 import { Wrapper, TitleWrapper, LeftSection, H3, H4 } from '../Home.styles';
+import { ANIMAL_NAME } from '../../../../../../../../config/stock';
 
 interface Props {
   stockId: string;
@@ -42,8 +43,9 @@ const RandomStockPreview = ({ stockId, onClick }: Props) => {
       </TitleWrapper>
       <H4>가격이 오를지 내릴지는 운에 맡겨보세요!</H4>
       <StockInfoBox
-        key={`${nextRoundPredict.companyName}`}
-        title={nextRoundPredict.companyName}
+        key={nextRoundPredict.companyName.slice(0, 4)}
+        title={nextRoundPredict.companyName.slice(0, 4)}
+        src={`/no_bg_animal/${ANIMAL_NAME[nextRoundPredict.companyName.slice(0, 4)]}.webp`}
         value={
           <div
             css={css`

@@ -19,6 +19,7 @@ import {
   getStockMessages,
   renderProfitBadge,
 } from '../../../../../../utils/stock';
+import { ANIMAL_NAME } from '../../../../../../config/stock';
 
 interface Props {
   stockId: string;
@@ -200,6 +201,8 @@ const StockList = ({ stockId }: Props) => {
           value={selectedCompany ? companiesPrice[selectedCompany] : 0}
           valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
           badge={renderProfitBadge(stockProfitRate)}
+          src={`/no_bg_animal/${ANIMAL_NAME[selectedCompany.slice(0, 4)]}.webp`}
+          width={50}
         />
         <MessageBalloon messages={stockMessages} />
         <StockLineChart
@@ -267,6 +270,8 @@ const StockItems = ({ 보유주식, 미보유주식, selectedCompany, onClick }:
               quantity={count}
               onClick={() => onClick(company)}
               isActive={company === selectedCompany}
+              src={`/no_bg_animal/${ANIMAL_NAME[company.slice(0, 4)]}.webp`}
+              width={50}
             />
           ))}
           {미보유주식.length > 0 && <Divider />}
@@ -282,6 +287,8 @@ const StockItems = ({ 보유주식, 미보유주식, selectedCompany, onClick }:
               quantity={0}
               onClick={() => onClick(company)}
               isActive={company === selectedCompany}
+              src={`/no_bg_animal/${ANIMAL_NAME[company.slice(0, 4)]}.webp`}
+              width={50}
             />
           ))}
         </>

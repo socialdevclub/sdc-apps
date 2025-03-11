@@ -9,9 +9,21 @@ interface InfoBoxProps {
   changeTime?: React.ReactNode;
   onClick?: () => void;
   opacity?: number;
+  src?: string;
+  width?: number;
 }
 
-const InfoBox = ({ title, value, valueColor, leftTime, changeTime, onClick, opacity = 1 }: InfoBoxProps) => {
+const InfoBox = ({
+  title,
+  value,
+  valueColor,
+  leftTime,
+  changeTime,
+  onClick,
+  opacity = 1,
+  src,
+  width = 36,
+}: InfoBoxProps) => {
   return (
     <Container onClick={onClick} opacity={opacity}>
       <Wrapper>
@@ -19,7 +31,12 @@ const InfoBox = ({ title, value, valueColor, leftTime, changeTime, onClick, opac
           {leftTime}
           {changeTime}
         </TimeWrapper>
-        {title && <ContainerTitle>{title}</ContainerTitle>}
+        {title && (
+          <ContainerTitle>
+            {src && <img src={src} alt={title} width={width} />}
+            <span>{title}</span>
+          </ContainerTitle>
+        )}
       </Wrapper>
       <ContainerBolder
         style={{
@@ -63,6 +80,9 @@ const ContainerTitle = styled.div`
   font-size: 20px;
   line-height: 22px;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  column-gap: 4px;
 `;
 
 const ContainerBolder = styled.div`

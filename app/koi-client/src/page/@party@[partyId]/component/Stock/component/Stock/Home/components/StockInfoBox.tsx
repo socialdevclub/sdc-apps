@@ -9,16 +9,17 @@ interface StockInfoBoxProps {
   remainingTime: number;
   changeTime: number | string;
   onClick?: () => void;
+  src?: string;
+  width?: number;
 }
 
-const StockInfoBox = ({ title, value, valueColor, remainingTime, changeTime, onClick }: StockInfoBoxProps) => {
+const StockInfoBox = (props: StockInfoBoxProps) => {
+  const { changeTime, remainingTime, ...rest } = props;
+
   return (
     <InfoBox
-      key={`${title}_${changeTime}`}
-      title={title}
-      value={value}
-      valueColor={valueColor}
-      onClick={onClick}
+      key={`${rest.title}_${changeTime}`}
+      {...rest}
       leftTime={
         <div
           css={css`
