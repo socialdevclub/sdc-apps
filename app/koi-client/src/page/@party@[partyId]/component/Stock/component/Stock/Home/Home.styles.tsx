@@ -40,7 +40,7 @@ export const H5 = styled.h5`
   font-size: 12px;
   color: #9ca3af;
   margin: 0;
-  padding: 8px
+  padding: 8px;
   cursor: pointer;
 `;
 

@@ -1,5 +1,7 @@
-import React, { CSSProperties } from 'react';
 import styled from '@emotion/styled';
+import React, { CSSProperties } from 'react';
+import { useMediaQuery } from 'react-responsive';
+import { MEDIA_QUERY } from '../config/common';
 import { ScrollView } from './ScrollView';
 
 interface Props {
@@ -20,9 +22,11 @@ const MobileLayout = ({
   backgroundColor = '',
   ScrollViewComponent = ScrollView,
 }: Props) => {
+  const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });
+
   return (
     <Wrapper>
-      <Content>
+      <Content isDesktop={isDesktop}>
         {HeaderComponent}
         <TopScrollView
           style={{
@@ -49,11 +53,11 @@ const Wrapper = styled.div`
   background: linear-gradient(to bottom, #111827, #000000);
 `;
 
-const Content = styled.div`
+const Content = styled.div<{ isDesktop: boolean }>`
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 400px;
+  max-width: ${({ isDesktop }) => (isDesktop ? '400px' : '100%')};
   height: 100%;
 `;
 
