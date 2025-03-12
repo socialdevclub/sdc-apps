@@ -9,7 +9,7 @@ import type {
 } from 'mongoose';
 import type { DeleteOptions, UpdateOptions } from 'mongodb';
 import type { StockLog, StockLogDocument } from './log.schema';
-import type { LogRepository } from './log.repository';
+import { LogRepository } from './log.repository';
 
 @Injectable()
 export class LogService {

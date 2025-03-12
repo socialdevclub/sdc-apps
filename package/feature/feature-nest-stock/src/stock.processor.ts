@@ -1,13 +1,13 @@
 import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import type { CompanyInfo, Request } from 'shared~type-stock';
 import { InjectConnection } from '@nestjs/mongoose';
-import type mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import { getDateDistance } from '@toss/date';
 import { StockLog } from './log/log.schema';
 import { UserRepository } from './user/user.repository';
 import { UserService } from './user/user.service';
-import type { StockRepository } from './stock.repository';
-import type { LogService } from './log/log.service';
+import { StockRepository } from './stock.repository';
+import { LogService } from './log/log.service';
 
 @Injectable()
 export class StockProcessor {

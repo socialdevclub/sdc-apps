@@ -3,16 +3,16 @@ import type { CompanyInfo, Request, Response, StockPhase } from 'shared~type-sto
 import { getDateDistance } from '@toss/date';
 import { ceilToUnit } from '@toss/utils';
 import type { ProjectionType, QueryOptions } from 'mongoose';
-import type mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
 import dayjs from 'dayjs';
 import { StockConfig } from 'shared~config';
 import type { Stock, StockDocument } from './stock.schema';
 import { UserService } from './user/user.service';
-import type { LogService } from './log/log.service';
-import type { ResultService } from './result/result.service';
+import { LogService } from './log/log.service';
+import { ResultService } from './result/result.service';
 import type { Result } from './result/result.schema';
-import type { StockRepository } from './stock.repository';
+import { StockRepository } from './stock.repository';
 import { UserRepository } from './user/user.repository';
 
 @Injectable()

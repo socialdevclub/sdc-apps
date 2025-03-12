@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common';
 import type { Request, Response, StockSchema } from 'shared~type-stock';
-import type { HttpService } from '@nestjs/axios';
+import { HttpService } from '@nestjs/axios';
 import type { Stock } from './stock.schema';
-import type { StockService } from './stock.service';
-import type { StockProcessor } from './stock.processor';
-import type { LogService } from './log/log.service';
+import { StockService } from './stock.service';
+import { StockProcessor } from './stock.processor';
+import { LogService } from './log/log.service';
 import { StockLog } from './log/log.schema';
 
 @Controller('stock')
