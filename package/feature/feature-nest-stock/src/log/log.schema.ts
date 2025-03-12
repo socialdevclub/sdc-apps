@@ -3,7 +3,7 @@ import type { HydratedDocument } from 'mongoose';
 import { SchemaTypes } from 'mongoose';
 import type { StockLogAction, StockLogSchema } from 'shared~type-stock';
 
-@Schema()
+@Schema({ autoIndex: true })
 export class StockLog implements StockLogSchema {
   @Prop()
   stockId: string;
@@ -43,3 +43,4 @@ export class StockLog implements StockLogSchema {
 export type StockLogDocument = HydratedDocument<StockLog>;
 
 export const stockLogSchema = SchemaFactory.createForClass(StockLog);
+stockLogSchema.index({ round: 1, stockId: 1, userId: 1 });
