@@ -8,6 +8,8 @@ export type GetStock = {
 
 export type PatchUpdateStock = Partial<StockSchema> & { _id: string };
 
+export type GetFindStockUser = StockUserSchema;
+
 export type PostBuyStock = {
   stockId: string;
   userId: string;

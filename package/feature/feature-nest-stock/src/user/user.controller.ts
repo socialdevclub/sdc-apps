@@ -19,6 +19,15 @@ export class UserController {
     return users.map((user) => this.userService.transStockUserToDto(user));
   }
 
+  @Get('/find-one')
+  async findOneUser(
+    @Query('stockId') stockId: string,
+    @Query('userId') userId: string,
+  ): Promise<Response.GetStockUser> {
+    const user = await this.userService.findOneByUserId(stockId, userId);
+    return this.userService.transStockUserToDto(user);
+  }
+
   @Post()
   setUser(@Body() body: StockUser): Promise<boolean> {
     return this.userService.setUser(body);
