@@ -295,7 +295,7 @@ const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos }: Sto
             },
             {
               backgroundColor: '#f63c6b',
-              disabled: isDisabled,
+              disabled: isDisabled || !user.inventory[selectedCompany],
               flex: 1,
               onClick: () => onClickSell(selectedCompany),
               text: '팔기',
@@ -308,7 +308,7 @@ const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos }: Sto
           buttons={[
             {
               backgroundColor: '#374151',
-              disabled: isDisabled,
+              disabled: isDisabled || !user.inventory[selectedCompany],
               onClick: () =>
                 onClickSell(selectedCompany, 보유주식.find(({ company }) => company === selectedCompany)?.count),
               text: '모두 팔기',
