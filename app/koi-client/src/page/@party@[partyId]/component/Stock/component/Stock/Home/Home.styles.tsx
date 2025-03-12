@@ -32,12 +32,21 @@ export const H3 = styled.h3`
 `;
 
 export const H4 = styled.h4`
-  font-size: 10px;
+  font-size: 12px;
+  font-weight: 500;
   color: #d4d4d8;
+  width: 100%;
+  opacity: 70%;
+`;
+
+export const Empty = styled(H4)`
+  text-align: center;
+  padding: 32px 0 18px;
 `;
 
 export const H5 = styled.h5`
   font-size: 12px;
+  font-weight: 400;
   color: #9ca3af;
   margin: 0;
   padding: 8px;

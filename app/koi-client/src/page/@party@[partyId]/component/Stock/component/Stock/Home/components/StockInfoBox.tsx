@@ -18,7 +18,6 @@ const StockInfoBox = (props: StockInfoBoxProps) => {
 
   return (
     <InfoBox
-      key={`${rest.title}_${changeTime}`}
       {...rest}
       leftTime={
         <div

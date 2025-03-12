@@ -368,6 +368,7 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
           />
         );
       })}
+      {futureInfos.length === 0 && <Empty>현재 시각 이후의 정보가 없습니다</Empty>}
 
       <Divider />
 
@@ -413,6 +414,7 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
           />
         );
       })}
+      {pastInfos.length === 0 && <Empty>현재 시각 이전의 정보가 없습니다</Empty>}
       <StickyBottom>
         <DrawStockInfo stockId={stockId} />
       </StickyBottom>
@@ -447,6 +449,16 @@ const H2 = styled.div`
   color: #c084fc;
   border-radius: 16px;
   background-color: rgba(192, 132, 252, 0.2);
+`;
+
+const Empty = styled.h4`
+  font-size: 12px;
+  font-weight: 500;
+  color: #d4d4d8;
+  width: 100%;
+  opacity: 70%;
+  text-align: center;
+  padding: 28px 0 24px;
 `;
 
 const Divider = styled.div`

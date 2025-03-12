@@ -13,12 +13,12 @@ const items: TabsProps['items'] = [
     label: '홈',
   },
   {
-    key: '주식',
-    label: '주식',
-  },
-  {
     key: '정보',
     label: '정보',
+  },
+  {
+    key: '주식',
+    label: '주식',
   },
 ];
 
@@ -34,11 +34,11 @@ const Stock = ({ stockId }: Props) => {
         case '홈':
           setSearchParams({ page: '홈' }, { replace: true });
           break;
-        case '주식':
-          setSearchParams({ page: '주식' }, { replace: true });
-          break;
         case '정보':
           setSearchParams({ page: '정보' }, { replace: true });
+          break;
+        case '주식':
+          setSearchParams({ page: '주식' }, { replace: true });
           break;
         default:
           setSearchParams({ page: '홈' }, { replace: true });

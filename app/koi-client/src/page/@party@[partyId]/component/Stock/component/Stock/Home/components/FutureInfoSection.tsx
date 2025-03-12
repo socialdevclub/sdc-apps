@@ -2,7 +2,7 @@ import { commaizeNumber } from '@toss/utils';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { colorDown, colorUp } from '../../../../../../../../config/color';
 import { getAnimalImageSource } from '../../../../../../../../utils/stock';
-import { FutureInfoWrapper, H3, H4, H5, H6, H6Wrapper, LeftSection, TitleWrapper } from '../Home.styles';
+import { FutureInfoWrapper, H3, H4, H5, H6, H6Wrapper, LeftSection, TitleWrapper, Empty } from '../Home.styles';
 import StockInfoBox from './StockInfoBox';
 
 interface FutureInfoSectionProps {
@@ -41,7 +41,7 @@ const FutureInfoSection = ({
         <H5 onClick={handlePageChange}>전체보기 &gt;</H5>
       </TitleWrapper>
       {futureInfos.length === 0 ? (
-        <H4>현재 시각 이후의 정보가 없습니다</H4>
+        <Empty>현재 시각 이후의 정보가 없습니다</Empty>
       ) : (
         <H4>현재 시각 이후의 정보 최대 2개가 표시됩니다</H4>
       )}

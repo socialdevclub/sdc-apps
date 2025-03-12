@@ -1,4 +1,4 @@
-import { commaizeNumber, objectEntries } from '@toss/utils';
+import { objectEntries } from '@toss/utils';
 import { Drawer, message } from 'antd';
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
@@ -71,12 +71,7 @@ const Home = ({ stockId }: Props) => {
         myInfos={myInfos}
       />
       <StickyBottom>
-        <StartLoan
-          stockId={stockId}
-          money={user.money}
-          loanCount={user.loanCount}
-          allSellPrice={commaizeNumber(allSellPrice)}
-        />
+        <StartLoan stockId={stockId} money={user.money} loanCount={user.loanCount} allSellPrice={allSellPrice} />
       </StickyBottom>
     </>
   );
