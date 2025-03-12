@@ -1,13 +1,8 @@
 import { getDateDistance } from '@toss/date';
 import { objectEntries } from '@toss/utils';
 import dayjs from 'dayjs';
-import {
-  REMAINING_STOCK_THRESHOLD,
-  STOCK_PER_USER,
-  STOCK_TRADE_STATUS,
-  StockTradeStatus,
-  TRADE,
-} from '../config/stock';
+import { StockLogSchema } from 'shared~type-stock';
+import { REMAINING_STOCK_THRESHOLD, STOCK_PER_USER, TRADE } from '../config/stock';
 import prependZero from '../service/prependZero';
 
 export const getLowSalesCompanies = (
@@ -97,15 +92,7 @@ export const getStockMessages = (params: GetStockMessagesParams): string[] => {
 };
 
 interface CalculateAveragePurchasePriceParams {
-  logs: Array<{
-    company: string;
-    date: Date;
-    price: number;
-    quantity: number;
-    action: string;
-    round: number;
-    status: StockTradeStatus;
-  }>;
+  logs: StockLogSchema[];
   company: string;
   currentQuantity: number;
   round?: number;
@@ -115,7 +102,7 @@ export const calculateAveragePurchasePrice = (params: CalculateAveragePurchasePr
   const { logs, company, currentQuantity, round } = params;
 
   const myCompanyTradeLog = logs?.filter(
-    ({ company: c, round: r, status }) => c === company && r === round && status === STOCK_TRADE_STATUS.SUCCESS,
+    ({ company: c, round: r, status }) => c === company && r === round && status === 'SUCCESS',
   );
   const sortedTradeLog = myCompanyTradeLog?.sort((a, b) => a.date.getTime() - b.date.getTime());
 
