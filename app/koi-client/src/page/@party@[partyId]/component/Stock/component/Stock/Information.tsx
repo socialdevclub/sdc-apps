@@ -265,6 +265,7 @@ interface InformationItemsProps {
 const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
+
   const { data: stock, refetch } = Query.Stock.useQueryStock(stockId);
   const { user } = Query.Stock.useUser({ stockId, userId });
   const [gameTime, setGameTime] = useState(getFormattedGameTime(stock?.startedTime));
@@ -334,8 +335,9 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
         return (
           <InfoBox
             key={`${company}_${timeIdx}`}
-            title={company}
+            title={company.slice(0, 4)}
             onClick={() => onClick(company)}
+            src={`/no_bg_animal/${ANIMAL_NAME[company.slice(0, 4)]}.webp`}
             value={`${price >= 0 ? '▲' : '▼'}${commaizeNumber(Math.abs(price))}`}
             valueColor={price >= 0 ? colorUp : colorDown}
             leftTime={
@@ -377,7 +379,8 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
         return (
           <InfoBox
             key={`${company}_${timeIdx}`}
-            title={company}
+            title={company.slice(0, 4)}
+            src={`/no_bg_animal/${ANIMAL_NAME[company.slice(0, 4)]}.webp`}
             value={`${price >= 0 ? '▲' : '▼'}${commaizeNumber(Math.abs(price))}`}
             valueColor={price >= 0 ? colorUp : colorDown}
             opacity={0.5}

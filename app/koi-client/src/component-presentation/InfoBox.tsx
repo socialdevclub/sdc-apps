@@ -62,7 +62,7 @@ const Container = styled.div<{ opacity?: number }>`
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 `;
 
 const TimeWrapper = styled.div`
