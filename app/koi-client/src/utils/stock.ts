@@ -1,7 +1,9 @@
 import { getDateDistance } from '@toss/date';
-import { objectEntries } from '@toss/utils';
+import { objectEntries, objectValues } from '@toss/utils';
 import dayjs from 'dayjs';
+import { COMPANY_NAMES, CompanyNames } from 'shared~config/dist/stock';
 import {
+  ANIMAL_NAME,
   REMAINING_STOCK_THRESHOLD,
   STOCK_PER_USER,
   STOCK_TRADE_STATUS,
@@ -174,4 +176,16 @@ export const renderProfitBadge = (
     color: '#94A3B8',
     text: '0% 변동 없음',
   };
+};
+
+export const getAnimalImageSource = (companyName: string): string => {
+  // 입력된 회사 이름이 유효한 CompanyNames 타입인지 확인
+  const isValidCompanyName = objectValues(COMPANY_NAMES).includes(companyName as CompanyNames);
+
+  if (isValidCompanyName) {
+    // 유효한 회사 이름이면 해당 동물 이미지 URL 반환
+    return `/no_bg_animal/${ANIMAL_NAME[companyName.slice(0, 4)]}.webp`;
+  }
+  // 유효하지 않은 회사 이름이면 기본값으로 햄찌금융 이미지 반환
+  return `/no_bg_animal/${ANIMAL_NAME['햄찌금융']}.webp`;
 };

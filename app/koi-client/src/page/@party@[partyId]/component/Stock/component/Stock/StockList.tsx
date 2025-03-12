@@ -11,12 +11,12 @@ import MessageBalloon from '../../../../../../component-presentation/MessageBall
 import StockCard from '../../../../../../component-presentation/StockCard';
 import StockLineChart from '../../../../../../component-presentation/StockLineChart';
 import { MEDIA_QUERY } from '../../../../../../config/common';
-import { ANIMAL_NAME } from '../../../../../../config/stock';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
 import {
   calculateAveragePurchasePrice,
   calculateProfitRate,
+  getAnimalImageSource,
   getStockMessages,
   renderProfitBadge,
 } from '../../../../../../utils/stock';
@@ -201,7 +201,7 @@ const StockList = ({ stockId }: Props) => {
           value={selectedCompany ? companiesPrice[selectedCompany] : 0}
           valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
           badge={renderProfitBadge(stockProfitRate)}
-          src={`/no_bg_animal/${ANIMAL_NAME[selectedCompany.slice(0, 4)]}.webp`}
+          src={getAnimalImageSource(selectedCompany)}
           width={50}
         />
         <MessageBalloon messages={stockMessages} />
@@ -270,7 +270,7 @@ const StockItems = ({ 보유주식, 미보유주식, selectedCompany, onClick }:
               quantity={count}
               onClick={() => onClick(company)}
               isActive={company === selectedCompany}
-              src={`/no_bg_animal/${ANIMAL_NAME[company.slice(0, 4)]}.webp`}
+              src={getAnimalImageSource(company)}
               width={50}
             />
           ))}
@@ -287,7 +287,7 @@ const StockItems = ({ 보유주식, 미보유주식, selectedCompany, onClick }:
               quantity={0}
               onClick={() => onClick(company)}
               isActive={company === selectedCompany}
-              src={`/no_bg_animal/${ANIMAL_NAME[company.slice(0, 4)]}.webp`}
+              src={getAnimalImageSource(company)}
               width={50}
             />
           ))}

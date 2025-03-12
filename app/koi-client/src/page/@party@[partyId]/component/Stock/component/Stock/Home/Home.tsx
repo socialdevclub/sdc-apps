@@ -8,12 +8,12 @@ import InfoHeader from '../../../../../../../component-presentation/InfoHeader';
 import MessageBalloon from '../../../../../../../component-presentation/MessageBalloon';
 import StockLineChart from '../../../../../../../component-presentation/StockLineChart';
 import { MEDIA_QUERY } from '../../../../../../../config/common';
-import { ANIMAL_NAME } from '../../../../../../../config/stock';
 import { Query } from '../../../../../../../hook';
 import { UserStore } from '../../../../../../../store';
 import {
   calculateAveragePurchasePrice,
   calculateProfitRate,
+  getAnimalImageSource,
   getStockMessages,
   renderProfitBadge,
 } from '../../../../../../../utils/stock';
@@ -274,7 +274,7 @@ const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos }: Sto
           value={selectedCompany ? companiesPrice[selectedCompany] : 0}
           valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
           badge={renderProfitBadge(stockProfitRate)}
-          src={`/no_bg_animal/${ANIMAL_NAME[selectedCompany.slice(0, 4)]}.webp`}
+          src={getAnimalImageSource(selectedCompany)}
           width={50}
         />
         <MessageBalloon messages={stockMessages} />

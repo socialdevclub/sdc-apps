@@ -1,7 +1,7 @@
 import { commaizeNumber } from '@toss/utils';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { colorDown, colorUp } from '../../../../../../../../config/color';
-import { ANIMAL_NAME } from '../../../../../../../../config/stock';
+import { getAnimalImageSource } from '../../../../../../../../utils/stock';
 import { FutureInfoWrapper, H3, H4, H5, H6, H6Wrapper, LeftSection, TitleWrapper } from '../Home.styles';
 import StockInfoBox from './StockInfoBox';
 
@@ -59,7 +59,7 @@ const FutureInfoSection = ({
               valueColor={price >= 0 ? colorUp : colorDown}
               remainingTime={remainingTime}
               changeTime={timeIdx * fluctuationsInterval}
-              src={`/no_bg_animal/${ANIMAL_NAME[company.slice(0, 4)]}.webp`}
+              src={getAnimalImageSource(company)}
               width={36}
             />
           );

@@ -12,13 +12,13 @@ import MessageBalloon from '../../../../../../component-presentation/MessageBall
 import StockLineChart from '../../../../../../component-presentation/StockLineChart';
 import { colorDown, colorUp } from '../../../../../../config/color';
 import { MEDIA_QUERY } from '../../../../../../config/common';
-import { ANIMAL_NAME } from '../../../../../../config/stock';
 import { Query } from '../../../../../../hook';
 import prependZero from '../../../../../../service/prependZero';
 import { UserStore } from '../../../../../../store';
 import {
   calculateAveragePurchasePrice,
   calculateProfitRate,
+  getAnimalImageSource,
   getFormattedGameTime,
   getStockMessages,
   renderProfitBadge,
@@ -207,7 +207,7 @@ const Information = ({ stockId }: Props) => {
           value={selectedCompany ? companiesPrice[selectedCompany] : 0}
           valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
           badge={renderProfitBadge(stockProfitRate)}
-          src={`/no_bg_animal/${ANIMAL_NAME[selectedCompany.slice(0, 4)]}.webp`}
+          src={getAnimalImageSource(selectedCompany)}
           width={50}
         />
         <MessageBalloon messages={stockMessages} />
@@ -337,7 +337,7 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
             key={`${company}_${timeIdx}`}
             title={company.slice(0, 4)}
             onClick={() => onClick(company)}
-            src={`/no_bg_animal/${ANIMAL_NAME[company.slice(0, 4)]}.webp`}
+            src={getAnimalImageSource(company)}
             value={`${price >= 0 ? '▲' : '▼'}${commaizeNumber(Math.abs(price))}`}
             valueColor={price >= 0 ? colorUp : colorDown}
             leftTime={
@@ -380,7 +380,7 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
           <InfoBox
             key={`${company}_${timeIdx}`}
             title={company.slice(0, 4)}
-            src={`/no_bg_animal/${ANIMAL_NAME[company.slice(0, 4)]}.webp`}
+            src={getAnimalImageSource(company)}
             value={`${price >= 0 ? '▲' : '▼'}${commaizeNumber(Math.abs(price))}`}
             valueColor={price >= 0 ? colorUp : colorDown}
             opacity={0.5}

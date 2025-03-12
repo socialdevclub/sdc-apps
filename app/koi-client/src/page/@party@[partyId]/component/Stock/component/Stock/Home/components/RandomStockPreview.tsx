@@ -1,12 +1,12 @@
+import { css } from '@emotion/react';
 import { useAtomValue } from 'jotai';
 import { memo } from 'react';
-import { css } from '@emotion/react';
 import { UserStore } from '../../../../../../../../store';
-import { useStockInfo } from '../hooks/useStockInfo';
+import { getAnimalImageSource } from '../../../../../../../../utils/stock';
+import { H3, H4, LeftSection, TitleWrapper, Wrapper } from '../Home.styles';
 import { useRandomStockPreview } from '../hooks/useRandomStockPreview';
+import { useStockInfo } from '../hooks/useStockInfo';
 import StockInfoBox from './StockInfoBox';
-import { Wrapper, TitleWrapper, LeftSection, H3, H4 } from '../Home.styles';
-import { ANIMAL_NAME } from '../../../../../../../../config/stock';
 
 interface Props {
   stockId: string;
@@ -45,7 +45,7 @@ const RandomStockPreview = ({ stockId, onClick }: Props) => {
       <StockInfoBox
         key={nextRoundPredict.companyName.slice(0, 4)}
         title={nextRoundPredict.companyName.slice(0, 4)}
-        src={`/no_bg_animal/${ANIMAL_NAME[nextRoundPredict.companyName.slice(0, 4)]}.webp`}
+        src={getAnimalImageSource(nextRoundPredict.companyName)}
         value={
           <div
             css={css`
