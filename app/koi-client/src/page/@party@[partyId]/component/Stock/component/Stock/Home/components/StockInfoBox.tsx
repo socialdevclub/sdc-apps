@@ -30,7 +30,7 @@ const StockInfoBox = (props: StockInfoBoxProps) => {
             line-height: 22px;
           `}
         >
-          {remainingTime <= 1 ? `🚨 임박` : `${remainingTime}분 후`}
+          {remainingTime <= 1 ? <span style={{ color: '#f96257' }}>🚨 임박</span> : `${remainingTime}분 후`}
         </div>
       }
       changeTime={
