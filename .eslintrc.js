@@ -21,7 +21,6 @@ module.exports = {
   plugins: ['prettier', '@typescript-eslint', 'unused-imports', 'sort-keys-fix', 'react'],
   root: true,
   rules: {
-    '@typescript-eslint/consistent-type-imports': ['warn', { prefer: 'type-imports' }],
     '@typescript-eslint/explicit-function-return-type': 0,
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/interface-name-prefix': 'off',
