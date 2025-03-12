@@ -221,14 +221,15 @@ const Information = ({ stockId }: Props) => {
           buttons={[
             {
               backgroundColor: '#007aff',
-              disabled: isDisabled,
+              // disabled: isDisabled,
               flex: 1,
               onClick: () => onClickBuy(selectedCompany),
               text: '사기',
             },
             {
               backgroundColor: '#f63c6b',
-              disabled: isDisabled || !user.inventory[selectedCompany],
+              // disabled: isDisabled || !user.inventory[selectedCompany],
+              disabled: !user.inventory[selectedCompany],
               flex: 1,
               onClick: () => onClickSell(selectedCompany),
               text: '팔기',
@@ -241,7 +242,8 @@ const Information = ({ stockId }: Props) => {
           buttons={[
             {
               backgroundColor: '#374151',
-              disabled: isDisabled || !user.inventory[selectedCompany],
+              // disabled: isDisabled || !user.inventory[selectedCompany],
+              disabled: !user.inventory[selectedCompany],
               onClick: () =>
                 onClickSell(selectedCompany, 보유주식.find(({ company }) => company === selectedCompany)?.count),
               text: '모두 팔기',
