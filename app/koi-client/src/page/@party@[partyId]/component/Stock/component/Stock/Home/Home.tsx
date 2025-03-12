@@ -177,7 +177,7 @@ const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos }: Sto
   };
 
   const onClickBuy = (company: string) => {
-    buyStock({ amount: 1, company, stockId, unitPrice: companiesPrice[company], userId })
+    buyStock({ amount: 1, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
         messageApi.destroy();
         messageApi.open({
@@ -197,7 +197,7 @@ const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos }: Sto
   };
 
   const onClickSell = (company: string, amount = 1) => {
-    sellStock({ amount, company, stockId, unitPrice: companiesPrice[company], userId })
+    sellStock({ amount, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
         messageApi.destroy();
         messageApi.open({
