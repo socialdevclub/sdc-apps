@@ -1,12 +1,18 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { StockUser, UserProcessor } from 'feature-nest-stock';
+import type { OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { StockProcessor, StockUser, UserProcessor } from 'feature-nest-stock';
 import { SqsService, SqsMessage } from 'lib-nest-sqs';
+import type { Request } from 'shared~type-stock';
 
 @Injectable()
 export class SqsConsumerService implements OnModuleInit {
   private readonly logger = new Logger(SqsConsumerService.name);
 
-  constructor(private readonly sqsService: SqsService, private readonly userProcessor: UserProcessor) {}
+  constructor(
+    private readonly sqsService: SqsService,
+    private readonly userProcessor: UserProcessor,
+    private readonly stockProcessor: StockProcessor,
+  ) {}
 
   async onModuleInit(): Promise<void> {
     // eslint-disable-next-line no-return-await
@@ -18,6 +24,16 @@ export class SqsConsumerService implements OnModuleInit {
       case 'registerUser':
         await this.handleUserRegistration(message.data as StockUser);
         break;
+      case '/stock/buy': {
+        const params = message.data as Request.PostBuyStock;
+        await this.stockProcessor.buyStock(params.stockId, params, { queueMessageId: message.id });
+        break;
+      }
+      case '/stock/sell': {
+        const params = message.data as Request.PostSellStock;
+        await this.stockProcessor.sellStock(params.stockId, params, { queueMessageId: message.id });
+        break;
+      }
       default:
         this.logger.warn(`알 수 없는 액션: ${message.action}`);
     }

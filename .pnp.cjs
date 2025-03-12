@@ -18702,6 +18702,7 @@ const RAW_RUNTIME_STATE =
           ["rimraf", "npm:5.0.10"],\
           ["run-script-webpack-plugin", "npm:0.2.0"],\
           ["rxjs", "npm:7.8.1"],\
+          ["shared~type-stock", "workspace:package/shared/type-stock"],\
           ["source-map-support", "npm:0.5.21"],\
           ["supertest", "npm:6.3.3"],\
           ["terser-webpack-plugin", "virtual:e66555e9c814796748a1bc62cbec9eb7319d53fce80eb16d53f4af0c13157bd31f95ef6d38c9e6e3e23ec60405611b374c533f5cbbb0836fb723b3e5bc4e1c87#npm:5.3.10"],\
@@ -21381,21 +21382,21 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["zod", [\
+      ["npm:3.24.2", {\
+        "packageLocation": "./.yarn/cache/zod-npm-3.24.2-ab80dc0969-604c62a8cf.zip/node_modules/zod/",\
+        "packageDependencies": [\
+          ["zod", "npm:3.24.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["zrender", [\
       ["npm:5.6.1", {\
         "packageLocation": "./.yarn/cache/zrender-npm-5.6.1-9037fc7858-25dfd476be.zip/node_modules/zrender/",\
         "packageDependencies": [\
           ["zrender", "npm:5.6.1"],\
           ["tslib", "npm:2.3.0"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["zod", [\
-      ["npm:3.24.2", {\
-        "packageLocation": "./.yarn/cache/zod-npm-3.24.2-ab80dc0969-604c62a8cf.zip/node_modules/zod/",\
-        "packageDependencies": [\
-          ["zod", "npm:3.24.2"]\
         ],\
         "linkType": "HARD"\
       }]\

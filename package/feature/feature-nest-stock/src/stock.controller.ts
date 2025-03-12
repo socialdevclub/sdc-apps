@@ -1,11 +1,20 @@
 import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common';
-import { Request, Response, StockSchema } from 'shared~type-stock';
-import { Stock } from './stock.schema';
+import type { Request, Response, StockSchema } from 'shared~type-stock';
+import { HttpService } from '@nestjs/axios';
+import type { Stock } from './stock.schema';
 import { StockService } from './stock.service';
+import { StockProcessor } from './stock.processor';
+import { LogService } from './log/log.service';
+import { StockLog } from './log/log.schema';
 
 @Controller('stock')
 export class StockController {
-  constructor(private readonly stockService: StockService) {}
+  constructor(
+    private readonly stockService: StockService,
+    private readonly httpService: HttpService,
+    private readonly stockProcessor: StockProcessor,
+    private readonly logService: LogService,
+  ) {}
 
   @Get('/list')
   async getStockList(@Body() body: Request.GetStockList): Promise<Stock[]> {
@@ -62,7 +71,29 @@ export class StockController {
 
   @Post('/buy')
   buyStock(@Body() body: Request.PostBuyStock): Promise<StockSchema> {
-    return this.stockService.buyStock(body.stockId, body);
+    return this.httpService.axiosRef
+      .post('https://api.socialdev.club/queue/stock/buy', body)
+      .then(async (res) => {
+        await this.logService.addLog(
+          new StockLog({
+            action: 'BUY',
+            company: body.company,
+            date: new Date(),
+            price: body.unitPrice * body.amount,
+            quantity: body.amount,
+            round: body.round,
+            status: 'SUCCESS',
+            stockId: body.stockId,
+            userId: body.userId,
+          }),
+        );
+        return res.data;
+      })
+      .catch(async (error) => {
+        console.error(error);
+        await this.stockProcessor.buyStock(body.stockId, body);
+        return { messageId: 'direct' };
+      });
   }
 
   @Post('/draw-info')
@@ -72,7 +103,29 @@ export class StockController {
 
   @Post('/sell')
   sellStock(@Body() body: Request.PostSellStock): Promise<StockSchema> {
-    return this.stockService.sellStock(body.stockId, body);
+    return this.httpService.axiosRef
+      .post('https://api.socialdev.club/queue/stock/sell', body)
+      .then(async (res) => {
+        await this.logService.addLog(
+          new StockLog({
+            action: 'SELL',
+            company: body.company,
+            date: new Date(),
+            price: body.unitPrice * body.amount,
+            quantity: body.amount,
+            round: body.round,
+            status: 'SUCCESS',
+            stockId: body.stockId,
+            userId: body.userId,
+          }),
+        );
+        return res.data;
+      })
+      .catch(async (error) => {
+        console.error(error);
+        await this.stockProcessor.sellStock(body.stockId, body);
+        return { messageId: 'direct' };
+      });
   }
 
   @Post('/finish')

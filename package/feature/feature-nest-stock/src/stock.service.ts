@@ -1,17 +1,17 @@
 import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
-import { CompanyInfo, Request, Response, StockPhase } from 'shared~type-stock';
+import type { CompanyInfo, Request, Response, StockPhase } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
 import { ceilToUnit } from '@toss/utils';
-import mongoose, { ProjectionType, QueryOptions } from 'mongoose';
+import type { ProjectionType, QueryOptions } from 'mongoose';
+import mongoose from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
 import dayjs from 'dayjs';
 import { StockConfig } from 'shared~config';
-import { Stock, StockDocument } from './stock.schema';
+import type { Stock, StockDocument } from './stock.schema';
 import { UserService } from './user/user.service';
 import { LogService } from './log/log.service';
-import { StockLog } from './log/log.schema';
 import { ResultService } from './result/result.service';
-import { Result } from './result/result.schema';
+import type { Result } from './result/result.schema';
 import { StockRepository } from './stock.repository';
 import { UserRepository } from './user/user.repository';
 
@@ -183,99 +183,6 @@ export class StockService {
     return result;
   }
 
-  async buyStock(stockId: string, body: Request.PostBuyStock): Promise<Stock> {
-    const { userId, company, amount, unitPrice } = body;
-    let result: Stock;
-    let stockLog: StockLog;
-
-    const session = await this.connection.startSession();
-    try {
-      await session.withTransaction(async () => {
-        const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const players = await this.userService.getUserList(stockId, { session });
-
-        const user = players.find((v) => v.userId === userId);
-
-        if (!stock.isTransaction) {
-          throw new HttpException('지금은 거래할 수 없습니다', HttpStatus.CONFLICT);
-        }
-
-        if (!user) {
-          throw new HttpException('유저 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
-        }
-
-        const { minutes, seconds } = getDateDistance(user.lastActivityTime, new Date());
-        if (minutes === 0 && seconds < stock.transactionInterval) {
-          throw new HttpException(`${stock.transactionInterval}초에 한 번만 거래할 수 있습니다`, HttpStatus.CONFLICT);
-        }
-
-        const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
-        const remainingStocks = stock.remainingStocks as unknown as Map<string, number>;
-
-        const companyInfo = companies.get(company);
-        if (!companyInfo) {
-          throw new HttpException('회사를 찾을 수 없습니다', HttpStatus.CONFLICT);
-        }
-
-        if (remainingStocks?.get(company) < amount) {
-          throw new HttpException('시장에 주식이 없습니다', HttpStatus.CONFLICT);
-        }
-
-        // x분 단위로 가격이 변함
-        const idx = Math.min(
-          Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
-          9,
-        );
-        const companyPrice = companyInfo[idx].가격;
-        const totalPrice = companyPrice * amount;
-        if (user.money < totalPrice) {
-          throw new HttpException('돈이 부족합니다', HttpStatus.CONFLICT);
-        }
-        if (companyPrice !== unitPrice) {
-          throw new HttpException('주가가 변동되었습니다. 다시 시도해주세요', HttpStatus.CONFLICT);
-        }
-
-        const inventory = user.inventory as unknown as Map<string, number>;
-        const companyCount = inventory.get(company) || 0;
-
-        if (companyCount + amount > players.length - 1) {
-          throw new HttpException('주식 보유 한도 초과', HttpStatus.CONFLICT);
-        }
-
-        inventory.set(company, companyCount + amount);
-
-        const remainingCompanyStock = remainingStocks.get(company);
-        remainingStocks.set(company, remainingCompanyStock - amount);
-
-        user.money -= totalPrice;
-        user.lastActivityTime = new Date();
-
-        await user.save({ session });
-        result = await stock.save({ session });
-
-        stockLog = new StockLog({
-          action: 'BUY',
-          company,
-          date: user.lastActivityTime,
-          price: companyPrice,
-          quantity: amount,
-          round: stock.round,
-          stockId,
-          userId,
-        });
-      });
-    } catch (error) {
-      console.error(error);
-      throw error;
-    } finally {
-      await session.endSession();
-    }
-
-    await this.logService.addLog(stockLog);
-
-    return result;
-  }
-
   async drawStockInfo(stockId: string, body: Request.PostDrawStockInfo): Promise<Stock> {
     const { userId } = body;
     let result: Stock;
@@ -369,88 +276,6 @@ export class StockService {
     } finally {
       await session.endSession();
     }
-
-    return result;
-  }
-
-  async sellStock(stockId: string, body: Request.PostSellStock): Promise<Stock> {
-    const { userId, company, amount, unitPrice } = body;
-    let result: Stock;
-    let stockLog: StockLog;
-
-    const session = await this.connection.startSession();
-    try {
-      await session.withTransaction(async () => {
-        const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const user = await this.userRepository.findOne({ stockId, userId }, undefined, { session });
-
-        if (!user) {
-          throw new HttpException('유저 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
-        }
-
-        if (!stock.isTransaction) {
-          throw new HttpException('지금은 거래할 수 없습니다', HttpStatus.CONFLICT);
-        }
-
-        const { minutes, seconds } = getDateDistance(user.lastActivityTime, new Date());
-        if (minutes === 0 && seconds < stock.transactionInterval) {
-          throw new HttpException(`${stock.transactionInterval}초에 한 번만 거래할 수 있습니다`, HttpStatus.CONFLICT);
-        }
-
-        const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
-        const remainingStocks = stock.remainingStocks as unknown as Map<string, number>;
-        const companyInfo = companies.get(company);
-        const remainingCompanyStock = remainingStocks.get(company);
-
-        if (!companyInfo) {
-          throw new HttpException('회사 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
-        }
-
-        const inventory = user.inventory as unknown as Map<string, number>;
-        if (!inventory.get(company) || inventory.get(company) < amount) {
-          throw new HttpException('주식을 보유하고 있지 않습니다', HttpStatus.CONFLICT);
-        }
-
-        const idx = Math.min(
-          Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
-          9,
-        );
-        const companyPrice = companyInfo[idx].가격;
-        const totalPrice = companyPrice * amount;
-
-        if (companyPrice !== unitPrice) {
-          throw new HttpException('주가가 변동되었습니다. 다시 시도해주세요', HttpStatus.CONFLICT);
-        }
-
-        inventory.set(company, inventory.get(company) - amount);
-        user.money += totalPrice;
-        user.lastActivityTime = new Date();
-
-        remainingStocks.set(company, remainingCompanyStock + amount);
-
-        await user.save({ session });
-        await stock.save({ session });
-
-        result = stock;
-        stockLog = new StockLog({
-          action: 'SELL',
-          company,
-          date: user.lastActivityTime,
-          price: companyPrice,
-          quantity: amount,
-          round: stock.round,
-          stockId,
-          userId,
-        });
-      });
-    } catch (error) {
-      console.error(error);
-      throw error;
-    } finally {
-      await session.endSession();
-    }
-
-    await this.logService.addLog(stockLog);
 
     return result;
   }

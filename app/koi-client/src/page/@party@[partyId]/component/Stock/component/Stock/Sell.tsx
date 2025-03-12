@@ -26,7 +26,7 @@ const Sell = ({ stockId }: Props) => {
   }
 
   const onClickSell = (company: string) => {
-    sellStock({ amount: 1, company, stockId, unitPrice: companiesPrice[company], userId })
+    sellStock({ amount: 1, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
         messageApi.destroy();
         messageApi.open({
