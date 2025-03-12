@@ -38,6 +38,11 @@ export class UserController {
       });
   }
 
+  @Post('/align-index')
+  async alignIndex(@Query('stockId') stockId: string): Promise<void> {
+    return this.userService.alignIndex(stockId);
+  }
+
   @Post('/introduce')
   async setIntroduce(@Body() body: Request.PostIntroduce): Promise<Response.SetIntroduce> {
     return this.userService.setIntroduce(body.stockId, body.userId, body.introduction);
