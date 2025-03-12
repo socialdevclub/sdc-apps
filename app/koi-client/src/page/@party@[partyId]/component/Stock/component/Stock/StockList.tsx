@@ -11,6 +11,7 @@ import MessageBalloon from '../../../../../../component-presentation/MessageBall
 import StockCard from '../../../../../../component-presentation/StockCard';
 import StockLineChart from '../../../../../../component-presentation/StockLineChart';
 import { MEDIA_QUERY } from '../../../../../../config/common';
+import { ANIMAL_NAME } from '../../../../../../config/stock';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
 import {
@@ -19,7 +20,6 @@ import {
   getStockMessages,
   renderProfitBadge,
 } from '../../../../../../utils/stock';
-import { ANIMAL_NAME } from '../../../../../../config/stock';
 
 interface Props {
   stockId: string;
@@ -111,7 +111,7 @@ const StockList = ({ stockId }: Props) => {
   };
 
   const onClickBuy = (company: string) => {
-    buyStock({ amount: 1, company, stockId, unitPrice: companiesPrice[company], userId })
+    buyStock({ amount: 1, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
         messageApi.destroy();
         messageApi.open({
@@ -131,7 +131,7 @@ const StockList = ({ stockId }: Props) => {
   };
 
   const onClickSell = (company: string, amount = 1) => {
-    sellStock({ amount, company, stockId, unitPrice: companiesPrice[company], userId })
+    sellStock({ amount, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
         messageApi.destroy();
         messageApi.open({

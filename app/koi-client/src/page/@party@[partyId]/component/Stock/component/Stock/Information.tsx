@@ -1,9 +1,8 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { commaizeNumber, objectEntries } from '@toss/utils';
-import { useAtomValue } from 'jotai';
-
 import { Drawer, message } from 'antd';
+import { useAtomValue } from 'jotai';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import ButtonGroup from '../../../../../../component-presentation/ButtonGroup';
@@ -13,6 +12,7 @@ import MessageBalloon from '../../../../../../component-presentation/MessageBall
 import StockLineChart from '../../../../../../component-presentation/StockLineChart';
 import { colorDown, colorUp } from '../../../../../../config/color';
 import { MEDIA_QUERY } from '../../../../../../config/common';
+import { ANIMAL_NAME } from '../../../../../../config/stock';
 import { Query } from '../../../../../../hook';
 import prependZero from '../../../../../../service/prependZero';
 import { UserStore } from '../../../../../../store';
@@ -34,8 +34,7 @@ const Information = ({ stockId }: Props) => {
   const userId = supabaseSession?.user.id;
 
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
-  const round = stock?.round;
-  const { data: logs } = Query.Stock.useQueryLog({ round, stockId, userId });
+  const { data: logs } = Query.Stock.useQueryLog({ round: stock?.round, stockId, userId });
   const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
 
   const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
@@ -90,7 +89,7 @@ const Information = ({ stockId }: Props) => {
     company: selectedCompany,
     currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
     logs,
-    round,
+    round: stock.round,
   });
 
   const stockProfitRate =
@@ -101,7 +100,7 @@ const Information = ({ stockId }: Props) => {
             company: selectedCompany,
             currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
             logs,
-            round,
+            round: stock.round,
           }),
         )
       : null;
@@ -123,7 +122,7 @@ const Information = ({ stockId }: Props) => {
   };
 
   const onClickBuy = (company: string) => {
-    buyStock({ amount: 1, company, stockId, unitPrice: companiesPrice[company], userId })
+    buyStock({ amount: 1, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
         messageApi.destroy();
         messageApi.open({
@@ -143,7 +142,7 @@ const Information = ({ stockId }: Props) => {
   };
 
   const onClickSell = (company: string, amount = 1) => {
-    sellStock({ amount, company, stockId, unitPrice: companiesPrice[company], userId })
+    sellStock({ amount, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
       .then(() => {
         messageApi.destroy();
         messageApi.open({

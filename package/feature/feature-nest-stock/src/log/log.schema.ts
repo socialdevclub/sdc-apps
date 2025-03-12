@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, SchemaTypes } from 'mongoose';
-import { StockLogAction, StockLogSchema } from 'shared~type-stock';
+import type { HydratedDocument } from 'mongoose';
+import { SchemaTypes } from 'mongoose';
+import type { StockLogAction, StockLogSchema } from 'shared~type-stock';
 
 @Schema()
 export class StockLog implements StockLogSchema {
@@ -15,6 +16,12 @@ export class StockLog implements StockLogSchema {
 
   @Prop()
   round: number;
+
+  @Prop()
+  status: 'QUEUING' | 'SUCCESS' | 'FAILED' | 'CANCEL';
+
+  @Prop()
+  queueId?: string;
 
   @Prop({ type: SchemaTypes.String })
   action: StockLogAction;

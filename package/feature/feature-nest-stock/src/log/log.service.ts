@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { MongooseQueryOptions, QueryOptions } from 'mongoose';
-import { DeleteOptions } from 'mongodb';
-import { StockLog, StockLogDocument } from './log.schema';
+import type {
+  FilterQuery,
+  MongooseQueryOptions,
+  ProjectionType,
+  QueryOptions,
+  UpdateQuery,
+  UpdateWriteOpResult,
+} from 'mongoose';
+import type { DeleteOptions, UpdateOptions } from 'mongodb';
+import type { StockLog, StockLogDocument } from './log.schema';
 import { LogRepository } from './log.repository';
 
 @Injectable()
@@ -26,6 +33,14 @@ export class LogService {
     return logs;
   }
 
+  async findOne(
+    filter: FilterQuery<StockLog>,
+    projection?: ProjectionType<StockLog>,
+    options?: QueryOptions<StockLog>,
+  ): Promise<StockLogDocument> {
+    return this.stockLogRepository.findOne(filter, projection, options);
+  }
+
   async addLog(log: StockLog): Promise<StockLogDocument> {
     return this.stockLogRepository.create(log);
   }
@@ -35,5 +50,13 @@ export class LogService {
     options?: DeleteOptions & Omit<MongooseQueryOptions<StockLog>, 'lean' | 'timestamps'>,
   ): Promise<void> {
     await this.stockLogRepository.deleteMany({ stockId }, options);
+  }
+
+  async updateOne(
+    filter: FilterQuery<StockLog>,
+    update: UpdateQuery<StockLog>,
+    options?: UpdateOptions & Omit<MongooseQueryOptions<StockLog>, 'lean'>,
+  ): Promise<UpdateWriteOpResult> {
+    return this.stockLogRepository.updateOne(filter, update, options);
   }
 }
