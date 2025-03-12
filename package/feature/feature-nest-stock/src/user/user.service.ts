@@ -38,7 +38,7 @@ export class UserService {
     return this.userRepository.find({ stockId }, undefined, options);
   }
 
-  findOneByUserId(stockId: string, userId: string, options?: mongoose.QueryOptions<StockUser>): Promise<StockUser> {
+  findOneByUserId(stockId: string, userId: string, options?: mongoose.QueryOptions<StockUser>): Promise<UserDocument> {
     return this.userRepository.findOne({ stockId, userId }, null, options);
   }
 
