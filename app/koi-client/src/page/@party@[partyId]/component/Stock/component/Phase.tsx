@@ -15,11 +15,12 @@ interface Props {
 }
 
 const Phase = ({ stockId }: Props) => {
-  const { stockPhase } = Query.Stock.useQueryStockPhase(stockId);
-  const { data: users } = Query.Stock.useUserList(stockId);
-
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
-  const isEntry = users?.some((user) => user.userId === supabaseSession?.user.id);
+
+  const { stockPhase } = Query.Stock.useQueryStockPhase(stockId);
+  const { data: user } = Query.Stock.useUserFindOne(stockId, supabaseSession?.user.id);
+
+  const isEntry = Boolean(user);
 
   if (!supabaseSession || !stockPhase) {
     return <></>;

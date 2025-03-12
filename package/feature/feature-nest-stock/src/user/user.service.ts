@@ -38,16 +38,12 @@ export class UserService {
     return this.userRepository.find({ stockId }, undefined, options);
   }
 
-  findOneByUserId(stockId: string, userId: string, options?: mongoose.QueryOptions<StockUser>): Promise<StockUser> {
+  findOneByUserId(stockId: string, userId: string, options?: mongoose.QueryOptions<StockUser>): Promise<UserDocument> {
     return this.userRepository.findOne({ stockId, userId }, null, options);
   }
 
   setUser(user: StockUser): Promise<boolean> {
     return this.userRepository.updateOne({ stockId: user.stockId, userId: user.userId }, user);
-  }
-
-  async registerUser(user: StockUser): Promise<Response.GetCreateUser> {
-    return this.userRepository.create(user);
   }
 
   async alignIndex(stockId: string): Promise<void> {

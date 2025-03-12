@@ -56,7 +56,7 @@ const PartyHeader = () => {
             }}
             className={css`
               color: white;
-              font-size: 32px;
+              flex-shrink: 0;
               &:hover {
                 cursor: pointer;
               }

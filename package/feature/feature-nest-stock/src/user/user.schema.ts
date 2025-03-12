@@ -15,7 +15,7 @@ export class StockUserInfo implements StockUserInfoSchema {
   introduction?: string;
 }
 
-@Schema()
+@Schema({ autoIndex: true })
 export class StockUser implements StockUserSchema {
   @Prop()
   stockId: string;
@@ -57,3 +57,6 @@ export class StockUser implements StockUserSchema {
 export type UserDocument = HydratedDocument<StockUser>;
 
 export const userSchema = SchemaFactory.createForClass(StockUser);
+
+// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+userSchema.index({ stockId: 1, index: 1 });

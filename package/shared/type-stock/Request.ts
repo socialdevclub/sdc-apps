@@ -8,12 +8,15 @@ export type GetStock = {
 
 export type PatchUpdateStock = Partial<StockSchema> & { _id: string };
 
+export type GetFindStockUser = StockUserSchema;
+
 export type PostBuyStock = {
   stockId: string;
   userId: string;
   company: string;
   amount: number;
   unitPrice: number;
+  round: number;
 };
 
 export type PostDrawStockInfo = {
@@ -27,6 +30,7 @@ export type PostSellStock = {
   company: string;
   amount: number;
   unitPrice: number;
+  round: number;
 };
 
 export type PostLoan = {

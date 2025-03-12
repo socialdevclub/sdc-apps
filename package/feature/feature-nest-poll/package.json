@@ -14,7 +14,6 @@
     "@nestjs/platform-express": "^10.3.0",
     "class-transformer": "^0.5.1",
     "cross-env": "^7.0.3",
-    "lib-nest-socket": "workspace:*",
     "lodash": "^4.17.21",
     "mongoose": "^8.1.0",
     "reflect-metadata": "^0.1.13",

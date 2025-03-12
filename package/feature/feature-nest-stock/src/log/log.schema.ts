@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, SchemaTypes } from 'mongoose';
-import { StockLogAction, StockLogSchema } from 'shared~type-stock';
+import type { HydratedDocument } from 'mongoose';
+import { SchemaTypes } from 'mongoose';
+import type { StockLogAction, StockLogSchema } from 'shared~type-stock';
 
-@Schema()
+@Schema({ autoIndex: true })
 export class StockLog implements StockLogSchema {
   @Prop()
   stockId: string;
@@ -12,6 +13,15 @@ export class StockLog implements StockLogSchema {
 
   @Prop()
   date: Date;
+
+  @Prop()
+  round: number;
+
+  @Prop()
+  status: 'QUEUING' | 'SUCCESS' | 'FAILED' | 'CANCEL';
+
+  @Prop()
+  queueId?: string;
 
   @Prop({ type: SchemaTypes.String })
   action: StockLogAction;
@@ -25,11 +35,12 @@ export class StockLog implements StockLogSchema {
   @Prop()
   quantity: number;
 
-  constructor(partial: Partial<StockLog>) {
-    Object.assign(this, partial);
+  constructor(stockLog: StockLog) {
+    Object.assign(this, stockLog);
   }
 }
 
 export type StockLogDocument = HydratedDocument<StockLog>;
 
 export const stockLogSchema = SchemaFactory.createForClass(StockLog);
+stockLogSchema.index({ round: 1, stockId: 1, userId: 1 });

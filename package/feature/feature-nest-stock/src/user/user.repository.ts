@@ -9,7 +9,6 @@ import mongoose, {
   UpdateQuery,
 } from 'mongoose';
 import { DeleteOptions, UpdateOptions } from 'mongodb';
-import { Response } from 'shared~type-stock';
 import { StockUser, UserDocument } from './user.schema';
 
 @Injectable()
@@ -20,23 +19,20 @@ export class UserRepository {
     private readonly userModel: Model<StockUser>,
   ) {}
 
-  async create(user: StockUser): Promise<Response.GetCreateUser> {
+  async create(user: StockUser): Promise<void> {
     const session = await this.connection.startSession();
 
     try {
-      const result = await session.withTransaction(async () => {
+      await session.withTransaction(async () => {
         const doc = await this.findOne({ stockId: user.stockId, userId: user.userId }, null, {
           session,
         });
         if (!doc) {
           const newStockUser = new StockUser(user, user);
           const newDoc = new this.userModel(newStockUser);
-          const updatedDoc = await newDoc.save({ session });
-          return { isAlreadyExists: false, user: updatedDoc };
+          await newDoc.save({ session });
         }
-        return { isAlreadyExists: true, user: doc };
       });
-      return result;
     } catch (err) {
       console.error(err);
       throw new HttpException('POST /stock/user/register Unknown Error', 500, { cause: err });

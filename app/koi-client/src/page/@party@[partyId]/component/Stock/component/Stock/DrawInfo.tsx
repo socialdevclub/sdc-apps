@@ -19,7 +19,7 @@ const DrawStockInfo = ({ stockId }: Props) => {
   const { allSellPrice } = Query.Stock.useAllSellPrice({ stockId, userId });
 
   const [open, setOpen] = useState(false);
-  const modalRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLUListElement>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId);
 
@@ -64,9 +64,9 @@ const DrawStockInfo = ({ stockId }: Props) => {
   return (
     <>
       {contextHolder}
-      <InformationDrawButton onClick={() => setOpen(true)} disabled={isDisabled}>
+      <InfoExtractButton onClick={() => setOpen(true)} disabled={isDisabled}>
         정보 뽑기
-      </InformationDrawButton>
+      </InfoExtractButton>
       <div
         css={{
           position: 'absolute',
@@ -75,24 +75,51 @@ const DrawStockInfo = ({ stockId }: Props) => {
         <Modal
           title="주식 정보 뽑기"
           open={open}
+          centered
           onCancel={() => setOpen(false)}
           okText="뽑기"
           cancelText="닫기"
           getContainer={false}
-          okButtonProps={{ loading: isLoading }}
+          okButtonProps={{ loading: isLoading, style: { backgroundColor: COLOR.green } }}
+          cancelButtonProps={{ style: { backgroundColor: '#252836', color: 'white' } }}
           onOk={onClickDrawStockInfo}
         >
-          <div ref={modalRef} tabIndex={-1}>
-            <p>1회 뽑는 데 30만원의 금액이 필요해요.</p>
-            <p>수익률 0% 이상일 때만 뽑기를 할 수 있어요.</p>
-          </div>
+          <InfoExtractionRulesList ref={modalRef} tabIndex={-1}>
+            <li>
+              <h3>1. 정보 뽑기 비용</h3>
+              <p>
+                1회 뽑는 데 <HighlightedText>30만원</HighlightedText>의 금액이 필요해요.
+              </p>
+            </li>
+            <li>
+              <h3>2. 정보 뽑기 조건</h3>
+              <p>
+                <HighlightedText>수익률 0% 이상</HighlightedText>일 때만 뽑기를 할 수 있어요.
+              </p>
+            </li>
+          </InfoExtractionRulesList>
         </Modal>
       </div>
     </>
   );
 };
 
-const InformationDrawButton = styled.button`
+const InfoExtractionRulesList = styled.ul`
+  list-style: none;
+  font-size: 12px;
+  color: #9ca3af;
+  padding: 3px 0;
+
+  & > li > h3 {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+`;
+const HighlightedText = styled.span`
+  color: ${COLOR.pastelGreen};
+`;
+
+const InfoExtractButton = styled.button`
   width: 100%;
   font-family: 'DungGeunMo';
   padding: 16px;

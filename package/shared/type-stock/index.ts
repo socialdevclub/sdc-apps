@@ -67,10 +67,12 @@ export type StockLogSchema = {
   stockId: string;
   userId: string;
   date: Date;
+  round: number;
   action: StockLogAction;
   company: string;
   price: number;
   quantity: number;
+  status: 'QUEUING' | 'SUCCESS' | 'FAILED' | 'CANCEL';
 };
 
 export type ResultSchema = {

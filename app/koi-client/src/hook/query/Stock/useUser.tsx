@@ -1,5 +1,4 @@
 import { getDateDistance } from '@toss/date';
-import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import { Query } from '../..';
 
@@ -13,8 +12,7 @@ interface Props {
 
 const useUser = ({ stockId, userId }: Props) => {
   const { data: stock } = Query.Stock.useQueryStock(stockId);
-  const { data } = Query.Stock.useUserList(stockId);
-  const user = useMemo(() => data?.find((user) => user.userId === userId), [data, userId]);
+  const { data: user } = Query.Stock.useUserFindOne(stockId, userId);
 
   if (!user) {
     return { user: undefined };

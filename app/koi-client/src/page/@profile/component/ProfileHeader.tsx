@@ -16,6 +16,8 @@ const ProfileHeader = () => {
             navigate(-1);
           }}
           className={css`
+            color: white;
+            flex-shrink: 0;
             &:hover {
               cursor: pointer;
             }

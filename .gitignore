@@ -20,6 +20,8 @@ turbo-build.log
 
 /app/server/public/avatar
 /app/koi-server/dev/main.js
+/app/sdc-sqs-worker/dev/main.js
+/app/sdc-sqs-producer/dev/main.js
 .env
 /test-results/
 /playwright-report/
