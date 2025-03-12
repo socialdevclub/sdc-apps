@@ -82,7 +82,7 @@ export class StockProcessor {
         const inventory = user.inventory as unknown as Map<string, number>;
         const companyCount = inventory.get(company) || 0;
 
-        if (companyCount + amount > players.length - 1) {
+        if (companyCount + amount > players.length * 2) {
           throw new HttpException('주식 보유 한도 초과', HttpStatus.CONFLICT);
         }
 
