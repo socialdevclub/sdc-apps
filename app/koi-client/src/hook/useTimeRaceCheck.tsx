@@ -1,25 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { getDateDistance } from '@toss/date';
-import dayjs from 'dayjs';
 import { Response } from 'shared~type-stock';
-import prependZero from '../service/prependZero';
-
-/**
- * 게임 시작 시간으로부터 현재까지 경과한 시간을 'MM:SS' 형식으로 반환합니다.
- *
- * @param startTime - 게임 시작 시간 (ISO 8601 형식의 문자열)
- * @returns 경과 시간을 'MM:SS' 형식으로 반환. 시작 시간이 없으면 '00:00' 반환
- *
- * @example getFormattedGameTime("2025-03-08T02:03:59+09:00"); // "51:49"
- */
-const getFormattedGameTime = (startTime?: string): string => {
-  if (!startTime) return '00:00';
-
-  return `${prependZero(getDateDistance(dayjs(startTime).toDate(), new Date()).minutes, 2)}:${prependZero(
-    getDateDistance(dayjs(startTime).toDate(), new Date()).seconds,
-    2,
-  )}`;
-};
+import { getFormattedGameTime } from '../utils/stock';
 
 interface Props {
   stock?: Response.GetStock;
