@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { SwitchCase } from '@toss/react';
-import { Suspense, useCallback } from 'react';
+import { Suspense, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Home from './Home/Home';
 import Information from './Information';
@@ -28,6 +28,15 @@ interface Props {
 
 const Stock = ({ stockId }: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.parentElement?.parentElement?.parentElement?.scrollTo({ top: 0 });
+    }
+  }, [searchParams]);
+
   const onClickTab = useCallback(
     (key: string) => {
       switch (key) {
@@ -49,7 +58,7 @@ const Stock = ({ stockId }: Props) => {
   );
 
   return (
-    <Container>
+    <Container ref={contentRef}>
       <Tabs defaultActiveKey={searchParams.get('page') ?? '홈'} items={items} onChange={onClickTab} />
       <ContentContainer>
         <Suspense fallback={<></>}>
