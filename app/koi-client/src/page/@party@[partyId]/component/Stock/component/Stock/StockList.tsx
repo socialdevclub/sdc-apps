@@ -10,46 +10,26 @@ import InfoHeader from '../../../../../../component-presentation/InfoHeader';
 import MessageBalloon from '../../../../../../component-presentation/MessageBalloon';
 import StockCard from '../../../../../../component-presentation/StockCard';
 import StockLineChart from '../../../../../../component-presentation/StockLineChart';
+import { MEDIA_QUERY } from '../../../../../../config/common';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
-import { calculateAveragePurchasePrice, calculateProfitRate, getStockMessages } from '../../../../../../utils/stock';
-
-const renderProfitBadge = (stockProfitRate: number | null) => {
-  if (stockProfitRate === null) {
-    return {
-      backgroundColor: 'rgba(148, 163, 184, 0.2)',
-      color: '#94A3B8',
-      text: '해당 주식이 없어요',
-    };
-  }
-  if (stockProfitRate > 0) {
-    return {
-      backgroundColor: 'rgba(163, 230, 53, 0.2)',
-      color: '#a3e635',
-      text: `+${stockProfitRate}% 수익 중`,
-    };
-  }
-  if (stockProfitRate < 0) {
-    return {
-      backgroundColor: 'rgba(220, 38, 38, 0.2)',
-      color: '#DC2626',
-      text: `${stockProfitRate}% 손실 중`,
-    };
-  }
-  return {
-    backgroundColor: 'rgba(148, 163, 184, 0.2)',
-    color: '#94A3B8',
-    text: '0% 변동 없음',
-  };
-};
+import {
+  calculateAveragePurchasePrice,
+  calculateProfitRate,
+  getAnimalImageSource,
+  getStockMessages,
+  renderProfitBadge,
+} from '../../../../../../utils/stock';
 
 interface Props {
   stockId: string;
 }
 
-const Buy = ({ stockId }: Props) => {
+const StockList = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
+
+  const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });
 
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
   const round = stock?.round;
@@ -58,8 +38,6 @@ const Buy = ({ stockId }: Props) => {
 
   const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
   const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
-
-  const isDesktop = useMediaQuery({ query: `(min-width: 800px)` });
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -91,33 +69,29 @@ const Buy = ({ stockId }: Props) => {
     return <>불러오는 중</>;
   }
 
-  const myInfos = objectEntries(stock.companies).flatMap(([company, companyInfos]) => {
-    const acc: Array<{ company: string; timeIdx: number; price: number }> = [];
-
-    companyInfos.forEach((companyInfo, idx) => {
-      if (companyInfos[idx].정보.some((name) => name === userId)) {
+  const myInfos = objectEntries(stock.companies).flatMap(([company, companyInfos]) =>
+    companyInfos.reduce((acc, companyInfo, idx) => {
+      if (companyInfo.정보.includes(userId)) {
         acc.push({
           company,
-          price: companyInfo.가격 - companyInfos[idx - 1].가격,
+          price: idx > 0 ? companyInfo.가격 - companyInfos[idx - 1].가격 : 0,
           timeIdx: idx,
         });
       }
-    });
+      return acc;
+    }, [] as Array<{ company: string; timeIdx: number; price: number }>),
+  );
 
-    return acc;
+  const averagePurchasePrice = calculateAveragePurchasePrice({
+    company: selectedCompany,
+    currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+    logs,
+    round,
   });
 
   const stockProfitRate =
     selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
-      ? calculateProfitRate(
-          companiesPrice[selectedCompany],
-          calculateAveragePurchasePrice({
-            company: selectedCompany,
-            currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-            logs,
-            round,
-          }),
-        )
+      ? calculateProfitRate(companiesPrice[selectedCompany], averagePurchasePrice)
       : null;
 
   const stockMessages = getStockMessages({
@@ -182,35 +156,12 @@ const Buy = ({ stockId }: Props) => {
   return (
     <>
       {contextHolder}
-      {보유주식.length > 0 && (
-        <>
-          <SectionTitle>보유 중인 주식</SectionTitle>
-          {보유주식.map(({ company, count }) => (
-            <StockCard
-              key={company}
-              company={company.slice(0, 4)}
-              quantity={count}
-              onClick={() => handleOpenDrawer(company)}
-              isActive={company === selectedCompany}
-            />
-          ))}
-          {미보유주식.length > 0 && <Divider />}
-        </>
-      )}
-      {미보유주식.length > 0 && (
-        <>
-          <SectionTitle>보유하지 않은 주식</SectionTitle>
-          {미보유주식.map((company) => (
-            <StockCard
-              key={company}
-              company={company.slice(0, 4)}
-              quantity={0}
-              onClick={() => handleOpenDrawer(company)}
-              isActive={company === selectedCompany}
-            />
-          ))}
-        </>
-      )}
+      <StockItems
+        보유주식={보유주식}
+        미보유주식={미보유주식}
+        selectedCompany={selectedCompany}
+        onClick={handleOpenDrawer}
+      />
       <Drawer
         placement="bottom"
         onClose={handleCloseDrawer}
@@ -250,31 +201,29 @@ const Buy = ({ stockId }: Props) => {
           value={selectedCompany ? companiesPrice[selectedCompany] : 0}
           valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
           badge={renderProfitBadge(stockProfitRate)}
+          src={getAnimalImageSource(selectedCompany)}
+          width={50}
         />
         <MessageBalloon messages={stockMessages} />
         <StockLineChart
           company={selectedCompany}
           priceData={selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]}
           fluctuationsInterval={stock.fluctuationsInterval}
-          averagePurchasePrice={calculateAveragePurchasePrice({
-            company: selectedCompany,
-            currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-            logs,
-            round,
-          })}
+          averagePurchasePrice={averagePurchasePrice}
         />
         <ButtonGroup
           buttons={[
             {
               backgroundColor: '#007aff',
-              disabled: isDisabled,
+              // disabled: isDisabled,
               flex: 1,
               onClick: () => onClickBuy(selectedCompany),
               text: '사기',
             },
             {
               backgroundColor: '#f63c6b',
-              disabled: isDisabled,
+              // disabled: isDisabled || !user.inventory[selectedCompany],
+              disabled: !user.inventory[selectedCompany],
               flex: 1,
               onClick: () => onClickSell(selectedCompany),
               text: '팔기',
@@ -287,7 +236,8 @@ const Buy = ({ stockId }: Props) => {
           buttons={[
             {
               backgroundColor: '#374151',
-              disabled: isDisabled,
+              // disabled: isDisabled || !user.inventory[selectedCompany],
+              disabled: !user.inventory[selectedCompany],
               onClick: () =>
                 onClickSell(selectedCompany, 보유주식.find(({ company }) => company === selectedCompany)?.count),
               text: '모두 팔기',
@@ -300,7 +250,54 @@ const Buy = ({ stockId }: Props) => {
   );
 };
 
-export default Buy;
+export default StockList;
+
+interface StockItemsProps {
+  보유주식: Array<{ company: string; count: number }>;
+  미보유주식: string[];
+  selectedCompany: string;
+  onClick: (company: string) => void;
+}
+
+const StockItems = ({ 보유주식, 미보유주식, selectedCompany, onClick }: StockItemsProps) => {
+  return (
+    <>
+      {보유주식.length > 0 && (
+        <>
+          <SectionTitle>보유 중인 주식</SectionTitle>
+          {보유주식.map(({ company, count }) => (
+            <StockCard
+              key={company}
+              company={company.slice(0, 4)}
+              quantity={count}
+              onClick={() => onClick(company)}
+              isActive={company === selectedCompany}
+              src={getAnimalImageSource(company)}
+              width={50}
+            />
+          ))}
+          {미보유주식.length > 0 && <Divider />}
+        </>
+      )}
+      {미보유주식.length > 0 && (
+        <>
+          <SectionTitle>보유하지 않은 주식</SectionTitle>
+          {미보유주식.map((company) => (
+            <StockCard
+              key={company}
+              company={company.slice(0, 4)}
+              quantity={0}
+              onClick={() => onClick(company)}
+              isActive={company === selectedCompany}
+              src={getAnimalImageSource(company)}
+              width={50}
+            />
+          ))}
+        </>
+      )}
+    </>
+  );
+};
 
 const SectionTitle = styled.h4`
   font-size: 16px;

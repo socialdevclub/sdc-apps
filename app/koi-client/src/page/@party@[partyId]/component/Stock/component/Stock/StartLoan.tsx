@@ -10,7 +10,7 @@ type Props = {
   stockId: string;
   loanCount: number;
   money: number;
-  allSellPrice: string;
+  allSellPrice: number;
 };
 
 const StartLoan = ({ stockId, loanCount, money, allSellPrice }: Props) => {
@@ -63,8 +63,7 @@ const StartLoan = ({ stockId, loanCount, money, allSellPrice }: Props) => {
 
   // 매수 가능 금액과 주식 가치 계산
   const availableMoney = money;
-  const stockValue = parseInt(allSellPrice, 10) || 0;
-  const totalAssets = availableMoney + stockValue;
+  const totalAssets = availableMoney + allSellPrice;
 
   // 대출 가능 여부 메시지 생성
   const getLoanStatusInfo = () => {
@@ -77,13 +76,13 @@ const StartLoan = ({ stockId, loanCount, money, allSellPrice }: Props) => {
     }
     if (totalAssets >= 1000000) {
       return {
-        message: `매수 가능 금액(${availableMoney.toLocaleString()}원)과 주식가치(${stockValue.toLocaleString()}원)의 합이 ${totalAssets.toLocaleString()}원으로, 100만원을 초과합니다.`,
+        message: `매수 가능 금액(${availableMoney.toLocaleString()}원)과 주식가치(${allSellPrice.toLocaleString()}원)의 합이 ${totalAssets.toLocaleString()}원으로, 100만원을 초과합니다.`,
         status: '대출 불가능',
         statusColor: '#c22e08',
       };
     }
     return {
-      message: `매수 가능 금액(${availableMoney.toLocaleString()}원)과 주식가치(${stockValue.toLocaleString()}원)의 합이 ${totalAssets.toLocaleString()}원으로, 100만원 미만입니다.`,
+      message: `매수 가능 금액(${availableMoney.toLocaleString()}원)과 주식가치(${allSellPrice.toLocaleString()}원)의 합이 ${totalAssets.toLocaleString()}원으로, 100만원 미만입니다.`,
       status: '대출 가능',
       statusColor: '#166f35',
     };
@@ -176,7 +175,7 @@ const StartLoan = ({ stockId, loanCount, money, allSellPrice }: Props) => {
                     </InfoRow>
                     <InfoRow>
                       <InfoLabel>주식가치</InfoLabel>
-                      <InfoValue>{stockValue.toLocaleString()}원</InfoValue>
+                      <InfoValue>{allSellPrice.toLocaleString()}원</InfoValue>
                     </InfoRow>
                     <InfoRow>
                       <InfoLabel>합계</InfoLabel>

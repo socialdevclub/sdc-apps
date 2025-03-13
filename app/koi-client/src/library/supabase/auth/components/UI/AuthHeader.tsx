@@ -1,10 +1,14 @@
 import styled from '@emotion/styled';
 import { ChevronLeft } from 'lucide-react';
+import { useMediaQuery } from 'react-responsive';
+import { MEDIA_QUERY } from '../../../../../config/common';
 
 function AuthHeader({ onClickBack }: { onClickBack: () => void }) {
+  const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });
+
   return (
     <Wrapper>
-      <Content>
+      <Content isDesktop={isDesktop}>
         <Button onClick={onClickBack}>
           <ChevronLeft size={35} color="gray" />
         </Button>
@@ -25,13 +29,13 @@ const Wrapper = styled.div`
   justify-content: center;
 `;
 
-const Content = styled.div`
+const Content = styled.div<{ isDesktop: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-  max-width: 400px;
+  max-width: ${({ isDesktop }) => (isDesktop ? '400px' : '100%')};
   background-color: #f2f2f2;
 `;
 
