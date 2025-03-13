@@ -124,9 +124,14 @@ interface CalculateAveragePurchasePriceParams {
 export const calculateAveragePurchasePrice = (params: CalculateAveragePurchasePriceParams): number => {
   const { logs, company, currentQuantity, round } = params;
 
+  if (round === undefined) {
+    return 0;
+  }
+
   const myCompanyTradeLog = logs?.filter(
     ({ company: c, round: r, status }) => c === company && r === round && status === STOCK_TRADE_STATUS.SUCCESS,
   );
+
   const sortedTradeLog = myCompanyTradeLog?.sort((a, b) => a.date.getTime() - b.date.getTime());
 
   let count = 0;
