@@ -43,25 +43,46 @@ const StockDrawer = ({
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { isFreezed, user } = Query.Stock.useUser({ stockId, userId, userRefetchInterval: 500 });
-  const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
+  const { isFreezed, user, refetch } = Query.Stock.useUser({
+    stockId,
+    stockRefetchInterval: Number.POSITIVE_INFINITY,
+    userId,
+    userRefetchInterval: Number.POSITIVE_INFINITY,
+  });
+  const {
+    data: stock,
+    companiesPrice,
+    timeIdx,
+  } = Query.Stock.useQueryStock(stockId, { refetchInterval: Number.POSITIVE_INFINITY });
   const { data: userCount } = Query.Stock.useUserCount({ stockId });
 
-  const [isEnabledQueryLog, setIsEnabledQueryLog] = useState(() => Boolean(selectedCompany));
+  const [isVisible, setIsVisible] = useState(() => Boolean(selectedCompany));
+  const prevIsVisibleRef = useRef(isVisible);
+
   const { data: logs } = Query.Stock.useQueryLog(
     { company: selectedCompany, round: stock?.round, stockId, userId },
     {
-      enabled: isEnabledQueryLog,
+      enabled: isVisible,
     },
   );
 
   // logs 변화를 감지하여 메시지 표시
-  const prevLogsRef = useRef<typeof logs>();
+  const prevLogsRef = useRef<Record<string, typeof logs>>({});
+
+  if (isVisible !== prevIsVisibleRef.current) {
+    if (isVisible) {
+      prevLogsRef.current[selectedCompany] = logs;
+    }
+    prevIsVisibleRef.current = isVisible;
+  }
+
   useEffect(() => {
     if (!logs || logs.length === 0) return;
 
     // 이전 로그와 현재 로그의 길이를 비교하여 새로운 로그가 추가되었는지 확인
-    if (prevLogsRef.current && logs.length > prevLogsRef.current.length) {
+    if (prevLogsRef.current && logs.length > prevLogsRef.current[selectedCompany]?.length) {
+      refetch();
+
       // 가장 최근 로그 확인
       const latestLog = logs[logs.length - 1];
 
@@ -92,8 +113,8 @@ const StockDrawer = ({
     }
 
     // 현재 로그를 저장
-    prevLogsRef.current = logs;
-  }, [logs, messageApi]);
+    prevLogsRef.current[selectedCompany] = logs;
+  }, [logs, messageApi, refetch, selectedCompany]);
 
   const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
   const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
@@ -107,14 +128,33 @@ const StockDrawer = ({
       }));
   }, [user?.inventory]);
 
+  const prevAveragePurchasePrice = useRef<number>();
   const averagePurchasePrice = useMemo(() => {
     return calculateAveragePurchasePrice({
       company: selectedCompany,
       currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
       logs,
+      prevData: prevAveragePurchasePrice.current,
       round: stock?.round,
     });
   }, [logs, selectedCompany, stock?.round, 보유주식]);
+
+  if (averagePurchasePrice !== prevAveragePurchasePrice.current) {
+    prevAveragePurchasePrice.current = averagePurchasePrice;
+  }
+
+  const stockProfitRate = useMemo(
+    () =>
+      selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
+        ? calculateProfitRate(companiesPrice[selectedCompany], averagePurchasePrice)
+        : null,
+    [averagePurchasePrice, companiesPrice, selectedCompany, 보유주식],
+  );
+
+  const chartPriceData = useMemo(
+    () => (selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]),
+    [priceData, selectedCompany, timeIdx],
+  );
 
   if (!stock || !userId || !user) {
     return <>불러오는 중</>;
@@ -160,11 +200,6 @@ const StockDrawer = ({
     // });
   };
 
-  const stockProfitRate =
-    selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
-      ? calculateProfitRate(companiesPrice[selectedCompany], averagePurchasePrice)
-      : null;
-
   const isLoading = isBuyLoading || isFreezed || isSellLoading;
   const isDisabled = timeIdx === undefined || timeIdx >= 9 || !stock.isTransaction || isLoading;
   const isCanBuy = user.money >= companiesPrice[selectedCompany];
@@ -206,20 +241,27 @@ const StockDrawer = ({
       <InfoHeader
         title={selectedCompany.slice(0, 4)}
         subtitle={`보유 주식: ${보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0}`}
+        subTitleColor={
+          isStockOverLimit(
+            userCount?.count ?? Number.NEGATIVE_INFINITY,
+            보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+            1,
+          )
+            ? 'red'
+            : '#d1d5db'
+        }
         value={selectedCompany ? companiesPrice[selectedCompany] : 0}
         valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
+        valueColor={isCanBuy ? 'white' : 'red'}
         badge={renderProfitBadge(stockProfitRate)}
         src={getAnimalImageSource(selectedCompany)}
         width={50}
       />
       <MessageBalloon messages={stockMessages} />
-      <ImpressionArea
-        onImpressionStart={() => setIsEnabledQueryLog(true)}
-        onImpressionEnd={() => setIsEnabledQueryLog(false)}
-      >
+      <ImpressionArea onImpressionStart={() => setIsVisible(true)} onImpressionEnd={() => setIsVisible(false)}>
         <StockLineChart
           company={selectedCompany}
-          priceData={selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]}
+          priceData={chartPriceData}
           fluctuationsInterval={stock.fluctuationsInterval}
           averagePurchasePrice={averagePurchasePrice}
         />
