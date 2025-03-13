@@ -16,7 +16,7 @@ const useQueryLog = ({ stockId, userId, round }: Props) => {
       pathname: `/stock/log?stockId=${stockId}&userId=${userId}&round=${round}`,
     },
     reactQueryOption: {
-      enabled: !!stockId && !!userId,
+      enabled: !!stockId && !!userId && round !== undefined,
       refetchInterval: 1500,
     },
   });
