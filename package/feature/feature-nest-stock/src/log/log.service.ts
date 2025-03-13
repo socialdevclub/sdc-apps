@@ -20,10 +20,12 @@ export class LogService {
     stockId: string,
     userId: string,
     round: number,
+    company?: string,
     options?: QueryOptions<StockLog>,
   ): Promise<StockLogDocument[]> {
     const logs = await this.stockLogRepository.find(
       {
+        company,
         round,
         stockId,
         userId,
