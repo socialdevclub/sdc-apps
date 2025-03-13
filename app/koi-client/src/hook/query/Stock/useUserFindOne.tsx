@@ -6,10 +6,12 @@ type StockId = string | undefined;
 
 interface Options {
   enabled?: boolean;
+  refetchInterval?: number;
 }
 
 const useUserFindOne = (stockId: string | undefined, userId: string | undefined, options?: Options) => {
   const enabled = options?.enabled ?? true;
+  const refetchInterval = options?.refetchInterval ?? 1500;
 
   const { data } = useQuery<Response.GetStockUser>({
     api: {
@@ -19,7 +21,7 @@ const useUserFindOne = (stockId: string | undefined, userId: string | undefined,
     },
     reactQueryOption: {
       enabled: !!stockId && !!userId && enabled,
-      refetchInterval: 1500,
+      refetchInterval,
     },
   });
 
