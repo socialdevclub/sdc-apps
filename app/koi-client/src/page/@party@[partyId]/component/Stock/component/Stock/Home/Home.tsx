@@ -23,10 +23,6 @@ import FutureInfoSection from './components/FutureInfoSection';
 import RandomStockPreview from './components/RandomStockPreview';
 import UserSummary from './components/UserSummary';
 import { useStockInfo } from './hooks/useStockInfo';
-import UserSummary from './components/UserSummary';
-import FutureInfoSection from './components/FutureInfoSection';
-import { Container, Wrapper, Divider, StickyBottom } from './Home.styles';
-import { Query } from '../../../../../../../hook';
 
 interface Props {
   stockId: string;
@@ -68,7 +64,7 @@ const Home = ({ stockId }: Props) => {
         myInfos={myInfos}
       />
       <StickyBottom>
-        <StartLoan stockId={stockId} money={user.money} loanCount={user.loanCount} allSellPrice={allSellPrice} />
+        <StartLoan stockId={stockId} money={user.money} loanCount={user.loanCount} allSellPrice={myAllSellPrice} />
       </StickyBottom>
     </>
   );
