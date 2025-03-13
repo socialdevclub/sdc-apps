@@ -15,7 +15,7 @@ interface Props {
 const Table = ({ elapsedTime, pov, stockId }: Props) => {
   const { data: game } = Query.Stock.useQueryStock(stockId);
   const { data: users } = Query.Stock.useUserList(stockId);
-  const { data: profiles } = Query.Supabase.useQueryProfileById(users.map((v) => v.userId));
+  const { data: profiles } = Query.Supabase.useQueryProfileById(users?.map((v) => v.userId) ?? []);
   const { data: results } = Query.Stock.useQueryResult(stockId);
 
   // 주식 가치 계산을 위한 훅 추가
@@ -43,7 +43,7 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
 
   // 주식 가치를 포함한 총 자산 기준으로 유저 정렬
   const sortedUsers =
-    [...users].sort((a, b) => {
+    [...(users ?? [])].sort((a, b) => {
       const aTotalValue = a.money + (userStockValueMap[a.userId] || 0);
       const bTotalValue = b.money + (userStockValueMap[b.userId] || 0);
       return bTotalValue - aTotalValue;
@@ -97,7 +97,7 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
 
                     const 정보 = companies[company][idx].정보
                       .map((userId: string) => {
-                        const nickname = users.find((v) => v.userId === userId)?.userInfo.nickname;
+                        const nickname = users?.find((v) => v.userId === userId)?.userInfo.nickname;
                         return nickname;
                       })
                       .join(' / ');
@@ -172,7 +172,7 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
                   </StyledTd>
                 ))}
               </StyledTr>
-              {users.map((user, index) => {
+              {users?.map((user, index) => {
                 return (
                   <StyledTr key={user.userId} isAlternate={index % 2 === 1}>
                     <StyledTd>{profiles?.data?.find((v) => v.id === user.userId)?.username}</StyledTd>
