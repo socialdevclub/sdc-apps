@@ -6,7 +6,12 @@ import { objectEntries } from '@toss/utils';
 import { isStockOverLimit } from 'shared~config/dist/stock';
 import { MEDIA_QUERY } from '../../../../../../config/common';
 import InfoHeader from '../../../../../../component-presentation/InfoHeader';
-import { calculateProfitRate, getAnimalImageSource, renderProfitBadge } from '../../../../../../utils/stock';
+import {
+  calculateAveragePurchasePrice,
+  calculateProfitRate,
+  getAnimalImageSource,
+  renderProfitBadge,
+} from '../../../../../../utils/stock';
 import MessageBalloon from '../../../../../../component-presentation/MessageBalloon';
 import StockLineChart from '../../../../../../component-presentation/StockLineChart';
 import ButtonGroup from '../../../../../../component-presentation/ButtonGroup';
@@ -19,9 +24,6 @@ interface Props {
   selectedCompany: string;
   stockMessages: string[];
   priceData: Record<string, number[]>;
-  averagePurchasePrice: number;
-  isDisabled: boolean;
-
   stockId: string;
   onClickBuy: (company: string) => void;
   onClickSell: (company: string, amount?: number) => void;
@@ -33,8 +35,6 @@ const StockDrawer = ({
   selectedCompany,
   stockMessages,
   priceData,
-  averagePurchasePrice,
-  isDisabled,
   stockId,
   onClickBuy,
   onClickSell,
@@ -43,9 +43,13 @@ const StockDrawer = ({
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: user } = Query.Stock.useUserFindOne(stockId, userId);
+  const { isFreezed, user } = Query.Stock.useUser({ stockId, userId, userRefetchInterval: 500 });
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
   const { data: userCount } = Query.Stock.useUserCount({ stockId });
+  const { data: logs } = Query.Stock.useQueryLog({ round: stock?.round, stockId, userId });
+
+  const { isLoading: isBuyLoading } = Query.Stock.useBuyStock();
+  const { isLoading: isSellLoading } = Query.Stock.useSellStock();
 
   const 보유주식 = useMemo(() => {
     return objectEntries(user?.inventory ?? {})
@@ -56,15 +60,26 @@ const StockDrawer = ({
       }));
   }, [user?.inventory]);
 
-  const stockProfitRate =
-    selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
-      ? calculateProfitRate(companiesPrice[selectedCompany], averagePurchasePrice)
-      : null;
+  const averagePurchasePrice = useMemo(() => {
+    return calculateAveragePurchasePrice({
+      company: selectedCompany,
+      currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+      logs,
+      round: stock?.round,
+    });
+  }, [logs, selectedCompany, stock?.round, 보유주식]);
 
   if (!stock || !userId || !user) {
     return <>불러오는 중</>;
   }
 
+  const stockProfitRate =
+    selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
+      ? calculateProfitRate(companiesPrice[selectedCompany], averagePurchasePrice)
+      : null;
+
+  const isLoading = isBuyLoading || isFreezed || isSellLoading;
+  const isDisabled = timeIdx === undefined || timeIdx >= 9 || !stock.isTransaction || isLoading;
   const isCanBuy = user.money >= companiesPrice[selectedCompany];
 
   return (

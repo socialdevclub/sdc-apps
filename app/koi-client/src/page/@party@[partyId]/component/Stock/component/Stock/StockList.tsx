@@ -3,18 +3,11 @@ import { objectEntries, objectValues } from '@toss/utils';
 import { message } from 'antd';
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
-import { useMediaQuery } from 'react-responsive';
 import { COMPANY_NAMES } from 'shared~config/dist/stock';
 import StockCard from '../../../../../../component-presentation/StockCard';
-import { MEDIA_QUERY } from '../../../../../../config/common';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
-import {
-  calculateAveragePurchasePrice,
-  calculateProfitRate,
-  getAnimalImageSource,
-  getStockMessages,
-} from '../../../../../../utils/stock';
+import { getAnimalImageSource, getStockMessages } from '../../../../../../utils/stock';
 import StockDrawer from './StockDrawer';
 
 interface Props {
@@ -25,11 +18,7 @@ const StockList = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });
-
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
-  const round = stock?.round;
-  const { data: logs } = Query.Stock.useQueryLog({ round, stockId, userId });
   const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
 
   const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
@@ -77,18 +66,6 @@ const StockList = ({ stockId }: Props) => {
       return acc;
     }, [] as Array<{ company: string; timeIdx: number; price: number }>),
   );
-
-  const averagePurchasePrice = calculateAveragePurchasePrice({
-    company: selectedCompany,
-    currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-    logs,
-    round,
-  });
-
-  const stockProfitRate =
-    selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
-      ? calculateProfitRate(companiesPrice[selectedCompany], averagePurchasePrice)
-      : null;
 
   const stockMessages = getStockMessages({
     companyName: selectedCompany,
@@ -146,9 +123,6 @@ const StockList = ({ stockId }: Props) => {
       });
   };
 
-  const isLoading = isBuyLoading || isFreezed || isSellLoading;
-  const isDisabled = timeIdx === undefined || timeIdx >= 9 || !stock.isTransaction || isLoading;
-
   return (
     <>
       {contextHolder}
@@ -164,8 +138,6 @@ const StockList = ({ stockId }: Props) => {
         selectedCompany={selectedCompany}
         stockMessages={stockMessages}
         priceData={priceData}
-        averagePurchasePrice={averagePurchasePrice}
-        isDisabled={isDisabled}
         stockId={stockId}
         onClickBuy={onClickBuy}
         onClickSell={onClickSell}

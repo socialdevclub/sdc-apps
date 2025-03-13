@@ -6,7 +6,7 @@ import { useMediaQuery } from 'react-responsive';
 import { MEDIA_QUERY } from '../../../../../../../config/common';
 import { Query } from '../../../../../../../hook';
 import { UserStore } from '../../../../../../../store';
-import { calculateAveragePurchasePrice, calculateProfitRate, getStockMessages } from '../../../../../../../utils/stock';
+import { getStockMessages } from '../../../../../../../utils/stock';
 import StartLoan from '../StartLoan';
 import { Container, Divider, StickyBottom, Wrapper } from './Home.styles';
 import FutureInfoSection from './components/FutureInfoSection';
@@ -75,8 +75,6 @@ const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos }: Sto
   const userId = supabaseSession?.user.id;
 
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
-  const round = stock?.round;
-  const { data: logs } = Query.Stock.useQueryLog({ round, stockId, userId });
   const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
 
   const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
@@ -126,18 +124,6 @@ const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos }: Sto
   //     return acc;
   //   }, [] as Array<{ company: string; timeIdx: number; price: number }>),
   // );
-
-  const averagePurchasePrice = calculateAveragePurchasePrice({
-    company: selectedCompany,
-    currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-    logs,
-    round,
-  });
-
-  const stockProfitRate =
-    selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
-      ? calculateProfitRate(companiesPrice[selectedCompany], averagePurchasePrice)
-      : null;
 
   const stockMessages = getStockMessages({
     companyName: selectedCompany,
@@ -220,8 +206,6 @@ const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos }: Sto
         selectedCompany={selectedCompany}
         stockMessages={stockMessages}
         priceData={priceData}
-        averagePurchasePrice={averagePurchasePrice}
-        isDisabled={isDisabled}
         stockId={stockId}
         onClickBuy={onClickBuy}
         onClickSell={onClickSell}

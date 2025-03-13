@@ -11,13 +11,7 @@ import { MEDIA_QUERY } from '../../../../../../config/common';
 import { Query } from '../../../../../../hook';
 import prependZero from '../../../../../../service/prependZero';
 import { UserStore } from '../../../../../../store';
-import {
-  calculateAveragePurchasePrice,
-  calculateProfitRate,
-  getAnimalImageSource,
-  getFormattedGameTime,
-  getStockMessages,
-} from '../../../../../../utils/stock';
+import { getAnimalImageSource, getFormattedGameTime, getStockMessages } from '../../../../../../utils/stock';
 import DrawStockInfo from './DrawInfo';
 import StockDrawer from './StockDrawer';
 
@@ -30,7 +24,6 @@ const Information = ({ stockId }: Props) => {
   const userId = supabaseSession?.user.id;
 
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
-  const { data: logs } = Query.Stock.useQueryLog({ round: stock?.round, stockId, userId });
   const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
 
   const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
@@ -80,26 +73,6 @@ const Information = ({ stockId }: Props) => {
       return acc;
     }, [] as Array<{ company: string; timeIdx: number; price: number }>),
   );
-
-  const averagePurchasePrice = calculateAveragePurchasePrice({
-    company: selectedCompany,
-    currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-    logs,
-    round: stock.round,
-  });
-
-  const stockProfitRate =
-    selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
-      ? calculateProfitRate(
-          companiesPrice[selectedCompany],
-          calculateAveragePurchasePrice({
-            company: selectedCompany,
-            currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-            logs,
-            round: stock.round,
-          }),
-        )
-      : null;
 
   const stockMessages = getStockMessages({
     companyName: selectedCompany,
@@ -170,8 +143,6 @@ const Information = ({ stockId }: Props) => {
         selectedCompany={selectedCompany}
         stockMessages={stockMessages}
         priceData={priceData}
-        averagePurchasePrice={averagePurchasePrice}
-        isDisabled={isDisabled}
         stockId={stockId}
         onClickBuy={onClickBuy}
         onClickSell={onClickSell}
