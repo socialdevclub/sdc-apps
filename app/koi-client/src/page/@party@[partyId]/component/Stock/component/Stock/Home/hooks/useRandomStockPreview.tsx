@@ -24,7 +24,7 @@ export const useRandomStockPreview = (
   nextRoundPredict: { companyName: string; predictTime: number; priceVariation: number } | null;
   TOTAL_ROUND_COUNT: number;
 } => {
-  if (!stock || !userId) {
+  if (!userId || !stock?.companies) {
     return { TOTAL_ROUND_COUNT, nextRoundPredict: null };
   }
 
