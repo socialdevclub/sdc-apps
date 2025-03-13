@@ -4,9 +4,7 @@ import { InjectConnection } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { getDateDistance } from '@toss/date';
 import { isStockOverLimit } from 'shared~config/dist/stock';
-import { StockLog } from './log/log.schema';
 import { UserRepository } from './user/user.repository';
-import { UserService } from './user/user.service';
 import { StockRepository } from './stock.repository';
 import { LogService } from './log/log.service';
 
@@ -16,8 +14,6 @@ export class StockProcessor {
     @InjectConnection() private readonly connection: mongoose.Connection,
     @Inject(forwardRef(() => UserRepository))
     private readonly userRepository: UserRepository,
-    @Inject(forwardRef(() => UserService))
-    private readonly userService: UserService,
     private readonly stockRepository: StockRepository,
     private readonly logService: LogService,
   ) {}
@@ -29,9 +25,8 @@ export class StockProcessor {
     try {
       await session.withTransaction(async () => {
         const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const players = await this.userService.getUserList(stockId, null, { session });
-
-        const user = players.find((v) => v.userId === userId);
+        const user = await this.userRepository.findOne({ stockId, userId }, undefined, { session });
+        const playerCount = await this.userRepository.countDocuments({ stockId }, { session });
 
         if (stock.round !== body.round) {
           throw new Error('주식 라운드가 변경되었습니다. 다시 시도해주세요');
@@ -43,15 +38,6 @@ export class StockProcessor {
 
         if (!user) {
           throw new Error('유저 정보를 불러올 수 없습니다');
-        }
-
-        const isNotQueued = !attributes?.queueMessageId;
-
-        if (isNotQueued) {
-          const { minutes, seconds } = getDateDistance(user.lastActivityTime, new Date());
-          if (minutes === 0 && seconds < stock.transactionInterval) {
-            throw new Error(`거래량이 많습니다`);
-          }
         }
 
         const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
@@ -66,7 +52,6 @@ export class StockProcessor {
           throw new Error('시장에 주식이 없습니다');
         }
 
-        // x분 단위로 가격이 변함
         const idx = Math.min(
           Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
           9,
@@ -83,35 +68,14 @@ export class StockProcessor {
         const inventory = user.inventory as unknown as Map<string, number>;
         const companyCount = inventory.get(company) || 0;
 
-        if (isStockOverLimit(players.length, companyCount, amount)) {
+        if (isStockOverLimit(playerCount, companyCount, amount)) {
           throw new Error('주식 보유 한도 초과');
         }
 
         inventory.set(company, companyCount + amount);
-
-        const remainingCompanyStock = remainingStocks.get(company);
-        remainingStocks.set(company, remainingCompanyStock - amount);
-
+        remainingStocks.set(company, remainingStocks.get(company) - amount);
         user.money -= totalPrice;
         user.lastActivityTime = new Date();
-
-        if (isNotQueued) {
-          await this.logService.addLog(
-            new StockLog({
-              action: 'BUY',
-              company,
-              date: user.lastActivityTime,
-              price: companyPrice,
-              quantity: amount,
-              round: stock.round,
-              status: 'SUCCESS',
-              stockId,
-              userId,
-            }),
-            { session },
-          );
-          return;
-        }
 
         const log = await this.logService.findOne({ queueId: attributes?.queueMessageId }, null, { session });
 
@@ -125,8 +89,28 @@ export class StockProcessor {
           default:
         }
 
-        await user.save({ session });
-        await stock.save({ session });
+        await this.userRepository.updateOne(
+          { _id: user._id },
+          {
+            $set: {
+              inventory: user.inventory,
+              lastActivityTime: user.lastActivityTime,
+              money: user.money,
+            },
+          },
+          { session },
+        );
+
+        await this.stockRepository.updateOne(
+          { _id: stockId },
+          {
+            $set: {
+              remainingStocks: stock.remainingStocks,
+            },
+          },
+          { session },
+        );
+
         await this.logService.updateOne(
           { queueId: attributes?.queueMessageId },
           { date: user.lastActivityTime, status: 'SUCCESS' },
@@ -142,7 +126,7 @@ export class StockProcessor {
       throw error;
     } finally {
       await session.endSession();
-      await this.logService.deleteOldStatusLogs();
+      this.logService.deleteOldStatusLogs().catch(console.error);
     }
   }
 
@@ -211,24 +195,6 @@ export class StockProcessor {
 
         remainingStocks.set(company, remainingCompanyStock + amount);
 
-        if (isNotQueued) {
-          await this.logService.addLog(
-            new StockLog({
-              action: 'SELL',
-              company,
-              date: user.lastActivityTime,
-              price: companyPrice,
-              quantity: amount,
-              round: stock.round,
-              status: 'SUCCESS',
-              stockId,
-              userId,
-            }),
-            { session },
-          );
-          return;
-        }
-
         const log = await this.logService.findOne({ queueId: attributes?.queueMessageId }, null, { session });
         switch (log?.status) {
           case 'CANCEL':
@@ -240,8 +206,28 @@ export class StockProcessor {
           default:
         }
 
-        await user.save({ session });
-        await stock.save({ session });
+        await this.userRepository.updateOne(
+          { _id: user._id },
+          {
+            $set: {
+              inventory: user.inventory,
+              lastActivityTime: user.lastActivityTime,
+              money: user.money,
+            },
+          },
+          { session },
+        );
+
+        await this.stockRepository.updateOne(
+          { _id: stockId },
+          {
+            $set: {
+              remainingStocks: stock.remainingStocks,
+            },
+          },
+          { session },
+        );
+
         await this.logService.updateOne(
           { queueId: attributes?.queueMessageId },
           { date: user.lastActivityTime, status: 'SUCCESS' },
@@ -257,7 +243,7 @@ export class StockProcessor {
       return;
     } finally {
       await session.endSession();
-      await this.logService.deleteOldStatusLogs();
+      this.logService.deleteOldStatusLogs().catch(console.error);
     }
   }
 }
