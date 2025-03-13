@@ -4,10 +4,8 @@ import { commaizeNumber, objectEntries } from '@toss/utils';
 import { message } from 'antd';
 import { useAtomValue } from 'jotai';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useMediaQuery } from 'react-responsive';
 import InfoBox from '../../../../../../component-presentation/InfoBox';
 import { colorDown, colorUp } from '../../../../../../config/color';
-import { MEDIA_QUERY } from '../../../../../../config/common';
 import { Query } from '../../../../../../hook';
 import prependZero from '../../../../../../service/prependZero';
 import { UserStore } from '../../../../../../store';
@@ -26,11 +24,6 @@ const Information = ({ stockId }: Props) => {
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
   const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
 
-  const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
-  const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
-
-  const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });
-
   const [messageApi, contextHolder] = message.useMessage();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -43,15 +36,6 @@ const Information = ({ stockId }: Props) => {
     });
     return result;
   }, [stock?.companies]);
-
-  const 보유주식 = useMemo(() => {
-    return objectEntries(user?.inventory ?? {})
-      .filter(([, count]) => count > 0)
-      .map(([company, count]) => ({
-        company,
-        count,
-      }));
-  }, [user?.inventory]);
 
   // const 미보유주식 = useMemo(() => {
   //   return objectValues(COMPANY_NAMES).filter((company) => !보유주식.some(({ company: c }) => c === company));
@@ -90,49 +74,6 @@ const Information = ({ stockId }: Props) => {
     setDrawerOpen(false);
   };
 
-  const onClickBuy = (company: string) => {
-    buyStock({ amount: 1, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
-      .then(() => {
-        messageApi.destroy();
-        messageApi.open({
-          content: '주식을 구매하였습니다.',
-          duration: 2,
-          type: 'success',
-        });
-      })
-      .catch((reason: Error) => {
-        messageApi.destroy();
-        messageApi.open({
-          content: `${reason.message}`,
-          duration: 2,
-          type: 'error',
-        });
-      });
-  };
-
-  const onClickSell = (company: string, amount = 1) => {
-    sellStock({ amount, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
-      .then(() => {
-        messageApi.destroy();
-        messageApi.open({
-          content: `주식을 ${amount > 1 ? `${amount}주 ` : ''}판매하였습니다.`,
-          duration: 2,
-          type: 'success',
-        });
-      })
-      .catch((reason: Error) => {
-        messageApi.destroy();
-        messageApi.open({
-          content: `${reason.message}`,
-          duration: 2,
-          type: 'error',
-        });
-      });
-  };
-
-  const isLoading = isBuyLoading || isFreezed || isSellLoading;
-  const isDisabled = timeIdx === undefined || timeIdx >= 9 || !stock.isTransaction || isLoading;
-
   return (
     <>
       {contextHolder}
@@ -144,8 +85,7 @@ const Information = ({ stockId }: Props) => {
         stockMessages={stockMessages}
         priceData={priceData}
         stockId={stockId}
-        onClickBuy={onClickBuy}
-        onClickSell={onClickSell}
+        messageApi={messageApi}
       />
     </>
   );

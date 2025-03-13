@@ -1,9 +1,11 @@
 import { Drawer } from 'antd';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useAtomValue } from 'jotai';
 import { objectEntries } from '@toss/utils';
 import { isStockOverLimit } from 'shared~config/dist/stock';
+import { ImpressionArea } from '@toss/impression-area';
+import { MessageInstance } from 'antd/es/message/interface';
 import { MEDIA_QUERY } from '../../../../../../config/common';
 import InfoHeader from '../../../../../../component-presentation/InfoHeader';
 import {
@@ -25,8 +27,7 @@ interface Props {
   stockMessages: string[];
   priceData: Record<string, number[]>;
   stockId: string;
-  onClickBuy: (company: string) => void;
-  onClickSell: (company: string, amount?: number) => void;
+  messageApi: MessageInstance;
 }
 
 const StockDrawer = ({
@@ -36,8 +37,7 @@ const StockDrawer = ({
   stockMessages,
   priceData,
   stockId,
-  onClickBuy,
-  onClickSell,
+  messageApi,
 }: Props) => {
   const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
@@ -46,10 +46,57 @@ const StockDrawer = ({
   const { isFreezed, user } = Query.Stock.useUser({ stockId, userId, userRefetchInterval: 500 });
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
   const { data: userCount } = Query.Stock.useUserCount({ stockId });
-  const { data: logs } = Query.Stock.useQueryLog({ round: stock?.round, stockId, userId });
 
-  const { isLoading: isBuyLoading } = Query.Stock.useBuyStock();
-  const { isLoading: isSellLoading } = Query.Stock.useSellStock();
+  const [isEnabledQueryLog, setIsEnabledQueryLog] = useState(() => Boolean(selectedCompany));
+  const { data: logs } = Query.Stock.useQueryLog(
+    { company: selectedCompany, round: stock?.round, stockId, userId },
+    {
+      enabled: isEnabledQueryLog,
+    },
+  );
+
+  // logs 변화를 감지하여 메시지 표시
+  const prevLogsRef = useRef<typeof logs>();
+  useEffect(() => {
+    if (!logs || logs.length === 0) return;
+
+    // 이전 로그와 현재 로그의 길이를 비교하여 새로운 로그가 추가되었는지 확인
+    if (prevLogsRef.current && logs.length > prevLogsRef.current.length) {
+      // 가장 최근 로그 확인
+      const latestLog = logs[logs.length - 1];
+
+      if (latestLog) {
+        if (latestLog.failedReason) {
+          messageApi.destroy();
+          messageApi.open({
+            content: latestLog.failedReason,
+            duration: 2,
+            type: 'error',
+          });
+        } else if (latestLog.action === 'BUY') {
+          messageApi.destroy();
+          messageApi.open({
+            content: `주식을 구매하였습니다.`,
+            duration: 2,
+            type: 'success',
+          });
+        } else if (latestLog.action === 'SELL') {
+          messageApi.destroy();
+          messageApi.open({
+            content: `주식을 ${latestLog.quantity}주 판매하였습니다.`,
+            duration: 2,
+            type: 'success',
+          });
+        }
+      }
+    }
+
+    // 현재 로그를 저장
+    prevLogsRef.current = logs;
+  }, [logs, messageApi]);
+
+  const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
+  const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
 
   const 보유주식 = useMemo(() => {
     return objectEntries(user?.inventory ?? {})
@@ -72,6 +119,46 @@ const StockDrawer = ({
   if (!stock || !userId || !user) {
     return <>불러오는 중</>;
   }
+
+  const onClickBuy = (company: string) => {
+    buyStock({ amount: 1, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId });
+    // .then(() => {
+    //   messageApi.destroy();
+    //   messageApi.open({
+    //     content: '주식을 구매하였습니다.',
+    //     duration: 2,
+    //     type: 'success',
+    //   });
+    // })
+    // .catch((reason: Error) => {
+    //   messageApi.destroy();
+    //   messageApi.open({
+    //     content: `${reason.message}`,
+    //     duration: 2,
+    //     type: 'error',
+    //   });
+    // });
+  };
+
+  const onClickSell = (company: string, amount = 1) => {
+    sellStock({ amount, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId });
+    // .then(() => {
+    //   messageApi.destroy();
+    //   messageApi.open({
+    //     content: `주식을 ${amount > 1 ? `${amount}주 ` : ''}판매하였습니다.`,
+    //     duration: 2,
+    //     type: 'success',
+    //   });
+    // })
+    // .catch((reason: Error) => {
+    //   messageApi.destroy();
+    //   messageApi.open({
+    //     content: `${reason.message}`,
+    //     duration: 2,
+    //     type: 'error',
+    //   });
+    // });
+  };
 
   const stockProfitRate =
     selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
@@ -126,12 +213,17 @@ const StockDrawer = ({
         width={50}
       />
       <MessageBalloon messages={stockMessages} />
-      <StockLineChart
-        company={selectedCompany}
-        priceData={selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]}
-        fluctuationsInterval={stock.fluctuationsInterval}
-        averagePurchasePrice={averagePurchasePrice}
-      />
+      <ImpressionArea
+        onImpressionStart={() => setIsEnabledQueryLog(true)}
+        onImpressionEnd={() => setIsEnabledQueryLog(false)}
+      >
+        <StockLineChart
+          company={selectedCompany}
+          priceData={selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]}
+          fluctuationsInterval={stock.fluctuationsInterval}
+          averagePurchasePrice={averagePurchasePrice}
+        />
+      </ImpressionArea>
       <ButtonGroup
         buttons={[
           {

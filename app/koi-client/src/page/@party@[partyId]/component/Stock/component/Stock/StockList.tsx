@@ -21,9 +21,6 @@ const StockList = ({ stockId }: Props) => {
   const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
   const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
 
-  const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
-  const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
-
   const [messageApi, contextHolder] = message.useMessage();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -83,46 +80,6 @@ const StockList = ({ stockId }: Props) => {
     setDrawerOpen(false);
   };
 
-  const onClickBuy = (company: string) => {
-    buyStock({ amount: 1, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
-      .then(() => {
-        messageApi.destroy();
-        messageApi.open({
-          content: '주식을 구매하였습니다.',
-          duration: 2,
-          type: 'success',
-        });
-      })
-      .catch((reason: Error) => {
-        messageApi.destroy();
-        messageApi.open({
-          content: `${reason.message}`,
-          duration: 2,
-          type: 'error',
-        });
-      });
-  };
-
-  const onClickSell = (company: string, amount = 1) => {
-    sellStock({ amount, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId })
-      .then(() => {
-        messageApi.destroy();
-        messageApi.open({
-          content: `주식을 ${amount > 1 ? `${amount}주 ` : ''}판매하였습니다.`,
-          duration: 2,
-          type: 'success',
-        });
-      })
-      .catch((reason: Error) => {
-        messageApi.destroy();
-        messageApi.open({
-          content: `${reason.message}`,
-          duration: 2,
-          type: 'error',
-        });
-      });
-  };
-
   return (
     <>
       {contextHolder}
@@ -139,8 +96,7 @@ const StockList = ({ stockId }: Props) => {
         stockMessages={stockMessages}
         priceData={priceData}
         stockId={stockId}
-        onClickBuy={onClickBuy}
-        onClickSell={onClickSell}
+        messageApi={messageApi}
       />
     </>
   );
