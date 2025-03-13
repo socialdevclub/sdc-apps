@@ -24,6 +24,22 @@ export const getRandomCompanyNames = (length?: number): string[] => {
   return result;
 };
 
+/**
+ * 주식 보유 한도 초과 여부를 확인하는 함수
+ * @param playerLength 플레이어 수
+ * @param currentStockCount 현재 보유 주식 수
+ * @param willBuyStockAmount 구매할 주식 수
+ * @returns 주식 보유 한도 초과 여부
+ */
+export const isStockOverLimit = (
+  playerLength: number,
+  currentStockCount: number,
+  willBuyStockAmount: number,
+): boolean => {
+  const maxStockCount = playerLength * 2;
+  return currentStockCount + willBuyStockAmount > maxStockCount;
+};
+
 export const INIT_STOCK_PRICE = 100000;
 export const INIT_USER_MONEY = 1_000_000;
 

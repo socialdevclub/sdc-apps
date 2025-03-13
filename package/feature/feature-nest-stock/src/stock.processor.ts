@@ -3,6 +3,7 @@ import type { CompanyInfo, Request } from 'shared~type-stock';
 import { InjectConnection } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { getDateDistance } from '@toss/date';
+import { isStockOverLimit } from 'shared~config/dist/stock';
 import { StockLog } from './log/log.schema';
 import { UserRepository } from './user/user.repository';
 import { UserService } from './user/user.service';
@@ -82,7 +83,7 @@ export class StockProcessor {
         const inventory = user.inventory as unknown as Map<string, number>;
         const companyCount = inventory.get(company) || 0;
 
-        if (companyCount + amount > players.length * 2) {
+        if (isStockOverLimit(players.length, companyCount, amount)) {
           throw new Error('주식 보유 한도 초과');
         }
 
@@ -141,6 +142,7 @@ export class StockProcessor {
       throw error;
     } finally {
       await session.endSession();
+      await this.logService.deleteOldStatusLogs();
     }
   }
 
@@ -255,6 +257,7 @@ export class StockProcessor {
       return;
     } finally {
       await session.endSession();
+      await this.logService.deleteOldStatusLogs();
     }
   }
 }

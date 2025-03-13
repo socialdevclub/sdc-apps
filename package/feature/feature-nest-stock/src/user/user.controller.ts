@@ -24,6 +24,12 @@ export class UserController {
     return this.userService.getRecommendedPartners(stockId, userId);
   }
 
+  @Get('/count')
+  async getUserCount(@Query('stockId') stockId: string): Promise<{ count: number }> {
+    const count = await this.userRepository.count({ stockId });
+    return { count };
+  }
+
   @Get('/find-one')
   async findOneUser(
     @Query('stockId') stockId: string,

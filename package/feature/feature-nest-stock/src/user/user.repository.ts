@@ -41,6 +41,10 @@ export class UserRepository {
     }
   }
 
+  async count(filter: FilterQuery<StockUser>): Promise<number> {
+    return this.userModel.countDocuments(filter);
+  }
+
   find(
     filter?: FilterQuery<StockUser>,
     projection?: ProjectionType<StockUser>,

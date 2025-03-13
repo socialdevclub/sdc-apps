@@ -60,4 +60,23 @@ export class LogService {
   ): Promise<UpdateWriteOpResult> {
     return this.stockLogRepository.updateOne(filter, update, options);
   }
+
+  /**
+   * 1분 이상 지난 CANCEL, FAILED, QUEUING 상태의 로그를 삭제합니다.
+   * @returns {Promise<boolean>} 삭제 성공 여부
+   */
+  async deleteOldStatusLogs(
+    options?: DeleteOptions & Omit<MongooseQueryOptions<StockLog>, 'lean' | 'timestamps'>,
+  ): Promise<boolean> {
+    const oneMinuteAgo = new Date();
+    oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
+
+    return this.stockLogRepository.deleteMany(
+      {
+        date: { $lt: oneMinuteAgo },
+        status: { $in: ['CANCEL', 'FAILED', 'QUEUING'] },
+      },
+      options,
+    );
+  }
 }
