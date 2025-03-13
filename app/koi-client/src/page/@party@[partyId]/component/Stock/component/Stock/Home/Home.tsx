@@ -5,6 +5,7 @@ import { useStockInfo } from './hooks/useStockInfo';
 import UserSummary from './components/UserSummary';
 import FutureInfoSection from './components/FutureInfoSection';
 import { Container, Wrapper, Divider, StickyBottom } from './Home.styles';
+import { Query } from '../../../../../../../hook';
 
 interface Props {
   stockId: string;
@@ -12,23 +13,16 @@ interface Props {
 
 const Home = ({ stockId }: Props) => {
   // 공통 훅 사용으로 데이터 로직 분리
-  const {
-    stock,
-    users,
-    user,
-    allSellPrice,
-    allUserSellPriceDesc,
-    gameTimeInMinutes,
-    myInfos,
-    futureInfos,
-    allProfitDesc,
-    moneyRatio,
-    userId,
-  } = useStockInfo(stockId);
-
+  const { stock, users, user, allUserSellPriceDesc, gameTimeInMinutes, myInfos, futureInfos, allProfitDesc, userId } =
+    useStockInfo(stockId);
+  const { myAllSellPrice } = Query.Stock.useMyAllSellPrice({ stockId, userId });
   if (!user || !stock) {
     return <div>불러오는 중..</div>;
   }
+
+  // 내 수익률 계산
+  const getProfitRatio = (v: number) => ((v / 1000000) * 100 - 100).toFixed(2);
+  const moneyRatio = getProfitRatio(user.money + myAllSellPrice);
 
   return (
     <>
@@ -38,7 +32,7 @@ const Home = ({ stockId }: Props) => {
           user={user}
           users={users}
           userId={userId}
-          allSellPrice={allSellPrice}
+          allSellPrice={myAllSellPrice}
           allUserSellPriceDesc={allUserSellPriceDesc}
           moneyRatio={moneyRatio}
           allProfitDesc={allProfitDesc}
@@ -63,7 +57,7 @@ const Home = ({ stockId }: Props) => {
           stockId={stockId}
           money={user.money}
           loanCount={user.loanCount}
-          allSellPrice={commaizeNumber(allSellPrice)}
+          allSellPrice={commaizeNumber(myAllSellPrice)}
         />
       </StickyBottom>
     </>

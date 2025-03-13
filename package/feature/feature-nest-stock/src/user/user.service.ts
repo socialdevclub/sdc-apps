@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import mongoose, { MongooseQueryOptions } from 'mongoose';
+import mongoose, { MongooseQueryOptions, ProjectionType } from 'mongoose';
 import { DeleteOptions, UpdateOptions } from 'mongodb';
 import { CompanyInfo, Response } from 'shared~type-stock';
 import dayjs from 'dayjs';
@@ -28,14 +28,57 @@ export class UserService {
   }
 
   transStockUserToDto(stockUser: UserDocument): Response.GetStockUser {
-    return {
-      ...stockUser.toJSON({ versionKey: false }),
-      lastActivityTime: dayjs(stockUser.lastActivityTime).utcOffset('9').format('YYYY-MM-DDTHH:mm:ssZ'),
-    };
+    const user = { ...stockUser.toJSON({ versionKey: false }) } as Response.GetStockUser;
+
+    if (user.lastActivityTime) {
+      user.lastActivityTime = dayjs(user.lastActivityTime).utcOffset('9').format('YYYY-MM-DDTHH:mm:ssZ');
+    }
+
+    return user;
   }
 
-  getUserList(stockId: string, options?: mongoose.QueryOptions<StockUser>): Promise<UserDocument[]> {
-    return this.userRepository.find({ stockId }, undefined, options);
+  getUserList(
+    stockId: string,
+    projection?: ProjectionType<StockUser>,
+    options?: mongoose.QueryOptions<StockUser>,
+  ): Promise<UserDocument[]> {
+    return this.userRepository.find({ stockId }, projection, options);
+  }
+
+  async getRecommendedPartners(stockId: string, userId: string): Promise<string[]> {
+    const stock = await this.stockRepository.findOneById(stockId, { companies: 1 });
+    const users = await this.getUserList(stockId, { userId: 1, userInfo: 1 });
+
+    const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
+
+    const [partnerIds] = Array.from(companies.entries()).reduce(
+      (reducer, [_, companyInfos]) => {
+        const [partnerIds] = reducer;
+
+        companyInfos.forEach((_, idx) => {
+          if (companyInfos[idx].정보.some((name) => name === userId)) {
+            const partners = companyInfos[idx].정보.filter((name) => name !== userId);
+            partners.forEach((partner) => {
+              if (partner && !partnerIds.some((v) => v === partner)) {
+                partnerIds.push(partner);
+              }
+            });
+          }
+        });
+
+        return reducer;
+      },
+      [[], []] as [Array<string>, Array<{ company: string; timeIdx: number; price: number }>],
+    );
+
+    return users
+      .map((user) => {
+        if (partnerIds.some((partnerId) => partnerId === user.userId)) {
+          return user.userInfo.nickname;
+        }
+        return undefined;
+      })
+      .filter((user) => Boolean(user));
   }
 
   findOneByUserId(stockId: string, userId: string, options?: mongoose.QueryOptions<StockUser>): Promise<UserDocument> {

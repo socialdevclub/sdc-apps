@@ -19,6 +19,11 @@ export class UserController {
     return users.map((user) => this.userService.transStockUserToDto(user));
   }
 
+  @Get('/recommended-partners')
+  async getRecommendedPartners(@Query('stockId') stockId: string, @Query('userId') userId: string): Promise<string[]> {
+    return this.userService.getRecommendedPartners(stockId, userId);
+  }
+
   @Get('/find-one')
   async findOneUser(
     @Query('stockId') stockId: string,

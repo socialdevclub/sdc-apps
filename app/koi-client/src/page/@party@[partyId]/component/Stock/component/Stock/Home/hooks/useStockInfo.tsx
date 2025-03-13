@@ -11,10 +11,12 @@ export const useStockInfo = (stockId: string) => {
   const userId = supabaseSession?.user.id;
 
   const { data: stock, refetch, timeIdx } = Query.Stock.useQueryStock(stockId);
-  const { data: users } = Query.Stock.useUserList(stockId);
   const { user } = Query.Stock.useUser({ stockId, userId });
-  const { allSellPrice, allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId, userId });
+  const { allUserSellPriceDesc } = Query.Stock.useAllUserSellPriceDesc(stockId);
   const { gameTime } = useTimeRaceCheck({ refetch, stock });
+
+  const isEnabledUserList = stock?.isVisibleRank ?? false;
+  const { data: users } = Query.Stock.useUserList(stockId, { enabled: isEnabledUserList });
 
   const gameTimeInSeconds = gameTime
     ? parseInt(gameTime.split(':')[0], 10) * 60 + parseInt(gameTime.split(':')[1], 10)
@@ -66,19 +68,13 @@ export const useStockInfo = (stockId: string) => {
           .sort((a, b) => b.profit - a.profit)
       : [];
 
-  // 내 수익률 계산
-  const getProfitRatio = (v: number) => ((v / 1000000) * 100 - 100).toFixed(2);
-  const moneyRatio = user ? getProfitRatio(user.money + allSellPrice) : '0';
-
   return {
     allProfitDesc,
-    allSellPrice,
     allUserSellPriceDesc,
     futureInfos,
     gameTime,
     gameTimeInMinutes,
     gameTimeInSeconds,
-    moneyRatio,
     myInfos,
     refetch,
     stock,

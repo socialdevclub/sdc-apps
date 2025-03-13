@@ -64,7 +64,7 @@ const Global: React.FC = () => {
   const [supabaseSession, setSupabaseSession] = useAtom(UserStore.supabaseSession);
 
   return (
-    <QueryClientProvider>
+    <QueryClientProvider devtoolEnabled>
       <ConfigProvider
         theme={{
           components: {

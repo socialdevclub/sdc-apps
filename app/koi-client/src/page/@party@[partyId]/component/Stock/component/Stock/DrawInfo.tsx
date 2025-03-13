@@ -16,7 +16,7 @@ const DrawStockInfo = ({ stockId }: Props) => {
 
   const { user } = Query.Stock.useUser({ stockId, userId });
   const { mutateAsync: drawStockInfo, isLoading } = Query.Stock.useDrawStockInfo();
-  const { allSellPrice } = Query.Stock.useAllSellPrice({ stockId, userId });
+  const { myAllSellPrice } = Query.Stock.useMyAllSellPrice({ stockId, userId });
 
   const [open, setOpen] = useState(false);
   const modalRef = useRef<HTMLUListElement>(null);
@@ -58,7 +58,7 @@ const DrawStockInfo = ({ stockId }: Props) => {
     return <>불러오는 중</>;
   }
 
-  const allPrice = allSellPrice + (user?.money ?? 0);
+  const allPrice = myAllSellPrice + (user?.money ?? 0);
   const isDisabled = timeIdx === undefined || timeIdx >= 7 || !stock.isTransaction || allPrice < 1000000;
 
   return (

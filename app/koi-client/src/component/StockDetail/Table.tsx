@@ -19,7 +19,7 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
   const { data: results } = Query.Stock.useQueryResult(stockId);
 
   // 주식 가치 계산을 위한 훅 추가
-  const { allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId });
+  const { allUserSellPriceDesc } = Query.Stock.useAllUserSellPriceDesc(stockId);
 
   // 각 테이블의 접기/펼치기 상태 관리
   const [firstPriceTableCollapsed, setFirstPriceTableCollapsed] = useState(false);

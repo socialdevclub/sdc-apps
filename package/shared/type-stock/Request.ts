@@ -8,7 +8,10 @@ export type GetStock = {
 
 export type PatchUpdateStock = Partial<StockSchema> & { _id: string };
 
-export type GetFindStockUser = StockUserSchema;
+export type GetFindStockUser = {
+  filter: StockUserSchema;
+  projection?: ProjectionType<StockUserSchema>;
+};
 
 export type PostBuyStock = {
   stockId: string;
