@@ -6401,11 +6401,43 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@toss/impression-area", [\
+      ["npm:1.4.2", {\
+        "packageLocation": "./.yarn/cache/@toss-impression-area-npm-1.4.2-e49ea06e4b-b2819fc5ea.zip/node_modules/@toss/impression-area/",\
+        "packageDependencies": [\
+          ["@toss/impression-area", "npm:1.4.2"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:1.4.2", {\
+        "packageLocation": "./.yarn/__virtual__/@toss-impression-area-virtual-bc08103afa/0/cache/@toss-impression-area-npm-1.4.2-e49ea06e4b-b2819fc5ea.zip/node_modules/@toss/impression-area/",\
+        "packageDependencies": [\
+          ["@toss/impression-area", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:1.4.2"],\
+          ["@toss/react", "virtual:bc08103afab867f6ee1a11dc7cc7d9121928e49781d6fa18882b30c26ccdd79d06a72ec3400d36d443961fc202adcc883e7e79ccc4d11e1d6f96d10c441ab188#npm:1.8.1"],\
+          ["@toss/utils", "npm:1.6.1"],\
+          ["@types/react", "npm:18.2.22"],\
+          ["lodash.debounce", "npm:4.0.8"],\
+          ["react", "npm:18.2.0"]\
+        ],\
+        "packagePeers": [\
+          "@types/react",\
+          "react"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@toss/react", [\
       ["npm:1.6.1", {\
         "packageLocation": "./.yarn/cache/@toss-react-npm-1.6.1-5056247031-5770356028.zip/node_modules/@toss/react/",\
         "packageDependencies": [\
           ["@toss/react", "npm:1.6.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["npm:1.8.1", {\
+        "packageLocation": "./.yarn/cache/@toss-react-npm-1.8.1-6e60ea30d1-7f1c9238ae.zip/node_modules/@toss/react/",\
+        "packageDependencies": [\
+          ["@toss/react", "npm:1.8.1"]\
         ],\
         "linkType": "SOFT"\
       }],\
@@ -6427,6 +6459,25 @@ const RAW_RUNTIME_STATE =
           "react"\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["virtual:bc08103afab867f6ee1a11dc7cc7d9121928e49781d6fa18882b30c26ccdd79d06a72ec3400d36d443961fc202adcc883e7e79ccc4d11e1d6f96d10c441ab188#npm:1.8.1", {\
+        "packageLocation": "./.yarn/__virtual__/@toss-react-virtual-4af823ee1c/0/cache/@toss-react-npm-1.8.1-6e60ea30d1-7f1c9238ae.zip/node_modules/@toss/react/",\
+        "packageDependencies": [\
+          ["@toss/react", "virtual:bc08103afab867f6ee1a11dc7cc7d9121928e49781d6fa18882b30c26ccdd79d06a72ec3400d36d443961fc202adcc883e7e79ccc4d11e1d6f96d10c441ab188#npm:1.8.1"],\
+          ["@babel/runtime", "npm:7.23.2"],\
+          ["@toss/storage", "npm:1.4.1"],\
+          ["@toss/utils", "npm:1.6.1"],\
+          ["@types/react", "npm:18.2.22"],\
+          ["classnames", "npm:2.3.2"],\
+          ["lodash.debounce", "npm:4.0.8"],\
+          ["lodash.throttle", "npm:4.1.1"],\
+          ["react", "npm:18.2.0"]\
+        ],\
+        "packagePeers": [\
+          "@types/react",\
+          "react"\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["@toss/storage", [\
@@ -6437,6 +6488,23 @@ const RAW_RUNTIME_STATE =
           ["@babel/runtime", "npm:7.23.2"]\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/cache/@toss-storage-npm-1.4.1-68096773a9-7f976fbc02.zip/node_modules/@toss/storage/",\
+        "packageDependencies": [\
+          ["@toss/storage", "npm:1.4.1"],\
+          ["@babel/runtime", "npm:7.23.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@toss/utility-types", [\
+      ["npm:1.2.1", {\
+        "packageLocation": "./.yarn/cache/@toss-utility-types-npm-1.2.1-e1ea0f180d-ea041f17b7.zip/node_modules/@toss/utility-types/",\
+        "packageDependencies": [\
+          ["@toss/utility-types", "npm:1.2.1"]\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["@toss/utils", [\
@@ -6445,6 +6513,16 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@toss/utils", "npm:1.4.6"],\
           ["@babel/runtime", "npm:7.23.2"],\
+          ["date-fns", "npm:2.30.0"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:1.6.1", {\
+        "packageLocation": "./.yarn/cache/@toss-utils-npm-1.6.1-547dc44525-cdc7eb8998.zip/node_modules/@toss/utils/",\
+        "packageDependencies": [\
+          ["@toss/utils", "npm:1.6.1"],\
+          ["@babel/runtime", "npm:7.23.2"],\
+          ["@toss/utility-types", "npm:1.2.1"],\
           ["date-fns", "npm:2.30.0"]\
         ],\
         "linkType": "HARD"\
@@ -14659,6 +14737,7 @@ const RAW_RUNTIME_STATE =
           ["@tanstack/react-query-devtools", "virtual:26c7e0b3641a794a76ed0ce1aa5b9688c9d422541f80c729df4415bfd37e15cf639602c60281ac066c5ecd6bcdb8822cc4ef679e583e0c3aaffd02dfbaa55884#npm:4.35.3"],\
           ["@tanstack/react-table", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:8.11.2"],\
           ["@toss/date", "npm:1.1.7"],\
+          ["@toss/impression-area", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:1.4.2"],\
           ["@toss/react", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:1.6.1"],\
           ["@toss/utils", "npm:1.4.6"],\
           ["@types/file-saver", "npm:2.0.7"],\
