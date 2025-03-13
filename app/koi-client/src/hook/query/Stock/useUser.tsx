@@ -8,21 +8,35 @@ interface Props {
    * undefined 이면 쿼리를 불러오지 않음
    */
   userId: string | undefined;
+  stockRefetchInterval?: number;
   userRefetchInterval?: number;
 }
 
-const useUser = ({ stockId, userId, userRefetchInterval }: Props) => {
-  const { data: stock } = Query.Stock.useQueryStock(stockId);
-  const { data: user } = Query.Stock.useUserFindOne(stockId, userId, { refetchInterval: userRefetchInterval });
+const useUser = ({ stockId, userId, userRefetchInterval, stockRefetchInterval }: Props) => {
+  const { data: stock, refetch: refetchStock } = Query.Stock.useQueryStock(stockId, {
+    refetchInterval: stockRefetchInterval,
+  });
+  const { data: user, refetch: refetchUser } = Query.Stock.useUserFindOne(stockId, userId, {
+    refetchInterval: userRefetchInterval,
+  });
+
+  const refetch = () => {
+    refetchStock();
+    refetchUser();
+  };
 
   if (!user) {
-    return { user: undefined };
+    return { refetch, user: undefined };
   }
 
   const { minutes, seconds } = getDateDistance(dayjs(user.lastActivityTime).toDate(), new Date());
   const isFreezed = minutes === 0 && seconds < (stock?.transactionInterval ?? 5);
 
-  return { isFreezed, user };
+  return {
+    isFreezed,
+    refetch,
+    user,
+  };
 };
 
 export default useUser;
