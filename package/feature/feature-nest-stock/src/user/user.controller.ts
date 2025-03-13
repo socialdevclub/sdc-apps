@@ -30,6 +30,11 @@ export class UserController {
     @Query('userId') userId: string,
   ): Promise<Response.GetStockUser> {
     const user = await this.userService.findOneByUserId(stockId, userId);
+
+    if (!user) {
+      return null;
+    }
+
     return this.userService.transStockUserToDto(user);
   }
 
