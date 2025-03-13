@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Query } from '@nestjs/common';
 import { Request, Response } from 'shared~type-stock';
 import { HttpService } from '@nestjs/axios';
 import { UserService } from './user.service';
@@ -32,7 +32,7 @@ export class UserController {
     const user = await this.userService.findOneByUserId(stockId, userId);
 
     if (!user) {
-      return null;
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     return this.userService.transStockUserToDto(user);

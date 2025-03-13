@@ -23,6 +23,10 @@ const useUserFindOne = (stockId: string | undefined, userId: string | undefined,
     },
   });
 
+  if (data && 'statusCode' in data && 'message' in data) {
+    return { data: undefined, error: data };
+  }
+
   return { data };
 };
 useUserFindOne.queryKey = (stockId: StockId, userId: string | undefined) =>
