@@ -16,7 +16,7 @@ export class SqsConsumerService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     // eslint-disable-next-line no-return-await
-    return await this.startConsumer();
+    // return await this.startConsumer();
   }
 
   async handleMessage(message: SqsMessage): Promise<void> {
@@ -26,12 +26,12 @@ export class SqsConsumerService implements OnModuleInit {
         break;
       case '/stock/buy': {
         const params = message.data as Request.PostBuyStock;
-        await this.stockProcessor.buyStock(params.stockId, params, { queueMessageId: message.id });
+        await this.stockProcessor.buyStock(params.stockId, params, { queueMessageId: params.queueUniqueId });
         break;
       }
       case '/stock/sell': {
         const params = message.data as Request.PostSellStock;
-        await this.stockProcessor.sellStock(params.stockId, params, { queueMessageId: message.id });
+        await this.stockProcessor.sellStock(params.stockId, params, { queueMessageId: params.queueUniqueId });
         break;
       }
       default:

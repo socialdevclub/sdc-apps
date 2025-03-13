@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { DeleteOptions, UpdateOptions } from 'mongodb';
 import type {
+  CreateOptions,
   FilterQuery,
   Model,
   MongooseQueryOptions,
@@ -36,8 +37,8 @@ export class LogRepository {
     return this.stockLogModel.findOne(filter, projection, options);
   }
 
-  create(log: StockLog): Promise<StockLogDocument> {
-    return this.stockLogModel.create(log);
+  async create(log: StockLog, options?: CreateOptions): Promise<void> {
+    await this.stockLogModel.create(log, options);
   }
 
   async updateOne(

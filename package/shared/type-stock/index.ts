@@ -73,6 +73,7 @@ export type StockLogSchema = {
   price: number;
   quantity: number;
   status: 'QUEUING' | 'SUCCESS' | 'FAILED' | 'CANCEL';
+  failedReason?: string;
 };
 
 export type ResultSchema = {

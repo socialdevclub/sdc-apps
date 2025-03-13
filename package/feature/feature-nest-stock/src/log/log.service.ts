@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type {
+  CreateOptions,
   FilterQuery,
   MongooseQueryOptions,
   ProjectionType,
@@ -41,8 +42,8 @@ export class LogService {
     return this.stockLogRepository.findOne(filter, projection, options);
   }
 
-  async addLog(log: StockLog): Promise<StockLogDocument> {
-    return this.stockLogRepository.create(log);
+  async addLog(log: StockLog, options?: CreateOptions): Promise<void> {
+    await this.stockLogRepository.create(log, options);
   }
 
   async deleteAllByStock(

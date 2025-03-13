@@ -71,8 +71,12 @@ export class StockController {
 
   @Post('/buy')
   buyStock(@Body() body: Request.PostBuyStock): Promise<StockSchema> {
+    const timestamp = Date.now();
+    const randomUUID = crypto.randomUUID();
+    const queueUniqueId = `${timestamp}-${randomUUID}`;
+
     return this.httpService.axiosRef
-      .post('https://api.socialdev.club/queue/stock/buy', body)
+      .post('https://api.socialdev.club/queue/stock/buy', { ...body, queueUniqueId })
       .then(async (res) => {
         await this.logService.addLog(
           new StockLog({
@@ -81,6 +85,7 @@ export class StockController {
             date: new Date(),
             price: body.unitPrice * body.amount,
             quantity: body.amount,
+            queueId: queueUniqueId,
             round: body.round,
             status: 'QUEUING',
             stockId: body.stockId,
@@ -103,8 +108,12 @@ export class StockController {
 
   @Post('/sell')
   sellStock(@Body() body: Request.PostSellStock): Promise<StockSchema> {
+    const timestamp = Date.now();
+    const randomUUID = crypto.randomUUID();
+    const queueUniqueId = `${timestamp}-${randomUUID}`;
+
     return this.httpService.axiosRef
-      .post('https://api.socialdev.club/queue/stock/sell', body)
+      .post('https://api.socialdev.club/queue/stock/sell', { ...body, queueUniqueId })
       .then(async (res) => {
         await this.logService.addLog(
           new StockLog({
@@ -113,6 +122,7 @@ export class StockController {
             date: new Date(),
             price: body.unitPrice * body.amount,
             quantity: body.amount,
+            queueId: queueUniqueId,
             round: body.round,
             status: 'QUEUING',
             stockId: body.stockId,

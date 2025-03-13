@@ -10,4 +10,14 @@ export class SqsProducerController {
   registerStockUser(@Body() body: Request.PostCreateUser): Promise<Response.GetCreateUser> {
     return this.sqsProducerService.registerStockUser(body);
   }
+
+  @Post('/stock/buy')
+  buyStock(@Body() body: Request.PostBuyStock): Promise<Response.GetCreateUser> {
+    return this.sqsProducerService.buyStock(body);
+  }
+
+  @Post('/stock/sell')
+  sellStock(@Body() body: Request.PostSellStock): Promise<Response.GetCreateUser> {
+    return this.sqsProducerService.sellStock(body);
+  }
 }

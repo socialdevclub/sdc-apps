@@ -28,20 +28,20 @@ export class StockProcessor {
     try {
       await session.withTransaction(async () => {
         const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const players = await this.userService.getUserList(stockId, { session });
+        const players = await this.userService.getUserList(stockId, null, { session });
 
         const user = players.find((v) => v.userId === userId);
 
         if (stock.round !== body.round) {
-          throw new HttpException('주식 라운드가 변경되었습니다. 다시 시도해주세요', HttpStatus.CONFLICT);
+          throw new Error('주식 라운드가 변경되었습니다. 다시 시도해주세요');
         }
 
         if (!stock.isTransaction) {
-          throw new HttpException('지금은 거래할 수 없습니다', HttpStatus.CONFLICT);
+          throw new Error('지금은 거래할 수 없습니다');
         }
 
         if (!user) {
-          throw new HttpException('유저 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
+          throw new Error('유저 정보를 불러올 수 없습니다');
         }
 
         const isNotQueued = !attributes?.queueMessageId;
@@ -49,7 +49,7 @@ export class StockProcessor {
         if (isNotQueued) {
           const { minutes, seconds } = getDateDistance(user.lastActivityTime, new Date());
           if (minutes === 0 && seconds < stock.transactionInterval) {
-            throw new HttpException(`${stock.transactionInterval}초에 한 번만 거래할 수 있습니다`, HttpStatus.CONFLICT);
+            throw new Error(`거래량이 많습니다`);
           }
         }
 
@@ -58,11 +58,11 @@ export class StockProcessor {
 
         const companyInfo = companies.get(company);
         if (!companyInfo) {
-          throw new HttpException('회사를 찾을 수 없습니다', HttpStatus.CONFLICT);
+          throw new Error('회사를 찾을 수 없습니다');
         }
 
         if (remainingStocks?.get(company) < amount) {
-          throw new HttpException('시장에 주식이 없습니다', HttpStatus.CONFLICT);
+          throw new Error('시장에 주식이 없습니다');
         }
 
         // x분 단위로 가격이 변함
@@ -73,17 +73,17 @@ export class StockProcessor {
         const companyPrice = companyInfo[idx].가격;
         const totalPrice = companyPrice * amount;
         if (user.money < totalPrice) {
-          throw new HttpException('돈이 부족합니다', HttpStatus.CONFLICT);
+          throw new Error('돈이 부족합니다');
         }
         if (companyPrice !== unitPrice) {
-          throw new HttpException('주가가 변동되었습니다. 다시 시도해주세요', HttpStatus.CONFLICT);
+          throw new Error('주가가 변동되었습니다. 다시 시도해주세요');
         }
 
         const inventory = user.inventory as unknown as Map<string, number>;
         const companyCount = inventory.get(company) || 0;
 
         if (companyCount + amount > players.length * 2) {
-          throw new HttpException('주식 보유 한도 초과', HttpStatus.CONFLICT);
+          throw new Error('주식 보유 한도 초과');
         }
 
         inventory.set(company, companyCount + amount);
@@ -93,9 +93,6 @@ export class StockProcessor {
 
         user.money -= totalPrice;
         user.lastActivityTime = new Date();
-
-        await user.save({ session });
-        await stock.save({ session });
 
         if (isNotQueued) {
           await this.logService.addLog(
@@ -110,11 +107,13 @@ export class StockProcessor {
               stockId,
               userId,
             }),
+            { session },
           );
           return;
         }
 
         const log = await this.logService.findOne({ queueId: attributes?.queueMessageId }, null, { session });
+
         switch (log?.status) {
           case 'CANCEL':
             throw new Error('취소된 요청입니다');
@@ -125,6 +124,8 @@ export class StockProcessor {
           default:
         }
 
+        await user.save({ session });
+        await stock.save({ session });
         await this.logService.updateOne(
           { queueId: attributes?.queueMessageId },
           { date: user.lastActivityTime, status: 'SUCCESS' },
@@ -133,6 +134,10 @@ export class StockProcessor {
       });
     } catch (error) {
       console.error(error);
+      await this.logService.updateOne(
+        { queueId: attributes?.queueMessageId },
+        { failedReason: error instanceof Error ? error.message : `${error}`, status: 'FAILED' },
+      );
       throw error;
     } finally {
       await session.endSession();
@@ -153,15 +158,15 @@ export class StockProcessor {
         const user = await this.userRepository.findOne({ stockId, userId }, undefined, { session });
 
         if (stock.round !== body.round) {
-          throw new HttpException('주식 라운드가 변경되었습니다. 다시 시도해주세요', HttpStatus.CONFLICT);
+          throw new Error('주식 라운드가 변경되었습니다. 다시 시도해주세요');
         }
 
         if (!user) {
-          throw new HttpException('유저 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
+          throw new Error('유저 정보를 불러올 수 없습니다');
         }
 
         if (!stock.isTransaction) {
-          throw new HttpException('지금은 거래할 수 없습니다', HttpStatus.CONFLICT);
+          throw new Error('지금은 거래할 수 없습니다');
         }
 
         const isNotQueued = !attributes?.queueMessageId;
@@ -169,7 +174,7 @@ export class StockProcessor {
         if (isNotQueued) {
           const { minutes, seconds } = getDateDistance(user.lastActivityTime, new Date());
           if (minutes === 0 && seconds < stock.transactionInterval) {
-            throw new HttpException(`${stock.transactionInterval}초에 한 번만 거래할 수 있습니다`, HttpStatus.CONFLICT);
+            throw new Error(`너무 빠른 거래입니다`);
           }
         }
 
@@ -204,9 +209,6 @@ export class StockProcessor {
 
         remainingStocks.set(company, remainingCompanyStock + amount);
 
-        await user.save({ session });
-        await stock.save({ session });
-
         if (isNotQueued) {
           await this.logService.addLog(
             new StockLog({
@@ -220,6 +222,7 @@ export class StockProcessor {
               stockId,
               userId,
             }),
+            { session },
           );
           return;
         }
@@ -235,6 +238,8 @@ export class StockProcessor {
           default:
         }
 
+        await user.save({ session });
+        await stock.save({ session });
         await this.logService.updateOne(
           { queueId: attributes?.queueMessageId },
           { date: user.lastActivityTime, status: 'SUCCESS' },
@@ -243,7 +248,11 @@ export class StockProcessor {
       });
     } catch (error) {
       console.error(error);
-      throw error;
+      await this.logService.updateOne(
+        { queueId: attributes?.queueMessageId },
+        { failedReason: error instanceof Error ? error.message : `${error}`, status: 'FAILED' },
+      );
+      return;
     } finally {
       await session.endSession();
     }

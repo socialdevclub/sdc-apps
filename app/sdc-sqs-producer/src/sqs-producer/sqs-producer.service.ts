@@ -10,4 +10,14 @@ export class SqsProducerService {
     const messageId = await this.sqsService.sendMessage('registerUser', body);
     return { messageId };
   }
+
+  async buyStock(body: Request.PostBuyStock): Promise<Response.GetCreateUser> {
+    const messageId = await this.sqsService.sendMessage('/stock/buy', body);
+    return { messageId };
+  }
+
+  async sellStock(body: Request.PostSellStock): Promise<Response.GetCreateUser> {
+    const messageId = await this.sqsService.sendMessage('/stock/sell', body);
+    return { messageId };
+  }
 }

@@ -20,6 +20,7 @@ export type PostBuyStock = {
   amount: number;
   unitPrice: number;
   round: number;
+  queueUniqueId?: string;
 };
 
 export type PostDrawStockInfo = {
@@ -34,6 +35,7 @@ export type PostSellStock = {
   amount: number;
   unitPrice: number;
   round: number;
+  queueUniqueId?: string;
 };
 
 export type PostLoan = {
