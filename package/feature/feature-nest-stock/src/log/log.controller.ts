@@ -11,7 +11,8 @@ export class LogController {
     @Query('stockId') stockId: string,
     @Query('userId') userId: string,
     @Query('round') round: number,
+    @Query('company') company?: string,
   ): Promise<StockLog[]> {
-    return this.logService.find(stockId, userId, round);
+    return this.logService.find(stockId, userId, round, company);
   }
 }

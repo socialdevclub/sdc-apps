@@ -1,8 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, MongooseQueryOptions, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+import {
+  FilterQuery,
+  Model,
+  MongooseQueryOptions,
+  ProjectionType,
+  QueryOptions,
+  UpdateQuery,
+  UpdateWriteOpResult,
+} from 'mongoose';
 import { StockSchemaWithId } from 'shared~type-stock';
-import { DeleteOptions } from 'mongodb';
+import { DeleteOptions, UpdateOptions } from 'mongodb';
 import { Stock, StockDocument } from './stock.schema';
 
 @Injectable()
@@ -57,6 +65,14 @@ export class StockRepository {
 
   create(): Promise<StockDocument> {
     return this.stockModel.create(new Stock());
+  }
+
+  updateOne(
+    filter: FilterQuery<Stock>,
+    update: UpdateQuery<Stock>,
+    options?: UpdateOptions & Omit<MongooseQueryOptions<Stock>, 'lean'>,
+  ): Promise<UpdateWriteOpResult> {
+    return this.stockModel.updateOne(filter, update, options);
   }
 
   async deleteMany(

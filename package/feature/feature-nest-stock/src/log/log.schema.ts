@@ -35,6 +35,9 @@ export class StockLog implements StockLogSchema {
   @Prop()
   quantity: number;
 
+  @Prop()
+  failedReason?: string;
+
   constructor(stockLog: StockLog) {
     Object.assign(this, stockLog);
   }

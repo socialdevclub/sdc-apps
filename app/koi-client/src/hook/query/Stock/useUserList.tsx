@@ -4,20 +4,23 @@ import { serverApiUrl } from '../../../config/baseUrl';
 
 type StockId = string | undefined;
 
-const useUserList = (stockId: StockId) => {
-  const { data } = useQuery<Response.GetStockUser[]>({
+interface Options {
+  enabled?: boolean;
+}
+
+const useUserList = (stockId: StockId, options?: Options) => {
+  const enabled = options?.enabled ?? true;
+  return useQuery<Response.GetStockUser[]>({
     api: {
       hostname: serverApiUrl,
       method: 'GET',
       pathname: `/stock/user?stockId=${stockId}`,
     },
     reactQueryOption: {
-      enabled: !!stockId,
+      enabled: !!stockId && enabled,
       refetchInterval: 1500,
     },
   });
-
-  return { data: data ?? [] };
 };
 useUserList.queryKey = (stockId: StockId) =>
   getQueryKey({

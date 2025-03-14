@@ -8,7 +8,7 @@ import mongoose, {
   QueryOptions,
   UpdateQuery,
 } from 'mongoose';
-import { DeleteOptions, UpdateOptions } from 'mongodb';
+import { CountOptions, DeleteOptions, UpdateOptions } from 'mongodb';
 import { StockUser, UserDocument } from './user.schema';
 
 @Injectable()
@@ -39,6 +39,10 @@ export class UserRepository {
     } finally {
       await session.endSession();
     }
+  }
+
+  async count(filter: FilterQuery<StockUser>): Promise<number> {
+    return this.userModel.countDocuments(filter);
   }
 
   find(
@@ -114,5 +118,12 @@ export class UserRepository {
     } catch (e: unknown) {
       throw new Error(e as string);
     }
+  }
+
+  async countDocuments(
+    filter: FilterQuery<StockUser>,
+    options?: CountOptions & Omit<MongooseQueryOptions<StockUser>, 'lean' | 'timestamps'>,
+  ): Promise<number> {
+    return this.userModel.countDocuments(filter, options);
   }
 }

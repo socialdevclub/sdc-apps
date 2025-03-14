@@ -6,12 +6,14 @@ type StockId = string | undefined;
 
 interface Options {
   enabled?: boolean;
+  refetchInterval?: number;
 }
 
 const useUserFindOne = (stockId: string | undefined, userId: string | undefined, options?: Options) => {
   const enabled = options?.enabled ?? true;
+  const refetchInterval = options?.refetchInterval ?? 1500;
 
-  const { data } = useQuery<Response.GetStockUser>({
+  const { data, refetch } = useQuery<Response.GetStockUser>({
     api: {
       hostname: serverApiUrl,
       method: 'GET',
@@ -19,11 +21,15 @@ const useUserFindOne = (stockId: string | undefined, userId: string | undefined,
     },
     reactQueryOption: {
       enabled: !!stockId && !!userId && enabled,
-      refetchInterval: 1500,
+      refetchInterval,
     },
   });
 
-  return { data };
+  if (data && 'statusCode' in data && 'message' in data) {
+    return { data: undefined, error: data, refetch };
+  }
+
+  return { data, refetch };
 };
 useUserFindOne.queryKey = (stockId: StockId, userId: string | undefined) =>
   getQueryKey({

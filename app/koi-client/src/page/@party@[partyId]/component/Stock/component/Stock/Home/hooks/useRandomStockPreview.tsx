@@ -1,26 +1,18 @@
 import { objectEntries } from '@toss/utils';
+import { StockSchema } from 'shared~type-stock';
 import { GetStock } from 'shared~type-stock/Response';
-import { Query } from '../../../../../../../../hook';
 
-const REMAINING_STOCK_THRESHOLD = 0.9;
-const STOCK_PER_USER = 3;
 const TOTAL_ROUND_COUNT = 10;
 
-// 문자열에서 숫자 생성 함수
-const generateNumberFromString = (str: string): number => {
-  return str.split('').reduce((acc, char, index) => acc + char.charCodeAt(0) * (index + 1), 0);
-};
-
 // 판매량이 낮은 회사 필터링
-const getLowSalesCompanies = (
-  remainingStocks: Record<string, number>,
-  userCount: number,
-  stockPerUser = STOCK_PER_USER,
-): string[] => {
-  const maxQuantity = (userCount ?? 1) * stockPerUser;
-  return objectEntries(remainingStocks)
-    .filter(([, remaining]) => remaining > maxQuantity * REMAINING_STOCK_THRESHOLD)
-    .map(([company]) => company);
+const getLowSalesCompanie = (
+  remainingStocks: StockSchema['remainingStocks'],
+): { companyName: string; quantity: number } => {
+  const lowSalesCompanie = objectEntries(remainingStocks).toSorted(([, a], [, b]) => b - a)[0];
+  return {
+    companyName: lowSalesCompanie[0],
+    quantity: lowSalesCompanie[1],
+  };
 };
 
 export const useRandomStockPreview = (
@@ -32,24 +24,18 @@ export const useRandomStockPreview = (
   nextRoundPredict: { companyName: string; predictTime: number; priceVariation: number } | null;
   TOTAL_ROUND_COUNT: number;
 } => {
-  const { data: users } = Query.Stock.useUserList(stockId);
-  const { data: profiles } = Query.Supabase.useQueryProfileById(users.map((v) => v.userId));
-
-  if (!stock || !userId) {
+  if (!userId || !stock?.companies) {
     return { TOTAL_ROUND_COUNT, nextRoundPredict: null };
   }
 
-  const lowSalesCompanies = getLowSalesCompanies(stock.remainingStocks, profiles?.data?.length ?? 1);
+  const { companyName } = getLowSalesCompanie(stock.remainingStocks);
 
   const getPredictedStockInfo = (): { companyName: string; predictTime: number; priceVariation: number } | null => {
     const _timeIdx = timeIdx ?? 0;
 
-    if (_timeIdx < 0 || _timeIdx >= TOTAL_ROUND_COUNT - 1 || lowSalesCompanies.length === 0) {
+    if (_timeIdx < 0 || _timeIdx >= TOTAL_ROUND_COUNT - 1) {
       return null;
     }
-
-    const randomIndex = generateNumberFromString(`${stockId}-${_timeIdx}-${userId}`) % lowSalesCompanies.length;
-    const companyName = lowSalesCompanies[randomIndex];
 
     return {
       companyName,

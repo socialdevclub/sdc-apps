@@ -163,7 +163,7 @@ export class StockService {
     // 회사 별 주식 재고 설정
     const remainingStocks = {};
     Object.keys(newCompanies).forEach((company) => {
-      remainingStocks[company] = players.length * 4;
+      remainingStocks[company] = players.length * 8;
     });
 
     const result = this.stockRepository.findOneAndUpdate(stockId, {

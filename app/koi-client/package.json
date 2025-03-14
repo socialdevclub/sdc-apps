@@ -25,6 +25,7 @@
     "@tanstack/react-query": "^4.35.3",
     "@tanstack/react-table": "^8.11.2",
     "@toss/date": "^1.1.7",
+    "@toss/impression-area": "^1.4.2",
     "@toss/react": "^1.6.1",
     "@toss/utils": "^1.4.6",
     "@wyw-in-js/babel-preset": "^0.2.2",

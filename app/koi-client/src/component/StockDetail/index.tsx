@@ -30,7 +30,7 @@ export default function StockDetail({ stockId }: Props) {
   const { data: stock } = Query.Stock.useQueryStock(stockId);
 
   // 주식 가치 계산을 위한 훅 추가
-  const { allUserSellPriceDesc } = Query.Stock.useAllSellPrice({ stockId });
+  const { allUserSellPriceDesc } = Query.Stock.useAllUserSellPriceDesc(stockId);
   const isAllSellPriceZero = allUserSellPriceDesc().every((v) => v.allSellPrice === 0);
 
   const companies = stock?.companies ?? {};

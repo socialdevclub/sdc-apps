@@ -1,8 +1,8 @@
-import { Avatar, Modal } from 'antd';
+import { Modal } from 'antd';
 import { ReactElement, cloneElement, useReducer } from 'react';
 import styled from '@emotion/styled';
-import { useRecommendedPartners } from '../../../../../../hook/query/Stock/useRecommendedPartners';
 import * as COLOR from '../../../../../../config/color';
+import RecommendedPartnersModalContent from './RecommendedPartnersModalContent';
 
 interface ButtonProps {
   onClick?: () => void;
@@ -15,7 +15,6 @@ interface Props {
 
 const RecommendedPartnersModal = ({ trigger, stockId }: Props) => {
   const [isRecommendModalOpen, toggleRecommendModalOpen] = useReducer((state) => !state, false);
-  const { partnerNicknames } = useRecommendedPartners(stockId);
 
   return (
     <>
@@ -32,18 +31,7 @@ const RecommendedPartnersModal = ({ trigger, stockId }: Props) => {
           일부 <span>정보를 공유</span>하는 대화 상대를 발견했어요 👀
         </PartnerDescription>
 
-        {partnerNicknames?.length === 0 ? (
-          <PartnerDescription>라고 할 뻔.. 사실 발견 못했어요 😢</PartnerDescription>
-        ) : (
-          <PartnerList>
-            {partnerNicknames.map((name) => (
-              <PartnerItem key={name}>
-                <Avatar size={40}>{name?.[0]}</Avatar>
-                <span>{name}</span>
-              </PartnerItem>
-            ))}
-          </PartnerList>
-        )}
+        <RecommendedPartnersModalContent stockId={stockId} />
       </Modal>
     </>
   );

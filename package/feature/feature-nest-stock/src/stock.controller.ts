@@ -70,28 +70,34 @@ export class StockController {
   }
 
   @Post('/buy')
-  buyStock(@Body() body: Request.PostBuyStock): Promise<StockSchema> {
+  async buyStock(@Body() body: Request.PostBuyStock): Promise<StockSchema> {
+    const timestamp = Date.now();
+    const randomUUID = crypto.randomUUID();
+    const queueUniqueId = `${timestamp}-${randomUUID}`;
+
+    await this.logService.addLog(
+      new StockLog({
+        action: 'BUY',
+        company: body.company,
+        date: new Date(),
+        price: body.unitPrice * body.amount,
+        quantity: body.amount,
+        queueId: queueUniqueId,
+        round: body.round,
+        status: 'QUEUING',
+        stockId: body.stockId,
+        userId: body.userId,
+      }),
+    );
+
     return this.httpService.axiosRef
-      .post('https://api.socialdev.club/queue/stock/buy', body)
+      .post('https://api.socialdev.club/queue/stock/buy', { ...body, queueUniqueId })
       .then(async (res) => {
-        await this.logService.addLog(
-          new StockLog({
-            action: 'BUY',
-            company: body.company,
-            date: new Date(),
-            price: body.unitPrice * body.amount,
-            quantity: body.amount,
-            round: body.round,
-            status: 'SUCCESS',
-            stockId: body.stockId,
-            userId: body.userId,
-          }),
-        );
         return res.data;
       })
       .catch(async (error) => {
         console.error(error);
-        await this.stockProcessor.buyStock(body.stockId, body);
+        await this.stockProcessor.buyStock(body.stockId, body, { queueMessageId: queueUniqueId });
         return { messageId: 'direct' };
       });
   }
@@ -102,28 +108,34 @@ export class StockController {
   }
 
   @Post('/sell')
-  sellStock(@Body() body: Request.PostSellStock): Promise<StockSchema> {
+  async sellStock(@Body() body: Request.PostSellStock): Promise<StockSchema> {
+    const timestamp = Date.now();
+    const randomUUID = crypto.randomUUID();
+    const queueUniqueId = `${timestamp}-${randomUUID}`;
+
+    await this.logService.addLog(
+      new StockLog({
+        action: 'SELL',
+        company: body.company,
+        date: new Date(),
+        price: body.unitPrice * body.amount,
+        quantity: body.amount,
+        queueId: queueUniqueId,
+        round: body.round,
+        status: 'QUEUING',
+        stockId: body.stockId,
+        userId: body.userId,
+      }),
+    );
+
     return this.httpService.axiosRef
-      .post('https://api.socialdev.club/queue/stock/sell', body)
+      .post('https://api.socialdev.club/queue/stock/sell', { ...body, queueUniqueId })
       .then(async (res) => {
-        await this.logService.addLog(
-          new StockLog({
-            action: 'SELL',
-            company: body.company,
-            date: new Date(),
-            price: body.unitPrice * body.amount,
-            quantity: body.amount,
-            round: body.round,
-            status: 'SUCCESS',
-            stockId: body.stockId,
-            userId: body.userId,
-          }),
-        );
         return res.data;
       })
       .catch(async (error) => {
         console.error(error);
-        await this.stockProcessor.sellStock(body.stockId, body);
+        await this.stockProcessor.sellStock(body.stockId, body, { queueMessageId: queueUniqueId });
         return { messageId: 'direct' };
       });
   }
