@@ -204,9 +204,9 @@ const StockDrawer = ({
   const isDisabled = timeIdx === undefined || timeIdx >= 9 || !stock.isTransaction || isLoading;
 
   const remainingStock = stock.remainingStocks[selectedCompany];
-  const isBuyable = user.money >= companiesPrice[selectedCompany] && remainingStock;
+  const isBuyable = user.money >= companiesPrice[selectedCompany];
   const isRemainingStock = Boolean(remainingStock);
-  const isCanBuy = user.money >= companiesPrice[selectedCompany] && remainingStock;
+  const isCanBuy = isBuyable && isRemainingStock;
 
   return (
     <Drawer
@@ -250,7 +250,7 @@ const StockDrawer = ({
             userCount?.count ?? Number.NEGATIVE_INFINITY,
             보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
             1,
-          ) && !isRemainingStock
+          ) || !isRemainingStock
             ? 'red'
             : '#d1d5db'
         }
