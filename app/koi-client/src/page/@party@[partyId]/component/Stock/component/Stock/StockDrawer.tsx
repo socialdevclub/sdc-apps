@@ -202,7 +202,11 @@ const StockDrawer = ({
 
   const isLoading = isBuyLoading || isFreezed || isSellLoading;
   const isDisabled = timeIdx === undefined || timeIdx >= 9 || !stock.isTransaction || isLoading;
-  const isCanBuy = user.money >= companiesPrice[selectedCompany];
+
+  const remainingStock = stock.remainingStocks[selectedCompany];
+  const isBuyable = user.money >= companiesPrice[selectedCompany] && remainingStock;
+  const isRemainingStock = Boolean(remainingStock);
+  const isCanBuy = user.money >= companiesPrice[selectedCompany] && remainingStock;
 
   return (
     <Drawer
@@ -246,13 +250,13 @@ const StockDrawer = ({
             userCount?.count ?? Number.NEGATIVE_INFINITY,
             보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
             1,
-          )
+          ) && !isRemainingStock
             ? 'red'
             : '#d1d5db'
         }
         value={selectedCompany ? companiesPrice[selectedCompany] : 0}
         valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
-        valueColor={isCanBuy ? 'white' : 'red'}
+        valueColor={isBuyable ? 'white' : 'red'}
         badge={renderProfitBadge(stockProfitRate)}
         src={getAnimalImageSource(selectedCompany)}
         width={50}
