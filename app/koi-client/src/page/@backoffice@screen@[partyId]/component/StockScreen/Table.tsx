@@ -42,7 +42,7 @@ const Table = ({ stockId }: Props) => {
         const diff = timeIdx === 0 ? 0 : companies[company][timeIdx].가격 - companies[company][timeIdx - 1].가격;
         const 등락 =
           diff > 0 ? `▲${commaizeNumber(Math.abs(diff))}` : diff < 0 ? `▼${commaizeNumber(Math.abs(diff))}` : '-';
-        const color = diff > 0 ? '#60A5FA' : diff < 0 ? '#F87171' : undefined;
+        const color = diff > 0 ? '#F87171' : diff < 0 ? '#60A5FA' : undefined;
 
         return (
           <Row key={company}>

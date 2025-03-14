@@ -11,10 +11,35 @@ export type ScrollViewProps = React.PropsWithChildren<{
   showScrollbar?: boolean;
 
   onScroll?: (args: React.UIEvent<HTMLDivElement, UIEvent>) => void;
+
+  /**
+   * 내부 스타일 적용 여부
+   * 사파리, 모바일 환경에서 모달이 헤더에 가려지는 문제
+   *
+   * @default false
+   */
+  disableInternalStyles?: boolean;
 }>;
 
-export const ScrollView = ({ showScrollbar = true, children, onScroll, ...props }: ScrollViewProps) => {
-  return (
+export const ScrollView = ({
+  showScrollbar = true,
+  children,
+  onScroll,
+  disableInternalStyles = false,
+  ...props
+}: ScrollViewProps) => {
+  return disableInternalStyles ? (
+    <div className={scrollViewStyle} {...props}>
+      <div className={viewportStyle} onScroll={onScroll}>
+        {children}
+      </div>
+      {showScrollbar && (
+        <div className={scrollbarStyle}>
+          <div className={thumbStyle} />
+        </div>
+      )}
+    </div>
+  ) : (
     <Radix.Root type="always" className={scrollViewStyle} data-f="SR-5f71" {...props}>
       <Radix.Viewport className={viewportStyle} onScroll={onScroll} data-f="SV-3fb5">
         {children}
