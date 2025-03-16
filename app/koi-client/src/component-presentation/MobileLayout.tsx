@@ -35,7 +35,7 @@ const MobileLayout = ({
             padding,
           }}
         >
-          <ScrollViewComponent disableInternalStyles>{children}</ScrollViewComponent>
+          <ScrollViewComponent>{children}</ScrollViewComponent>
         </TopScrollView>
       </Content>
     </Wrapper>
