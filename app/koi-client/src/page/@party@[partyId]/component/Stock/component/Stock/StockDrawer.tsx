@@ -45,9 +45,7 @@ const StockDrawer = ({
 
   const { isFreezed, user, refetch } = Query.Stock.useUser({
     stockId,
-    stockRefetchInterval: Number.POSITIVE_INFINITY,
     userId,
-    userRefetchInterval: Number.POSITIVE_INFINITY,
   });
   const {
     data: stock,
