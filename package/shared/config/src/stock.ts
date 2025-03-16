@@ -36,7 +36,7 @@ export const isStockOverLimit = (
   currentStockCount: number,
   willBuyStockAmount: number,
 ): boolean => {
-  const maxStockCount = playerLength * 2;
+  const maxStockCount = playerLength;
   return currentStockCount + willBuyStockAmount > maxStockCount;
 };
 
