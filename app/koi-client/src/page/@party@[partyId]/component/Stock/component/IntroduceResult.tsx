@@ -41,22 +41,59 @@ export default function IntroduceResult({ HeaderComponent = <></>, stockId }: Pr
       <BodyContainer>
         <h2>🔍 프로필 추리하기</h2>
         <List
-          css={css({ backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: '16px', width: '100%' })}
+          css={css({
+            backgroundColor: 'rgba(217,217,217,0.2)',
+            border: '1px solid rgba(96, 96, 96, 0.5)',
+            borderRadius: '8px',
+            width: '100%',
+          })}
           dataSource={rules}
           size="large"
           renderItem={(item) => (
             <List.Item>
               <List.Item.Meta
                 avatar={<>{item.emoji}</>}
-                title={<span css={css({ color: '#ffffff', wordBreak: 'keep-all' })}>{item.text}</span>}
+                title={
+                  <span css={css({ color: '#ffffff', fontSize: '16px', wordBreak: 'keep-all' })}>{item.text}</span>
+                }
               />
             </List.Item>
           )}
         />
-        <Card title="첫번째 프로필" css={css({ overflowWrap: 'break-word', width: '100%' })}>
+        <Card
+          title="🙋🏻‍ 첫번째 프로필"
+          css={css({
+            '& .ant-card-head': {
+              borderBottom: '1px solid rgba(96, 96, 96, 0.5)',
+              color: '#ffffff',
+            },
+            backgroundColor: 'rgba(217,217,217,0.2)',
+            border: '1px solid rgba(96, 96, 96, 0.5)',
+            color: '#ffffff',
+            minHeight: '230px',
+            overflowWrap: 'break-word',
+            width: '100%',
+          })}
+        >
+          <MatchingReason>📌 당신과 이름이 비슷해요!</MatchingReason>
           {userList?.[prevIndex]?.userInfo.introduction}
         </Card>
-        <Card title="두번째 프로필" css={css({ overflowWrap: 'break-word', width: '100%' })}>
+        <Card
+          title="🙋🏻‍ 두번째 프로필"
+          css={css({
+            '& .ant-card-head': {
+              borderBottom: '1px solid rgba(96, 96, 96, 0.5)',
+              color: '#ffffff',
+            },
+            backgroundColor: 'rgba(217,217,217,0.2)',
+            border: '1px solid rgba(96, 96, 96, 0.5)',
+            color: '#ffffff',
+            minHeight: '230px',
+            overflowWrap: 'break-word',
+            width: '100%',
+          })}
+        >
+          <MatchingReason>📌 당신과 비슷한 관심사를 가지고 있어요!</MatchingReason>
           {userList?.[nextIndex]?.userInfo.introduction}
         </Card>
       </BodyContainer>
@@ -76,9 +113,17 @@ const Container = styled.div`
 const BodyContainer = styled.div`
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
   align-items: center;
   width: 100%;
   height: 100%;
   gap: 16px;
+`;
+
+const MatchingReason = styled.p`
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffcc00;
+  margin-bottom: 8px;
+  margin-top: 0;
 `;
