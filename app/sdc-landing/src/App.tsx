@@ -5,11 +5,16 @@ import Home from './page/@';
 import SupabaseProvider from './library/supabase/SupabaseProvider';
 import OnboardingLoginPage from './page/@onboarding/OnboardingLoginPage';
 import ProfileEditPage from './page/@onboarding/ProfileEditPage';
+import OnboardingPage from './page/@onboarding/OnboardingPage';
 
 const router = createBrowserRouter([
   {
     element: <Home />,
     path: '/',
+  },
+  {
+    element: <OnboardingPage />,
+    path: '/onboarding',
   },
   {
     element: <OnboardingLoginPage />,
