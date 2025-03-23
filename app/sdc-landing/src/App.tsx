@@ -6,6 +6,7 @@ import SupabaseProvider from './library/supabase/SupabaseProvider';
 import OnboardingLoginPage from './page/@onboarding/OnboardingLoginPage';
 import ProfileEditPage from './page/@onboarding/ProfileEditPage';
 import OnboardingPage from './page/@onboarding/OnboardingPage';
+import ProfileViewPage from './page/@onboarding/ProfileViewPage';
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
   },
   {
     element: <ProfileEditPage />,
+    path: '/onboarding/profile/edit',
+  },
+  {
+    element: <ProfileViewPage />,
     path: '/onboarding/profile',
   },
 ]);

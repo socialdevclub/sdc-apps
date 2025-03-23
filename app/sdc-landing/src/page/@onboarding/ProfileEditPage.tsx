@@ -349,7 +349,7 @@ const ProfileEditPage: React.FC = () => {
     setIsProfileLoading(false);
 
     // 홈페이지로 이동
-    navigate('/');
+    navigate('/onboarding/profile');
   };
 
   // 로딩 중 렌더링
