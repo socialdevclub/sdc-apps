@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Query } from '../../hook';
@@ -321,7 +321,13 @@ const INTRODUCE_QUESTION = {
   question: '당신만의 특별한 이야기나 경험을 들려주세요. 소셜데브클럽에서 함께하게 된 계기도 궁금해요! (200~2000자)',
 };
 
-// 프로필 컴포넌트
+// 로컬스토리지 키 상수
+const STORAGE_KEYS = {
+  HELPER_ANSWERS: 'sdc_profile_helper_answers',
+  INTRODUCE: 'sdc_profile_introduce',
+};
+
+// 자기소개 프로필 컴포넌트
 const ProfileEditPage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -355,6 +361,74 @@ const ProfileEditPage: React.FC = () => {
   const [generatedIntroduce, setGeneratedIntroduce] = useState<string>('');
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
 
+  // 디바운스 타이머 상태 추가
+  const [introduceDebounceTimer, setIntroduceDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+  const [answerDebounceTimer, setAnswerDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+
+  // 디바운스 함수 - 자기소개 저장
+  const saveIntroduceToLocalStorage = useCallback((text: string) => {
+    localStorage.setItem(STORAGE_KEYS.INTRODUCE, text);
+  }, []);
+
+  // 디바운스 함수 - 도우미 답변 저장
+  const saveAnswersToLocalStorage = useCallback(
+    (answersData: Record<string, string>, currentQ: number, currentAns: string) => {
+      // 현재 답변을 포함하여 저장
+      const updatedAnswers = { ...answersData };
+      if (currentAns.trim() && currentQ >= 0 && currentQ < INTRO_QUESTIONS.length) {
+        updatedAnswers[INTRO_QUESTIONS[currentQ].question] = currentAns;
+      }
+
+      // [{question, answer}, ...] 형태로 변환
+      const formattedAnswers = Object.entries(updatedAnswers).map(([question, answer]) => ({
+        answer,
+        question,
+      }));
+
+      localStorage.setItem(STORAGE_KEYS.HELPER_ANSWERS, JSON.stringify(formattedAnswers));
+    },
+    [],
+  );
+
+  // 로컬스토리지에서 데이터 불러오기
+  useEffect(() => {
+    const loadSavedData = () => {
+      // 자기소개 불러오기
+      const savedIntroduce = localStorage.getItem(STORAGE_KEYS.INTRODUCE);
+      if (savedIntroduce) {
+        setIntroduce(savedIntroduce);
+      }
+
+      // 도우미 답변 불러오기
+      const savedAnswers = localStorage.getItem(STORAGE_KEYS.HELPER_ANSWERS);
+      if (savedAnswers) {
+        try {
+          const parsedAnswers = JSON.parse(savedAnswers) as Array<{ question: string; answer: string }>;
+
+          // 객체 형태로 변환
+          const answersObject: Record<string, string> = {};
+          parsedAnswers.forEach((item) => {
+            answersObject[item.question] = item.answer;
+          });
+
+          setAnswers(answersObject);
+
+          // 현재 질문에 대한 답변이 있으면 설정
+          if (currentQuestionIndex < INTRO_QUESTIONS.length) {
+            const currentQuestion = INTRO_QUESTIONS[currentQuestionIndex].question;
+            if (answersObject[currentQuestion]) {
+              setCurrentAnswer(answersObject[currentQuestion]);
+            }
+          }
+        } catch (error) {
+          console.error('도우미 답변 데이터 파싱 오류:', error);
+        }
+      }
+    };
+
+    loadSavedData();
+  }, []);
+
   // 프로필 데이터 로드
   useEffect(() => {
     const fetchProfile = async () => {
@@ -379,7 +453,9 @@ const ProfileEditPage: React.FC = () => {
           setGender(data.gender);
         }
 
-        if (data?.introduce) {
+        // 로컬 스토리지에 저장된 자기소개가 없을 때만 DB 데이터 사용
+        const savedIntroduce = localStorage.getItem(STORAGE_KEYS.INTRODUCE);
+        if (!savedIntroduce && data?.introduce) {
           setIntroduce(data.introduce);
         }
 
@@ -422,44 +498,95 @@ const ProfileEditPage: React.FC = () => {
     setGender(e.target.value);
   };
 
+  // 자기소개 변경 핸들러 - 디바운스 적용
   const handleIntroduceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setIntroduce(e.target.value);
+    const newValue = e.target.value;
+    setIntroduce(newValue);
+
+    // 이전 타이머 취소
+    if (introduceDebounceTimer) {
+      clearTimeout(introduceDebounceTimer);
+    }
+
+    // 1초 후 로컬스토리지에 저장
+    const timerId = setTimeout(() => {
+      saveIntroduceToLocalStorage(newValue);
+    }, 1000);
+
+    setIntroduceDebounceTimer(timerId);
   };
 
-  // 현재 답변 변경 핸들러
+  // 현재 답변 변경 핸들러 - 디바운스 적용
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCurrentAnswer(e.target.value);
+    const newValue = e.target.value;
+    setCurrentAnswer(newValue);
+
+    // 이전 타이머 취소
+    if (answerDebounceTimer) {
+      clearTimeout(answerDebounceTimer);
+    }
+
+    // 1초 후 로컬스토리지에 저장
+    const timerId = setTimeout(() => {
+      saveAnswersToLocalStorage(answers, currentQuestionIndex, newValue);
+    }, 1000);
+
+    setAnswerDebounceTimer(timerId);
   };
 
   // 자기소개 도우미 열기
   const openHelper = () => {
     setIsHelperOpen(true);
     setCurrentQuestionIndex(0);
-    setAnswers({});
-    setCurrentAnswer('');
+
+    // 저장된 답변이 있으면 현재 질문의 답변 설정
+    const savedAnswer = answers[INTRO_QUESTIONS[0].question];
+    setCurrentAnswer(savedAnswer || '');
+
+    // 저장된 답변이 없으면 초기화
+    if (Object.keys(answers).length === 0) {
+      setAnswers({});
+    }
   };
 
   // 자기소개 도우미 닫기
   const closeHelper = () => {
+    // 현재 답변 저장
+    if (currentAnswer.trim()) {
+      const updatedAnswers = {
+        ...answers,
+        [INTRO_QUESTIONS[currentQuestionIndex].question]: currentAnswer.trim(),
+      };
+      setAnswers(updatedAnswers);
+      saveAnswersToLocalStorage(updatedAnswers, -1, '');
+    }
+
     setIsHelperOpen(false);
   };
 
   // 다음 질문으로 이동
   const goToNextQuestion = () => {
     // 현재 답변 저장
+    const updatedAnswers = { ...answers };
     if (currentAnswer.trim()) {
-      setAnswers({
-        ...answers,
-        [INTRO_QUESTIONS[currentQuestionIndex].question]: currentAnswer.trim(),
-      });
+      updatedAnswers[INTRO_QUESTIONS[currentQuestionIndex].question] = currentAnswer.trim();
+      setAnswers(updatedAnswers);
     }
 
     // 다음 질문 인덱스로 이동
     if (currentQuestionIndex < INTRO_QUESTIONS.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setCurrentAnswer('');
+      const nextIndex = currentQuestionIndex + 1;
+      setCurrentQuestionIndex(nextIndex);
+
+      // 다음 질문에 대한 이전 답변이 있으면 설정
+      const nextQuestion = INTRO_QUESTIONS[nextIndex].question;
+      setCurrentAnswer(updatedAnswers[nextQuestion] || '');
+
+      // 로컬스토리지에 저장
+      saveAnswersToLocalStorage(updatedAnswers, nextIndex, updatedAnswers[nextQuestion] || '');
     } else {
       // 모든 질문에 답변했으면 자기소개 생성
+      saveAnswersToLocalStorage(updatedAnswers, -1, '');
       generateIntroduction();
     }
   };
@@ -468,17 +595,22 @@ const ProfileEditPage: React.FC = () => {
   const goToPrevQuestion = () => {
     if (currentQuestionIndex > 0) {
       // 현재 답변 저장
+      const updatedAnswers = { ...answers };
       if (currentAnswer.trim()) {
-        setAnswers({
-          ...answers,
-          [INTRO_QUESTIONS[currentQuestionIndex].question]: currentAnswer.trim(),
-        });
+        updatedAnswers[INTRO_QUESTIONS[currentQuestionIndex].question] = currentAnswer.trim();
+        setAnswers(updatedAnswers);
       }
 
       // 이전 질문으로 이동
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      const prevIndex = currentQuestionIndex - 1;
+      setCurrentQuestionIndex(prevIndex);
+
       // 이전에 저장된 답변 불러오기
-      setCurrentAnswer(answers[INTRO_QUESTIONS[currentQuestionIndex - 1].question] || '');
+      const prevQuestion = INTRO_QUESTIONS[prevIndex].question;
+      setCurrentAnswer(updatedAnswers[prevQuestion] || '');
+
+      // 로컬스토리지에 저장
+      saveAnswersToLocalStorage(updatedAnswers, prevIndex, updatedAnswers[prevQuestion] || '');
     }
   };
 
@@ -535,6 +667,7 @@ const ProfileEditPage: React.FC = () => {
   // 미리보기 승인 처리
   const confirmPreview = () => {
     setIntroduce(generatedIntroduce);
+    saveIntroduceToLocalStorage(generatedIntroduce);
     setIsPreviewMode(false);
     setIsHelperOpen(false);
     setError('');
@@ -548,7 +681,15 @@ const ProfileEditPage: React.FC = () => {
 
   // 미리보기 수정 처리
   const editGeneratedIntroduce = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setGeneratedIntroduce(e.target.value);
+    const newValue = e.target.value;
+    setGeneratedIntroduce(newValue);
+
+    // 이전 타이머 취소
+    if (introduceDebounceTimer) {
+      clearTimeout(introduceDebounceTimer);
+    }
+
+    // 1초 후 로컬스토리지에 저장 - 미리보기 상태에서는 저장하지 않음
   };
 
   // 글자 수 검사
@@ -604,6 +745,9 @@ const ProfileEditPage: React.FC = () => {
       setIsProfileLoading(false);
       return;
     }
+
+    // 프로필 저장 성공 시 로컬 스토리지 데이터 삭제
+    localStorage.removeItem(STORAGE_KEYS.INTRODUCE);
 
     setIsProfileLoading(false);
 
