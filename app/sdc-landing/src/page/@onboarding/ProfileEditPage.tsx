@@ -691,7 +691,7 @@ const ProfileEditPage: React.FC = () => {
             <CharCount isExceeded={isInvalidLength}>
               {introduce.length}/{INTRODUCE_QUESTION.minLength}~{INTRODUCE_QUESTION.maxLength}자
             </CharCount>
-            <HelpButton onClick={openHelper}>자기소개 작성하기</HelpButton>
+            <HelpButton onClick={openHelper}>AI 자기소개 작성 도우미</HelpButton>
           </FormItem>
 
           {error && <ErrorMessage>{error}</ErrorMessage>}
