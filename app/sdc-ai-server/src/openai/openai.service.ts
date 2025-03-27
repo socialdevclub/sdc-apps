@@ -33,7 +33,7 @@ export class OpenAIService {
           },
         ],
         model: 'gpt-4o-mini',
-        temperature: 1,
+        temperature: 0.7,
       });
 
       return response.choices[0].message.content || '응답을 생성하는 데 문제가 발생했습니다.';
@@ -72,6 +72,8 @@ export class OpenAIService {
 - 합쇼체 대신 친근한 해요체로 써야 해요. (있습니다 -> 있어요)
 - "여러분"과 같이 제 3자에게 말을 걸지 말고, 인사도 하지마
 - 최대 1500자로 작성해줘
+
+중요: 제공된 JSON 데이터에 없는 정보는 절대 만들어내지 마세요.
 
 다음은 참고할 JSON 데이터입니다:
 ${JSON.stringify(promptData)}
