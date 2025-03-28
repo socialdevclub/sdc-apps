@@ -7,6 +7,7 @@ import OnboardingLoginPage from './page/@onboarding/OnboardingLoginPage';
 import ProfileEditPage from './page/@onboarding/ProfileEditPage';
 import OnboardingPage from './page/@onboarding/OnboardingPage';
 import ProfileViewPage from './page/@onboarding/ProfileViewPage';
+import ProfileListPage from './page/@onboarding/ProfileListPage';
 
 const router = createBrowserRouter([
   {
@@ -22,12 +23,20 @@ const router = createBrowserRouter([
     path: '/onboarding/login',
   },
   {
+    element: <ProfileListPage />,
+    path: '/onboarding/profile',
+  },
+  {
     element: <ProfileEditPage />,
     path: '/onboarding/profile/edit',
   },
   {
     element: <ProfileViewPage />,
-    path: '/onboarding/profile',
+    path: '/onboarding/profile/view',
+  },
+  {
+    element: <ProfileViewPage />,
+    path: '/onboarding/profile/view/:username',
   },
 ]);
 

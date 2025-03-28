@@ -731,6 +731,7 @@ const ProfileEditPage: React.FC = () => {
     setIsProfileLoading(true);
 
     const updates = {
+      avatar_url: avatarUrl,
       gender,
       introduce,
       updated_at: new Date().toISOString(),

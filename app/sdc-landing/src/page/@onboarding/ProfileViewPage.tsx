@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { Query } from '../../hook';
 import { supabase } from '../../library/supabase';
@@ -135,6 +135,7 @@ const EditButton = styled.button`
 // 프로필 컴포넌트
 const ProfileViewPage: React.FC = () => {
   const navigate = useNavigate();
+  const { username: usernameParam } = useParams<{ username?: string }>();
 
   // 디스코드 관련 데이터 가져오기
   const {
@@ -153,33 +154,53 @@ const ProfileViewPage: React.FC = () => {
   const [avatarUrl, setAvatarUrl] = useState<string>('');
   const [introduce, setIntroduce] = useState<string>('');
   const [isProfileLoading, setIsProfileLoading] = useState<boolean>(true);
+  const [isOtherUser, setIsOtherUser] = useState<boolean>(false);
 
   // 프로필 데이터 로드
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!session?.session?.user?.id) return;
-
       try {
-        const { data, error } = await supabase.from('profiles').select('*').eq('id', session.session.user.id).single();
+        let profileData;
 
-        if (error) {
-          console.error('프로필 데이터 로드 오류:', error);
+        if (usernameParam) {
+          // 특정 사용자 프로필 조회
+          setIsOtherUser(true);
+          const { data, error } = await supabase.from('profiles').select('*').eq('username', usernameParam).single();
+
+          if (error) {
+            console.error('프로필 데이터 로드 오류:', error);
+            return;
+          }
+
+          profileData = data;
+        } else if (session?.session?.user?.id) {
+          // 현재 로그인한 사용자 프로필 조회
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.session.user.id)
+            .single();
+
+          if (error) {
+            console.error('프로필 데이터 로드 오류:', error);
+            return;
+          }
+
+          profileData = data;
+        } else {
           return;
         }
 
-        // 디스코드 닉네임이 있으면 우선 설정
-        if (nickname) {
-          setUsername(nickname);
-        } else if (data?.username) {
-          setUsername(data.username);
-        }
+        // 프로필 데이터 설정
+        if (profileData) {
+          setUsername(profileData.username || '');
+          setGender(profileData.gender || '');
+          setIntroduce(profileData.introduce || '');
 
-        if (data?.gender) {
-          setGender(data.gender);
-        }
-
-        if (data?.introduce) {
-          setIntroduce(data.introduce);
+          // 아바타 URL 설정
+          if (profileData.avatar_url) {
+            setAvatarUrl(profileData.avatar_url);
+          }
         }
 
         setIsProfileLoading(false);
@@ -190,11 +211,11 @@ const ProfileViewPage: React.FC = () => {
     };
 
     fetchProfile();
-  }, [session, nickname]);
+  }, [session, usernameParam]);
 
-  // 디스코드 아바타 URL 설정
+  // 디스코드 아바타 URL 설정 - 자신의 프로필 볼 때만 적용
   useEffect(() => {
-    if (discordData?.user?.id) {
+    if (!isOtherUser && discordData?.user?.id) {
       const discordId = discordData.user.id;
       const avatarId = discordData.user.avatar;
 
@@ -203,7 +224,7 @@ const ProfileViewPage: React.FC = () => {
         setAvatarUrl(avatarUrl);
       }
     }
-  }, [discordData]);
+  }, [discordData, isOtherUser]);
 
   // 디스코드 연동 체크 및 리다이렉트
   useEffect(() => {
@@ -239,8 +260,8 @@ const ProfileViewPage: React.FC = () => {
 
   return (
     <ProfileContainer>
-      <Title>내 프로필</Title>
-      <Subtitle>나의 프로필 정보를 확인해보세요</Subtitle>
+      <Title>{isOtherUser ? `${username}님의 프로필` : '내 프로필'}</Title>
+      <Subtitle>{isOtherUser ? `${username}님의 프로필 정보입니다` : '나의 프로필 정보를 확인해보세요'}</Subtitle>
 
       <ProfileCard>
         <AvatarContainer>
@@ -248,29 +269,27 @@ const ProfileViewPage: React.FC = () => {
             <Avatar imageUrl={avatarUrl} />
           ) : (
             <Avatar>
-              <AvatarPlaceholder>{username.charAt(0).toUpperCase()}</AvatarPlaceholder>
+              <AvatarPlaceholder>{username ? username[0].toUpperCase() : '?'}</AvatarPlaceholder>
             </Avatar>
           )}
+          <h2>{username || '이름 미설정'}</h2>
         </AvatarContainer>
 
         <InfoContainer>
-          <InfoRow>
-            <InfoLabel>닉네임</InfoLabel>
-            <InfoValue>{username || '미설정'}</InfoValue>
-          </InfoRow>
-
           <InfoRow>
             <InfoLabel>성별</InfoLabel>
             <InfoValue>{getGenderDisplay(gender)}</InfoValue>
           </InfoRow>
         </InfoContainer>
 
-        <IntroduceContainer>
-          <IntroduceTitle>자기소개</IntroduceTitle>
-          <IntroduceContent>{introduce || '자기소개가 작성되지 않았습니다.'}</IntroduceContent>
-        </IntroduceContainer>
+        {introduce && (
+          <IntroduceContainer>
+            <IntroduceTitle>소개</IntroduceTitle>
+            <IntroduceContent>{introduce}</IntroduceContent>
+          </IntroduceContainer>
+        )}
 
-        <EditButton onClick={handleEditProfile}>프로필 수정하기</EditButton>
+        {!isOtherUser && <EditButton onClick={handleEditProfile}>프로필 수정</EditButton>}
       </ProfileCard>
     </ProfileContainer>
   );

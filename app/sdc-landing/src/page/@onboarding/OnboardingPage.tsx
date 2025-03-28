@@ -17,7 +17,7 @@ const OnboardingPage: React.FC = () => {
   // 로그인 상태에 따라 리다이렉트
   if (hasProviderToken) {
     // 로그인이 되어있다면 프로필 페이지로 리다이렉트
-    return <Navigate to="/onboarding/profile" replace />;
+    return <Navigate to="/onboarding/profile/view" replace />;
   }
   // 로그인이 안되어있다면 로그인 페이지로 리다이렉트
   return <Navigate to="/onboarding/login" replace />;
