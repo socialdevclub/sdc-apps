@@ -427,7 +427,7 @@ const ProfileEditPage: React.FC = () => {
     };
 
     loadSavedData();
-  }, []);
+  }, [currentQuestionIndex]);
 
   // 프로필 데이터 로드
   useEffect(() => {
