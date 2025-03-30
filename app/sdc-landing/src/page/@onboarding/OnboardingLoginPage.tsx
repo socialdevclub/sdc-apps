@@ -54,7 +54,7 @@ const DiscordButton = styled.a`
 `;
 
 const OnboardingLoginPage: React.FC = () => {
-  const redirectTo = `${window.location.origin}/onboarding/profile`;
+  const redirectTo = `${window.location.origin}/onboarding/profile/edit`;
 
   return (
     <OnboardingContainer>
