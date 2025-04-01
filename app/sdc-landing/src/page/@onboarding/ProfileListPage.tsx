@@ -217,9 +217,18 @@ const ProfileListPage = () => {
           </Pagination>
         </>
       ) : (
-        <EmptyState>
-          <EmptyStateText>아직 프로필이 없습니다.</EmptyStateText>
-        </EmptyState>
+        <>
+          <EmptyState>
+            <EmptyStateText>아직 프로필이 없습니다.</EmptyStateText>
+          </EmptyState>
+          <Pagination>
+            <PageButton disabled={pageNumber === 0} onClick={() => handlePageChange(pageNumber - 1)}>
+              이전
+            </PageButton>
+            <PageButton isActive>{pageNumber + 1}</PageButton>
+            <PageButton disabled>다음</PageButton>
+          </Pagination>
+        </>
       )}
     </ProfileContainer>
   );
