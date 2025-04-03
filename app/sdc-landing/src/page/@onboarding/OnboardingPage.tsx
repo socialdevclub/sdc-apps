@@ -3,6 +3,8 @@ import { Navigate } from 'react-router-dom';
 import { Query } from '../../hook';
 
 const OnboardingPage: React.FC = () => {
+  const { data: myProfile } = Query.Supabase.useQueryMyProfile();
+
   // 세션 정보 가져오기
   const { data, isLoading } = Query.Supabase.useGetSession();
   const session = data?.session;
@@ -16,8 +18,10 @@ const OnboardingPage: React.FC = () => {
 
   // 로그인 상태에 따라 리다이렉트
   if (hasProviderToken) {
-    // 로그인이 되어있다면 프로필 페이지로 리다이렉트
-    return <Navigate to="/onboarding/profile/view" replace />;
+    if (myProfile?.introduce) {
+      return <Navigate to="/onboarding/profile" replace />;
+    }
+    return <Navigate to="/onboarding/profile/view/edit" replace />;
   }
   // 로그인이 안되어있다면 로그인 페이지로 리다이렉트
   return <Navigate to="/onboarding/login" replace />;

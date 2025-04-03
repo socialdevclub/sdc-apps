@@ -24,12 +24,9 @@ const useQuerySdcGuildUser = () => {
     // 캐시 데이터 유지 (10분)
     cacheTime: 10 * 60 * 1000,
 
-    queryFn: async (): Promise<APIGuildMember> => {
-      // 세션이 없으면 호출하지 않음
-      if (!session?.session?.provider_token) {
-        throw new QueryError('No Supabase Session');
-      }
+    enabled: !!session?.session?.provider_token,
 
+    queryFn: async (): Promise<APIGuildMember> => {
       // withSessionStorage 유틸리티를 사용하여 API 호출과 캐싱 처리
       const fetchGuildUser = async (): Promise<APIGuildMember> => {
         const url = `https://discord.com/api/v10/users/@me/guilds/${SDC_GUILD_ID}/member`;
@@ -76,7 +73,7 @@ const useQuerySdcGuildUser = () => {
   const nickname = query.data?.nick || query.data?.user?.global_name;
   const isJoined = Boolean(nickname);
 
-  const isAuthenticated = !query.error?.message.includes('Unauthorized');
+  const isAuthenticated = !query.error?.message.includes('Unauthorized') && !!session?.session?.provider_token;
   const isRateLimited = query.error?.message.includes('rate limited');
 
   return {

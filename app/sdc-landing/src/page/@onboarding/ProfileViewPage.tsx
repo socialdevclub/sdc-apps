@@ -139,7 +139,6 @@ const ProfileViewPage: React.FC = () => {
 
   // 디스코드 관련 데이터 가져오기
   const {
-    nickname,
     isAuthenticated,
     isFetching: isDiscordLoading,
     data: discordData,
@@ -147,6 +146,8 @@ const ProfileViewPage: React.FC = () => {
 
   // Supabase 세션 가져오기
   const { data: session } = Query.Supabase.useGetSession();
+
+  const { data: myProfile } = Query.Supabase.useQueryMyProfile();
 
   // 상태 관리
   const [username, setUsername] = useState<string>('');
@@ -162,7 +163,7 @@ const ProfileViewPage: React.FC = () => {
       try {
         let profileData;
 
-        if (usernameParam) {
+        if (usernameParam && myProfile?.username !== usernameParam) {
           // 특정 사용자 프로필 조회
           setIsOtherUser(true);
           const { data, error } = await supabase.from('profiles').select('*').eq('username', usernameParam).single();
@@ -211,7 +212,7 @@ const ProfileViewPage: React.FC = () => {
     };
 
     fetchProfile();
-  }, [session, usernameParam]);
+  }, [myProfile?.username, session, usernameParam]);
 
   // 디스코드 아바타 URL 설정 - 자신의 프로필 볼 때만 적용
   useEffect(() => {
