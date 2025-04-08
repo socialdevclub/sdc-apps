@@ -14,6 +14,7 @@ dist
 out
 node_modules
 turbo-build.log
+mcp.json
 
 # mac
 .DS_Store
