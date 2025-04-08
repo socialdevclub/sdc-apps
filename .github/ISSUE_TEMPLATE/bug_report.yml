@@ -1,0 +1,39 @@
+name: 🐞 Bug Report
+description: Report a reproducible bug or unexpected behavior.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+      placeholder: "Example: When I click the login button, nothing happens."
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce the bug?
+      placeholder: |
+        1. Go to the login page
+        2. Enter your email and password
+        3. Click on "Login"
+        4. See error
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Environment
+      description: OS, Browser, Device, etc.
+      placeholder: e.g., Windows 11, Chrome 122.0.0
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Screenshots or Logs
+      description: If applicable, add screenshots or logs to help explain your problem.
+    validations:
+      required: false
