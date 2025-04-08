@@ -9,13 +9,13 @@ interface BadgeProps {
   rounded?: boolean;
 }
 
-const Badge: React.FC<BadgeProps> = ({
+const Badge = ({
   text,
   backgroundColor = '#3e4e37',
   textColor = '#a3e635',
   size = 'medium',
   rounded = true,
-}) => {
+}: BadgeProps) => {
   return (
     <Container style={{ backgroundColor }} size={size} rounded={rounded}>
       <Text style={{ color: textColor }} size={size}>
