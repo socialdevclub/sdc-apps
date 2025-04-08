@@ -34,3 +34,9 @@ export const ANIMAL_NAME: Record<string, string> = {
   햄찌금융: 'hamster',
   호랑전자: 'tiger',
 };
+
+export enum StockMessageType {
+  RISE = 'RISE', // 주가 상승 예상
+  FALL = 'FALL', // 주가 하락 예상
+  UNKNOWN = 'UNKNOWN', // 정보 없음
+}
