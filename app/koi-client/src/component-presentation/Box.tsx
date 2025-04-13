@@ -8,7 +8,7 @@ interface BoxProps {
   rightComponent?: React.ReactNode;
 }
 
-const Box: React.FC<BoxProps> = ({ title, value, valueColor, rightComponent }) => {
+const Box = ({ title, value, valueColor, rightComponent }: BoxProps) => {
   return (
     <Container>
       <div>

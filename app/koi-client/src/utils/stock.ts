@@ -55,15 +55,6 @@ export function calculateProfitRate(currentPrice: number, averagePrice: number):
 /**
  * 주식 정보 메시지 타입
  */
-export enum StockMessageType {
-  RISE = 'RISE', // 주가 상승 예상
-  FALL = 'FALL', // 주가 하락 예상
-  UNKNOWN = 'UNKNOWN', // 정보 없음
-}
-
-/**
- * 주식 정보 메시지 생성 함수 파라미터
- */
 export interface GetStockMessagesParams {
   stockInfos: Array<{
     company: string;
