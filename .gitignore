@@ -28,5 +28,7 @@ turbo-build.log
 /blob-report/
 /playwright/.cache/
 
-# windsurf rules
+# IDE rules
 .windsurfrules
+.cursor/
+.cursorrules
