@@ -12,6 +12,11 @@ export type StockUserInfoSchema = {
   introduction?: string;
 };
 
+type StockUserCompanyStorageValue = {
+  count: Record<string, number>; // 회사명: 수량
+  history: Record<string, Array<number>>; // 회사 > 라운드 > 개수
+};
+
 export type StockUserSchema = {
   stockId: string;
   userId: string;
@@ -19,6 +24,7 @@ export type StockUserSchema = {
   index: number;
   money: number;
   inventory: Record<string, number>;
+  companyStorage: Record<string, StockUserCompanyStorageValue>;
   lastActivityTime: Date;
   loanCount: number;
 };
