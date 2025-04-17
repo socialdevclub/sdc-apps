@@ -1,0 +1,39 @@
+name: 🐞 버그 리포트
+description: 재현 가능한 버그나 예상치 못한 동작을 보고합니다.
+title: "[버그] "
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: 설명
+      description: 버그에 대해 설명을 작성해 주세요.
+      placeholder: "예시: 로그인 버튼을 클릭해도 아무 반응이 없습니다."
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 재현 단계
+      description: 버그를 재현하기 위해서 어떻게 해야 할지 설명해 주세요.
+      placeholder: |
+        1. 로그인 페이지로 이동
+        2. 이메일과 비밀번호 입력
+        3. "로그인" 버튼 클릭
+        4. 에러 발생
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: 환경
+      description: OS, 브라우저, 기기 등 버그가 발생한 환경을 설명해 주세요.
+      placeholder: Windows 11, Chrome 122.0.0, Mac OS, Safari, iPhone 15 Pro Max...
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: 스크린샷 또는 로그
+      description: 해당되는 경우, 문제를 설명하는 데 도움이 되는 스크린샷이나 로그를 첨부해 주세요.
+    validations:
+      required: false
