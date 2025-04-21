@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
 import type { CompanyInfo, Request, Response, StockPhase } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
-import { ceilToUnit } from '@toss/utils';
+import { ceilToUnit, objectEntries } from '@toss/utils';
 import type { ProjectionType, QueryOptions } from 'mongoose';
 import mongoose from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
@@ -294,7 +294,6 @@ export class StockService {
         }
 
         for await (const user of users) {
-          const inventory = user.inventory as unknown as Map<string, number>;
           const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
           const remainingStocks = stock.remainingStocks as unknown as Map<string, number>;
 
@@ -302,13 +301,15 @@ export class StockService {
             Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
             9,
           );
-          inventory.forEach((amount, company) => {
+
+          objectEntries(user.companyStorage).forEach(([company, { count }]) => {
             const companyPrice = companies.get(company)[idx]?.가격;
-            const totalPrice = companyPrice * amount;
+            const totalPrice = companyPrice * count;
 
             user.money += totalPrice;
-            remainingStocks.set(company, remainingStocks.get(company) + amount);
-            inventory.set(company, 0);
+            remainingStocks.set(company, remainingStocks.get(company) + count);
+            user.companyStorage[company].history[idx] -= count;
+            user.companyStorage[company].count = 0;
           });
 
           const loanMoney = user.loanCount * StockConfig.SETTLE_LOAN_PRICE;

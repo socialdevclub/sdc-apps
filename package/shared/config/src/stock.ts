@@ -49,3 +49,5 @@ export const SETTLE_LOAN_PRICE = 2_000_000;
 
 export const DEFAULT_DRAW_COST = 300_000;
 export const ROUND_SKIP_STEP = 2;
+
+export const MAX_STOCK_IDX = 9;

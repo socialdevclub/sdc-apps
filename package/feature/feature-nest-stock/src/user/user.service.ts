@@ -7,6 +7,7 @@ import { InjectConnection } from '@nestjs/mongoose';
 import { getDateDistance } from '@toss/date';
 import { StockConfig } from 'shared~config';
 import { OpenAI } from 'openai';
+import { objectEntries } from '@toss/utils';
 import { StockUser, UserDocument } from './user.schema';
 import { UserRepository } from './user.repository';
 import { StockRepository } from '../stock.repository';
@@ -272,15 +273,13 @@ ${JSON.stringify(userData)}`;
 
       const idx = Math.min(
         Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
-        9,
+        StockConfig.MAX_STOCK_IDX,
       );
 
-      const inventory = user.inventory as unknown as Map<string, number>;
-
-      const allCompaniesPrice = Array.from(inventory.entries()).reduce((acc, [name, amount]) => {
-        const companyInfo = companies.get(name);
+      const allCompaniesPrice = objectEntries(user.companyStorage).reduce((acc, [company, { count }]) => {
+        const companyInfo = companies.get(company);
         const price = companyInfo[idx]?.가격;
-        return acc + price * amount;
+        return acc + price * count;
       }, 0);
 
       const estimatedAllMoney = allCompaniesPrice + user.money;

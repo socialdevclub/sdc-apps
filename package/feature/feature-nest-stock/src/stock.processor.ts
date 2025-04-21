@@ -65,14 +65,18 @@ export class StockProcessor {
           throw new Error('주가가 변동되었습니다. 다시 시도해주세요');
         }
 
-        const inventory = user.inventory as unknown as Map<string, number>;
-        const companyCount = inventory.get(company) || 0;
+        if (!user.companyStorage[company]) {
+          throw new Error(`주식 보유 정보 ${company}를 불러올 수 없습니다`);
+        }
+
+        const companyCount = user.companyStorage[company].count;
 
         if (isStockOverLimit(playerCount, companyCount, amount)) {
           throw new Error('주식 보유 한도 초과');
         }
 
-        inventory.set(company, companyCount + amount);
+        user.companyStorage[company].count = companyCount + amount;
+        user.companyStorage[company].history[idx] += amount;
         remainingStocks.set(company, remainingStocks.get(company) - amount);
         user.money -= totalPrice;
         user.lastActivityTime = new Date();
@@ -93,7 +97,7 @@ export class StockProcessor {
           { _id: user._id },
           {
             $set: {
-              inventory: user.inventory,
+              companyStorage: user.companyStorage,
               lastActivityTime: user.lastActivityTime,
               money: user.money,
             },
@@ -173,8 +177,12 @@ export class StockProcessor {
           throw new HttpException('회사 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
         }
 
-        const inventory = user.inventory as unknown as Map<string, number>;
-        if (!inventory.get(company) || inventory.get(company) < amount) {
+        if (!user.companyStorage[company]) {
+          throw new Error(`주식 보유 정보 ${company}를 불러올 수 없습니다`);
+        }
+
+        const companyCount = user.companyStorage[company].count;
+        if (companyCount < amount) {
           throw new HttpException('주식을 보유하고 있지 않습니다', HttpStatus.CONFLICT);
         }
 
@@ -189,7 +197,8 @@ export class StockProcessor {
           throw new HttpException('주가가 변동되었습니다. 다시 시도해주세요', HttpStatus.CONFLICT);
         }
 
-        inventory.set(company, inventory.get(company) - amount);
+        user.companyStorage[company].count = companyCount - amount;
+        user.companyStorage[company].history[idx] -= amount;
         user.money += totalPrice;
         user.lastActivityTime = new Date();
 
@@ -210,7 +219,7 @@ export class StockProcessor {
           { _id: user._id },
           {
             $set: {
-              inventory: user.inventory,
+              companyStorage: user.companyStorage,
               lastActivityTime: user.lastActivityTime,
               money: user.money,
             },

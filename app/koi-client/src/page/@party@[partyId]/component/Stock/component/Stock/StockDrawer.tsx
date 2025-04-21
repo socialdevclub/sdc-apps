@@ -2,10 +2,11 @@ import { Drawer } from 'antd';
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useAtomValue } from 'jotai';
-import { objectEntries } from '@toss/utils';
 import { isStockOverLimit } from 'shared~config/dist/stock';
 import { ImpressionArea } from '@toss/impression-area';
 import { MessageInstance } from 'antd/es/message/interface';
+import { StockConfig } from 'shared~config';
+import { objectEntries } from '@toss/utils';
 import { MEDIA_QUERY } from '../../../../../../config/common';
 import InfoHeader from '../../../../../../component-presentation/InfoHeader';
 import {
@@ -118,24 +119,24 @@ const StockDrawer = ({
   const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
 
   const 보유주식 = useMemo(() => {
-    return objectEntries(user?.inventory ?? {})
-      .filter(([, count]) => count > 0)
-      .map(([company, count]) => ({
+    return objectEntries(user?.companyStorage ?? {})
+      .filter(([, { count }]) => count > 0)
+      .map(([company, { count }]) => ({
         company,
         count,
       }));
-  }, [user?.inventory]);
+  }, [user?.companyStorage]);
 
   const prevAveragePurchasePrice = useRef<number>();
   const averagePurchasePrice = useMemo(() => {
     return calculateAveragePurchasePrice({
       company: selectedCompany,
-      currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+      currentQuantity: user?.companyStorage[selectedCompany]?.count ?? 0,
       logs,
       prevData: prevAveragePurchasePrice.current,
       round: stock?.round,
     });
-  }, [logs, selectedCompany, stock?.round, 보유주식]);
+  }, [logs, selectedCompany, stock?.round, user?.companyStorage]);
 
   if (averagePurchasePrice !== prevAveragePurchasePrice.current) {
     prevAveragePurchasePrice.current = averagePurchasePrice;
@@ -199,7 +200,7 @@ const StockDrawer = ({
   };
 
   const isLoading = isBuyLoading || isFreezed || isSellLoading;
-  const isDisabled = timeIdx === undefined || timeIdx >= 9 || !stock.isTransaction || isLoading;
+  const isDisabled = timeIdx === undefined || timeIdx >= StockConfig.MAX_STOCK_IDX || !stock.isTransaction || isLoading;
 
   const remainingStock = stock.remainingStocks[selectedCompany];
   const isBuyable = user.money >= companiesPrice[selectedCompany];
@@ -242,11 +243,11 @@ const StockDrawer = ({
     >
       <InfoHeader
         title={selectedCompany.slice(0, 4)}
-        subtitle={`보유 주식: ${보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0}`}
+        subtitle={`보유 주식: ${user.companyStorage[selectedCompany]?.count ?? 0}`}
         subTitleColor={
           isStockOverLimit(
             userCount?.count ?? Number.NEGATIVE_INFINITY,
-            보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+            user.companyStorage[selectedCompany]?.count ?? 0,
             1,
           ) || !isRemainingStock
             ? 'red'
@@ -277,7 +278,7 @@ const StockDrawer = ({
               !isCanBuy ||
               isStockOverLimit(
                 userCount?.count ?? Number.NEGATIVE_INFINITY,
-                보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+                user.companyStorage[selectedCompany]?.count ?? 0,
                 1,
               ),
             flex: 1,
@@ -286,7 +287,7 @@ const StockDrawer = ({
           },
           {
             backgroundColor: '#f63c6b',
-            disabled: isDisabled || !user.inventory[selectedCompany],
+            disabled: isDisabled || !user.companyStorage[selectedCompany]?.count,
             flex: 1,
             onClick: () => onClickSell(selectedCompany),
             text: '팔기',
@@ -299,9 +300,8 @@ const StockDrawer = ({
         buttons={[
           {
             backgroundColor: '#374151',
-            disabled: isDisabled || !user.inventory[selectedCompany],
-            onClick: () =>
-              onClickSell(selectedCompany, 보유주식.find(({ company }) => company === selectedCompany)?.count),
+            disabled: isDisabled || !user.companyStorage[selectedCompany]?.count,
+            onClick: () => onClickSell(selectedCompany, user.companyStorage[selectedCompany]?.count),
             text: '모두 팔기',
           },
         ]}

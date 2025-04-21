@@ -32,14 +32,14 @@ export class StockUser implements StockUserSchema {
   @Prop()
   money: number;
 
-  @Prop({ type: SchemaTypes.Map })
-  inventory: Record<string, number>;
-
   @Prop({ type: SchemaTypes.Date })
   lastActivityTime: Date;
 
   @Prop({ default: 0 })
   loanCount: number;
+
+  @Prop({ type: SchemaTypes.Mixed })
+  companyStorage: StockUserSchema['companyStorage'];
 
   constructor(required: Pick<StockUserSchema, StockUserRequired>, partial: StockUserForm) {
     this.userId = required.userId;
@@ -48,9 +48,9 @@ export class StockUser implements StockUserSchema {
 
     this.index = partial.index ?? 0;
     this.money = partial.money ?? StockConfig.INIT_USER_MONEY;
-    this.inventory = partial.inventory ?? {};
     this.lastActivityTime = new Date();
     this.loanCount = partial.loanCount ?? 0;
+    this.companyStorage = partial.companyStorage ?? {};
   }
 }
 

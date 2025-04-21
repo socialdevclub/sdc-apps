@@ -13,8 +13,8 @@ export type StockUserInfoSchema = {
 };
 
 type StockUserCompanyStorageValue = {
-  count: Record<string, number>; // 회사명: 수량
-  history: Record<string, Array<number>>; // 회사 > 라운드 > 개수
+  count: number; // 회사명: 수량
+  history: Array<number>; // 회사 > 라운드 > 개수
 };
 
 export type StockUserSchema = {
@@ -23,7 +23,6 @@ export type StockUserSchema = {
   userInfo: StockUserInfoSchema;
   index: number;
   money: number;
-  inventory: Record<string, number>;
   companyStorage: Record<string, StockUserCompanyStorageValue>;
   lastActivityTime: Date;
   loanCount: number;
