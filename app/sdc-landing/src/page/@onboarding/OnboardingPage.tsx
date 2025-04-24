@@ -21,7 +21,7 @@ const OnboardingPage: React.FC = () => {
     if (myProfile?.introduce) {
       return <Navigate to="/onboarding/profile" replace />;
     }
-    return <Navigate to="/onboarding/profile/view/edit" replace />;
+    return <Navigate to="/onboarding/profile/edit" replace />;
   }
   // 로그인이 안되어있다면 로그인 페이지로 리다이렉트
   return <Navigate to="/onboarding/login" replace />;
