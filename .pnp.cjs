@@ -18316,6 +18316,7 @@ const RAW_RUNTIME_STATE =
           ["lucide-react", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:0.475.0"],\
           ["react", "npm:18.3.1"],\
           ["react-dom", "virtual:26c7e0b3641a794a76ed0ce1aa5b9688c9d422541f80c729df4415bfd37e15cf639602c60281ac066c5ecd6bcdb8822cc4ef679e583e0c3aaffd02dfbaa55884#npm:18.3.1"],\
+          ["react-error-boundary", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:4.0.11"],\
           ["react-responsive", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:9.0.2"],\
           ["react-router-dom", "virtual:3781e4e4653b304d27938f77fea1ab9b6773bbd3d16c365c26414696786c5b1cc2fb193f577d466767d7df01d7ff1a4418f0d78f32cd3cf5e383212925d5a89b#npm:6.16.0"],\
           ["turbo", "npm:1.11.2"],\

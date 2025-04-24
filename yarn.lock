@@ -13392,6 +13392,7 @@ __metadata:
     lucide-react: "npm:^0.475.0"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
+    react-error-boundary: "npm:^4.0.11"
     react-responsive: "npm:^9.0.2"
     react-router-dom: "npm:^6.16.0"
     turbo: "npm:^1.11.2"
