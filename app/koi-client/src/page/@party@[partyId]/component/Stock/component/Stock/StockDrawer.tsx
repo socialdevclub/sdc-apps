@@ -130,12 +130,28 @@ const StockDrawer = ({
 
   const averagePurchasePrice = useMemo(
     () =>
-      (currentStockStorage?.stockCountHistory.reduce((acc, count, currentIdx) => {
-        if (Math.min(timeIdx ?? 0, StockConfig.MAX_STOCK_IDX) < currentIdx) {
-          return acc;
-        }
-        return acc + count * (stock?.companies[selectedCompany][currentIdx]?.가격 ?? 0);
-      }, 0) ?? 0) / (currentStockStorage?.stockCountCurrent ?? 1),
+      (currentStockStorage?.stockCountHistory.reduce(
+        (acc, count, currentIdx) => {
+          if (Math.min(timeIdx ?? 0, StockConfig.MAX_STOCK_IDX) < currentIdx) {
+            return acc;
+          }
+
+          const newCount = acc.count + count;
+
+          if (newCount === 0) {
+            return {
+              count: 0,
+              price: 0,
+            };
+          }
+
+          return {
+            count: newCount,
+            price: acc.price + count * (stock?.companies[selectedCompany][currentIdx]?.가격 ?? 0),
+          };
+        },
+        { count: 0, price: 0 },
+      ).price ?? 0) / (currentStockStorage?.stockCountCurrent ?? 1),
     [
       currentStockStorage?.stockCountCurrent,
       currentStockStorage?.stockCountHistory,
