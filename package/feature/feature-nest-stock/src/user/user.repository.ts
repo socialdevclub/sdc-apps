@@ -10,6 +10,7 @@ import mongoose, {
 } from 'mongoose';
 import { CountOptions, DeleteOptions, UpdateOptions } from 'mongodb';
 import { StockConfig } from 'shared~config';
+import { StockStorageSchema } from 'shared~type-stock';
 import { StockUser, UserDocument } from './user.schema';
 
 @Injectable()
@@ -106,20 +107,20 @@ export class UserRepository {
   ): Promise<boolean> {
     try {
       const companies = StockConfig.getRandomCompanyNames();
-      const companyStorage = companies.reduce((acc, company) => {
-        acc[company] = {
-          count: 0,
-          history: new Array(StockConfig.MAX_STOCK_IDX + 1).fill(0),
-        };
-        return acc;
-      }, {});
+      const stockStorage = companies.map((company) => {
+        return {
+          companyName: company,
+          stockCountCurrent: 0,
+          stockCountHistory: new Array(StockConfig.MAX_STOCK_IDX + 1).fill(0),
+        } as StockStorageSchema;
+      });
       return !!(await this.userModel.updateMany(
         { stockId },
         {
           $set: {
-            companyStorage,
             lastActivityTime: new Date(),
             money: StockConfig.INIT_USER_MONEY,
+            stockStorage,
           },
         },
         options,

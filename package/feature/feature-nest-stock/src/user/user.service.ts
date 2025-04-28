@@ -7,7 +7,6 @@ import { InjectConnection } from '@nestjs/mongoose';
 import { getDateDistance } from '@toss/date';
 import { StockConfig } from 'shared~config';
 import { OpenAI } from 'openai';
-import { objectEntries } from '@toss/utils';
 import { StockUser, UserDocument } from './user.schema';
 import { UserRepository } from './user.repository';
 import { StockRepository } from '../stock.repository';
@@ -276,10 +275,10 @@ ${JSON.stringify(userData)}`;
         StockConfig.MAX_STOCK_IDX,
       );
 
-      const allCompaniesPrice = objectEntries(user.companyStorage).reduce((acc, [company, { count }]) => {
-        const companyInfo = companies.get(company);
+      const allCompaniesPrice = user.stockStorages.reduce((acc, { companyName, stockCountCurrent }) => {
+        const companyInfo = companies.get(companyName);
         const price = companyInfo[idx]?.가격;
-        return acc + price * count;
+        return acc + price * stockCountCurrent;
       }, 0);
 
       const estimatedAllMoney = allCompaniesPrice + user.money;

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
 import type { CompanyInfo, Request, Response, StockPhase } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
-import { ceilToUnit, objectEntries } from '@toss/utils';
+import { ceilToUnit } from '@toss/utils';
 import type { ProjectionType, QueryOptions } from 'mongoose';
 import mongoose from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
@@ -302,14 +302,17 @@ export class StockService {
             9,
           );
 
-          objectEntries(user.companyStorage).forEach(([company, { count }]) => {
-            const companyPrice = companies.get(company)[idx]?.가격;
-            const totalPrice = companyPrice * count;
+          user.stockStorages.forEach((stockStorage) => {
+            const companyPrice = companies.get(stockStorage.companyName)[idx]?.가격;
+            const totalPrice = companyPrice * stockStorage.stockCountCurrent;
 
             user.money += totalPrice;
-            remainingStocks.set(company, remainingStocks.get(company) + count);
-            user.companyStorage[company].history[idx] -= count;
-            user.companyStorage[company].count = 0;
+            remainingStocks.set(
+              stockStorage.companyName,
+              remainingStocks.get(stockStorage.companyName) + stockStorage.stockCountCurrent,
+            );
+            stockStorage.stockCountHistory[idx] -= stockStorage.stockCountCurrent;
+            stockStorage.stockCountCurrent = 0;
           });
 
           const loanMoney = user.loanCount * StockConfig.SETTLE_LOAN_PRICE;

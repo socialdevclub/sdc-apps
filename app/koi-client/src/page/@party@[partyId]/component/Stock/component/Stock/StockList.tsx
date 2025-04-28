@@ -35,13 +35,15 @@ const StockList = ({ stockId }: Props) => {
   }, [stock?.companies]);
 
   const 보유주식 = useMemo(() => {
-    return objectEntries(user?.companyStorage ?? {})
-      .filter(([, { count }]) => count > 0)
-      .map(([company, { count }]) => ({
-        company,
-        count,
-      }));
-  }, [user?.companyStorage]);
+    return (
+      user?.stockStorages
+        .filter(({ stockCountCurrent }) => stockCountCurrent > 0)
+        .map(({ companyName, stockCountCurrent }) => ({
+          company: companyName,
+          count: stockCountCurrent,
+        })) ?? []
+    );
+  }, [user?.stockStorages]);
 
   const 미보유주식 = useMemo(() => {
     return objectValues(COMPANY_NAMES).filter((company) => !보유주식.some(({ company: c }) => c === company));

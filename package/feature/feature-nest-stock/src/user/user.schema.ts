@@ -1,7 +1,25 @@
-import { StockUserForm, StockUserRequired, StockUserSchema, StockUserInfoSchema } from 'shared~type-stock';
+import {
+  StockUserForm,
+  StockUserRequired,
+  StockUserSchema,
+  StockUserInfoSchema,
+  StockStorageSchema,
+} from 'shared~type-stock';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { StockConfig } from 'shared~config';
+
+@Schema()
+export class StockUserStorage implements StockStorageSchema {
+  @Prop()
+  companyName: string;
+
+  @Prop()
+  stockCountCurrent: number;
+
+  @Prop()
+  stockCountHistory: number[];
+}
 
 @Schema({ _id: false })
 export class StockUserInfo implements StockUserInfoSchema {
@@ -38,8 +56,8 @@ export class StockUser implements StockUserSchema {
   @Prop({ default: 0 })
   loanCount: number;
 
-  @Prop({ type: SchemaTypes.Mixed })
-  companyStorage: StockUserSchema['companyStorage'];
+  @Prop({ type: [StockUserStorage] })
+  stockStorages: StockStorageSchema[];
 
   constructor(required: Pick<StockUserSchema, StockUserRequired>, partial: StockUserForm) {
     this.userId = required.userId;
@@ -50,7 +68,17 @@ export class StockUser implements StockUserSchema {
     this.money = partial.money ?? StockConfig.INIT_USER_MONEY;
     this.lastActivityTime = new Date();
     this.loanCount = partial.loanCount ?? 0;
-    this.companyStorage = partial.companyStorage ?? {};
+
+    const companies = StockConfig.getRandomCompanyNames();
+    const stockStorages = companies.map((company) => {
+      return {
+        companyName: company,
+        stockCountCurrent: 0,
+        stockCountHistory: new Array(StockConfig.MAX_STOCK_IDX + 1).fill(0),
+      } as StockStorageSchema;
+    });
+
+    this.stockStorages = partial.stockStorages ?? stockStorages;
   }
 }
 

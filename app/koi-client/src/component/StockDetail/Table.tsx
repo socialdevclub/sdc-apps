@@ -177,7 +177,12 @@ const Table = ({ elapsedTime, pov, stockId }: Props) => {
                   <StyledTr key={user.userId} isAlternate={index % 2 === 1}>
                     <StyledTd>{profiles?.data?.find((v) => v.id === user.userId)?.username}</StyledTd>
                     {companyNames.map((company) => {
-                      return <StyledTd key={company}>{user.companyStorage[company]?.count || ''}</StyledTd>;
+                      return (
+                        <StyledTd key={company}>
+                          {user.stockStorages.find(({ companyName }) => companyName === company)?.stockCountCurrent ||
+                            ''}
+                        </StyledTd>
+                      );
                     })}
                   </StyledTr>
                 );

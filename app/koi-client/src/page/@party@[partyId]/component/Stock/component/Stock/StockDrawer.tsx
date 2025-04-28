@@ -6,7 +6,6 @@ import { isStockOverLimit } from 'shared~config/dist/stock';
 import { ImpressionArea } from '@toss/impression-area';
 import { MessageInstance } from 'antd/es/message/interface';
 import { StockConfig } from 'shared~config';
-import { objectEntries } from '@toss/utils';
 import { MEDIA_QUERY } from '../../../../../../config/common';
 import InfoHeader from '../../../../../../component-presentation/InfoHeader';
 import {
@@ -119,24 +118,26 @@ const StockDrawer = ({
   const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
 
   const 보유주식 = useMemo(() => {
-    return objectEntries(user?.companyStorage ?? {})
-      .filter(([, { count }]) => count > 0)
-      .map(([company, { count }]) => ({
-        company,
-        count,
-      }));
-  }, [user?.companyStorage]);
+    return (
+      user?.stockStorages
+        .filter(({ stockCountCurrent }) => stockCountCurrent > 0)
+        .map(({ companyName, stockCountCurrent }) => ({
+          company: companyName,
+          count: stockCountCurrent,
+        })) ?? []
+    );
+  }, [user?.stockStorages]);
 
   const prevAveragePurchasePrice = useRef<number>();
   const averagePurchasePrice = useMemo(() => {
     return calculateAveragePurchasePrice({
       company: selectedCompany,
-      currentQuantity: user?.companyStorage[selectedCompany]?.count ?? 0,
+      currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
       logs,
       prevData: prevAveragePurchasePrice.current,
       round: stock?.round,
     });
-  }, [logs, selectedCompany, stock?.round, user?.companyStorage]);
+  }, [logs, selectedCompany, stock?.round, 보유주식]);
 
   if (averagePurchasePrice !== prevAveragePurchasePrice.current) {
     prevAveragePurchasePrice.current = averagePurchasePrice;
@@ -243,11 +244,11 @@ const StockDrawer = ({
     >
       <InfoHeader
         title={selectedCompany.slice(0, 4)}
-        subtitle={`보유 주식: ${user.companyStorage[selectedCompany]?.count ?? 0}`}
+        subtitle={`보유 주식: ${보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0}`}
         subTitleColor={
           isStockOverLimit(
             userCount?.count ?? Number.NEGATIVE_INFINITY,
-            user.companyStorage[selectedCompany]?.count ?? 0,
+            보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
             1,
           ) || !isRemainingStock
             ? 'red'
@@ -278,7 +279,7 @@ const StockDrawer = ({
               !isCanBuy ||
               isStockOverLimit(
                 userCount?.count ?? Number.NEGATIVE_INFINITY,
-                user.companyStorage[selectedCompany]?.count ?? 0,
+                보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
                 1,
               ),
             flex: 1,
@@ -287,7 +288,7 @@ const StockDrawer = ({
           },
           {
             backgroundColor: '#f63c6b',
-            disabled: isDisabled || !user.companyStorage[selectedCompany]?.count,
+            disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
             flex: 1,
             onClick: () => onClickSell(selectedCompany),
             text: '팔기',
@@ -300,8 +301,9 @@ const StockDrawer = ({
         buttons={[
           {
             backgroundColor: '#374151',
-            disabled: isDisabled || !user.companyStorage[selectedCompany]?.count,
-            onClick: () => onClickSell(selectedCompany, user.companyStorage[selectedCompany]?.count),
+            disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
+            onClick: () =>
+              onClickSell(selectedCompany, 보유주식.find(({ company }) => company === selectedCompany)?.count),
             text: '모두 팔기',
           },
         ]}
