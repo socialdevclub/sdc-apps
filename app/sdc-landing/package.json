@@ -3,28 +3,45 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "turbo:dev": "turbo run dev",
+    "turbo:build": "turbo run build"
   },
   "dependencies": {
+    "@auth/core": "^0.38.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@stitches/core": "^1.2.8",
+    "@supabase/auth-ui-shared": "^0.1.8",
+    "@supabase/supabase-js": "^2.49.1",
+    "@tanstack/react-query": "^4.35.3",
+    "jotai": "^2.12.2",
+    "lib-react-query": "workspace:*",
+    "lucide-react": "^0.475.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-error-boundary": "^4.0.11",
+    "react-responsive": "^9.0.2",
+    "react-router-dom": "^6.16.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@types/node": "^22.13.10",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
+    "discord-api-types": "^0.37.119",
     "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
+    "turbo": "^1.11.2",
     "typescript": "^5.1.3",
     "typescript-eslint": "^8.18.2",
-    "vite": "^6.0.11"
+    "vite": "^6.0.11",
+    "vite-plugin-commonjs": "^0.9.0"
   }
 }

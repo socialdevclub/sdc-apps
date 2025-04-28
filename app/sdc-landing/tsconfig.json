@@ -1,14 +1,21 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
+  "extends": "../../__config__/tsconfig.common.react.json",
   "compilerOptions": {
-    "baseUrl": "src",
-    "paths": {
-      "@pages/*": ["pages/*"],
-      "@assets/*": ["assets/*"]
-    }
+    "baseUrl": ".",
+    "jsxImportSource": "@emotion/react"
   }
 }
+// {
+//   "files": [],
+//   "references": [
+//     { "path": "./tsconfig.app.json" },
+//     { "path": "./tsconfig.node.json" }
+//   ],
+//   "compilerOptions": {
+//     "baseUrl": "src",
+//     "paths": {
+//       "@pages/*": ["pages/*"],
+//       "@assets/*": ["assets/*"]
+//     }
+//   }
+// }
