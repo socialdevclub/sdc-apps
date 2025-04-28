@@ -8,12 +8,7 @@ import { MessageInstance } from 'antd/es/message/interface';
 import { StockConfig } from 'shared~config';
 import { MEDIA_QUERY } from '../../../../../../config/common';
 import InfoHeader from '../../../../../../component-presentation/InfoHeader';
-import {
-  calculateAveragePurchasePrice,
-  calculateProfitRate,
-  getAnimalImageSource,
-  renderProfitBadge,
-} from '../../../../../../utils/stock';
+import { calculateProfitRate, getAnimalImageSource, renderProfitBadge } from '../../../../../../utils/stock';
 import MessageBalloon from '../../../../../../component-presentation/MessageBalloon';
 import StockLineChart from '../../../../../../component-presentation/StockLineChart';
 import ButtonGroup from '../../../../../../component-presentation/ButtonGroup';
@@ -128,20 +123,27 @@ const StockDrawer = ({
     );
   }, [user?.stockStorages]);
 
-  const prevAveragePurchasePrice = useRef<number>();
-  const averagePurchasePrice = useMemo(() => {
-    return calculateAveragePurchasePrice({
-      company: selectedCompany,
-      currentQuantity: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-      logs,
-      prevData: prevAveragePurchasePrice.current,
-      round: stock?.round,
-    });
-  }, [logs, selectedCompany, stock?.round, 보유주식]);
+  const currentStockStorage = useMemo(
+    () => user?.stockStorages.find(({ companyName }) => companyName === selectedCompany),
+    [selectedCompany, user?.stockStorages],
+  );
 
-  if (averagePurchasePrice !== prevAveragePurchasePrice.current) {
-    prevAveragePurchasePrice.current = averagePurchasePrice;
-  }
+  const averagePurchasePrice = useMemo(
+    () =>
+      (currentStockStorage?.stockCountHistory.reduce((acc, count, currentIdx) => {
+        if (Math.min(timeIdx ?? 0, StockConfig.MAX_STOCK_IDX) < currentIdx) {
+          return acc;
+        }
+        return acc + count * (stock?.companies[selectedCompany][currentIdx]?.가격 ?? 0);
+      }, 0) ?? 0) / (currentStockStorage?.stockCountCurrent ?? 1),
+    [
+      currentStockStorage?.stockCountCurrent,
+      currentStockStorage?.stockCountHistory,
+      selectedCompany,
+      stock?.companies,
+      timeIdx,
+    ],
+  );
 
   const stockProfitRate = useMemo(
     () =>
