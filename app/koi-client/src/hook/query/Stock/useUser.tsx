@@ -1,5 +1,6 @@
 import { getDateDistance } from '@toss/date';
 import dayjs from 'dayjs';
+import { useCallback } from 'react';
 import { Query } from '../..';
 
 interface Props {
@@ -25,14 +26,22 @@ const useUser = ({ stockId, userId, userRefetchInterval, stockRefetchInterval }:
     refetchUser();
   };
 
+  const getStockStorage = useCallback(
+    (company: string) => {
+      return user?.stockStorages.find((storage) => storage.companyName === company);
+    },
+    [user?.stockStorages],
+  );
+
   if (!user) {
-    return { refetch, user: undefined };
+    return { getStockStorage, refetch, user: undefined };
   }
 
   const { minutes, seconds } = getDateDistance(dayjs(user.lastActivityTime).toDate(), new Date());
   const isFreezed = minutes === 0 && seconds < (stock?.transactionInterval ?? 5);
 
   return {
+    getStockStorage,
     isFreezed,
     refetch,
     user,

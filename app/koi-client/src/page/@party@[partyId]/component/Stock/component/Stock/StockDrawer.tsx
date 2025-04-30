@@ -1,9 +1,8 @@
 import { Drawer } from 'antd';
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useAtomValue } from 'jotai';
 import { isStockOverLimit } from 'shared~config/dist/stock';
-import { ImpressionArea } from '@toss/impression-area';
 import { MessageInstance } from 'antd/es/message/interface';
 import { StockConfig } from 'shared~config';
 import { MEDIA_QUERY } from '../../../../../../config/common';
@@ -38,9 +37,10 @@ const StockDrawer = ({
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { isFreezed, user, refetch } = Query.Stock.useUser({
+  const { isFreezed, user, getStockStorage } = Query.Stock.useUser({
     stockId,
     userId,
+    userRefetchInterval: 500,
   });
   const {
     data: stock,
@@ -49,65 +49,31 @@ const StockDrawer = ({
   } = Query.Stock.useQueryStock(stockId, { refetchInterval: Number.POSITIVE_INFINITY });
   const { data: userCount } = Query.Stock.useUserCount({ stockId });
 
-  const [isVisible, setIsVisible] = useState(() => Boolean(selectedCompany));
-  const prevIsVisibleRef = useRef(isVisible);
+  const stockCountCurrent = getStockStorage(selectedCompany)?.stockCountCurrent;
+  const prevStockCountCurrent = useRef<number | undefined>(stockCountCurrent);
 
-  const { data: logs } = Query.Stock.useQueryLog(
-    { company: selectedCompany, round: stock?.round, stockId, userId },
-    {
-      enabled: isVisible,
-    },
-  );
-
-  // logs 변화를 감지하여 메시지 표시
-  const prevLogsRef = useRef<Record<string, typeof logs>>({});
-
-  if (isVisible !== prevIsVisibleRef.current) {
-    if (isVisible) {
-      prevLogsRef.current[selectedCompany] = logs;
-    }
-    prevIsVisibleRef.current = isVisible;
-  }
-
-  useEffect(() => {
-    if (!logs || logs.length === 0) return;
-
-    // 이전 로그와 현재 로그의 길이를 비교하여 새로운 로그가 추가되었는지 확인
-    if (prevLogsRef.current && logs.length > prevLogsRef.current[selectedCompany]?.length) {
-      refetch();
-
-      // 가장 최근 로그 확인
-      const latestLog = logs[logs.length - 1];
-
-      if (latestLog) {
-        if (latestLog.failedReason) {
-          messageApi.destroy();
-          messageApi.open({
-            content: latestLog.failedReason,
-            duration: 2,
-            type: 'error',
-          });
-        } else if (latestLog.action === 'BUY') {
-          messageApi.destroy();
-          messageApi.open({
-            content: `주식을 구매하였습니다.`,
-            duration: 2,
-            type: 'success',
-          });
-        } else if (latestLog.action === 'SELL') {
-          messageApi.destroy();
-          messageApi.open({
-            content: `주식을 ${latestLog.quantity}주 판매하였습니다.`,
-            duration: 2,
-            type: 'success',
-          });
-        }
+  if (prevStockCountCurrent.current !== stockCountCurrent && typeof stockCountCurrent === 'number') {
+    if (typeof prevStockCountCurrent.current !== 'number') {
+      prevStockCountCurrent.current = stockCountCurrent;
+    } else {
+      if (stockCountCurrent > prevStockCountCurrent.current) {
+        messageApi.destroy();
+        messageApi.open({
+          content: `주식을 ${stockCountCurrent - prevStockCountCurrent.current}주 구매하였습니다.`,
+          duration: 2,
+          type: 'success',
+        });
+      } else if (stockCountCurrent < prevStockCountCurrent.current) {
+        messageApi.destroy();
+        messageApi.open({
+          content: `주식을 ${prevStockCountCurrent.current - stockCountCurrent}주 판매하였습니다.`,
+          duration: 2,
+          type: 'success',
+        });
       }
+      prevStockCountCurrent.current = stockCountCurrent;
     }
-
-    // 현재 로그를 저장
-    prevLogsRef.current[selectedCompany] = logs;
-  }, [logs, messageApi, refetch, selectedCompany]);
+  }
 
   const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
   const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
@@ -262,7 +228,7 @@ const StockDrawer = ({
     >
       <InfoHeader
         title={selectedCompany.slice(0, 4)}
-        subtitle={`보유 주식: ${보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0}`}
+        subtitle={`보유 주식: ${getStockStorage(selectedCompany)?.stockCountCurrent ?? 0}`}
         subTitleColor={
           isStockOverLimit(
             userCount?.count ?? Number.NEGATIVE_INFINITY,
@@ -280,14 +246,12 @@ const StockDrawer = ({
         width={50}
       />
       <MessageBalloon messages={stockMessages} />
-      <ImpressionArea onImpressionStart={() => setIsVisible(true)} onImpressionEnd={() => setIsVisible(false)}>
-        <StockLineChart
-          company={selectedCompany}
-          priceData={chartPriceData}
-          fluctuationsInterval={stock.fluctuationsInterval}
-          averagePurchasePrice={averagePurchasePrice}
-        />
-      </ImpressionArea>
+      <StockLineChart
+        company={selectedCompany}
+        priceData={chartPriceData}
+        fluctuationsInterval={stock.fluctuationsInterval}
+        averagePurchasePrice={averagePurchasePrice}
+      />
       <ButtonGroup
         buttons={[
           {
