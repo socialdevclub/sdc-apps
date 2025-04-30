@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import { objectEntries, objectValues } from '@toss/utils';
-import { message } from 'antd';
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
 import { COMPANY_NAMES } from 'shared~config/dist/stock';
+import { MessageInstance } from 'antd/es/message/interface';
 import StockCard from '../../../../../../component-presentation/StockCard';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
@@ -12,16 +12,15 @@ import StockDrawer from './StockDrawer';
 
 interface Props {
   stockId: string;
+  messageApi: MessageInstance;
 }
 
-const StockList = ({ stockId }: Props) => {
+const StockList = ({ stockId, messageApi }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
-  const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
-
-  const [messageApi, contextHolder] = message.useMessage();
+  const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId);
+  const { user } = Query.Stock.useUser({ stockId, userId });
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState('');
@@ -84,7 +83,6 @@ const StockList = ({ stockId }: Props) => {
 
   return (
     <>
-      {contextHolder}
       <StockItems
         보유주식={보유주식}
         미보유주식={미보유주식}
