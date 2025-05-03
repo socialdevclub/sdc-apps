@@ -107,7 +107,7 @@ export class UserRepository {
   ): Promise<boolean> {
     try {
       const companies = StockConfig.getRandomCompanyNames();
-      const stockStorage = companies.map((company) => {
+      const stockStorages = companies.map((company) => {
         return {
           companyName: company,
           stockCountCurrent: 0,
@@ -120,7 +120,7 @@ export class UserRepository {
           $set: {
             lastActivityTime: new Date(),
             money: StockConfig.INIT_USER_MONEY,
-            stockStorage,
+            stockStorages,
           },
         },
         options,
