@@ -1,9 +1,9 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { commaizeNumber, objectEntries } from '@toss/utils';
-import { message } from 'antd';
 import { useAtomValue } from 'jotai';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { MessageInstance } from 'antd/es/message/interface';
 import InfoBox from '../../../../../../component-presentation/InfoBox';
 import { colorDown, colorUp } from '../../../../../../config/color';
 import { Query } from '../../../../../../hook';
@@ -15,16 +15,15 @@ import StockDrawer from './StockDrawer';
 
 interface Props {
   stockId: string;
+  messageApi: MessageInstance;
 }
 
-const Information = ({ stockId }: Props) => {
+const Information = ({ stockId, messageApi }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
-  const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
-
-  const [messageApi, contextHolder] = message.useMessage();
+  const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId);
+  const { user } = Query.Stock.useUser({ stockId, userId });
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState('');
@@ -76,7 +75,6 @@ const Information = ({ stockId }: Props) => {
 
   return (
     <>
-      {contextHolder}
       <InformationItems stockId={stockId} onClick={handleOpenDrawer} myInfos={myInfos} />
       <StockDrawer
         drawerOpen={drawerOpen}

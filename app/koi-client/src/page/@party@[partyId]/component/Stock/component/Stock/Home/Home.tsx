@@ -1,7 +1,7 @@
 import { objectEntries } from '@toss/utils';
-import { message } from 'antd';
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
+import { MessageInstance } from 'antd/es/message/interface';
 import { Query } from '../../../../../../../hook';
 import { UserStore } from '../../../../../../../store';
 import { getStockMessages } from '../../../../../../../utils/stock';
@@ -15,9 +15,10 @@ import StockDrawer from '../StockDrawer';
 
 interface Props {
   stockId: string;
+  messageApi: MessageInstance;
 }
 
-const Home = ({ stockId }: Props) => {
+const Home = ({ stockId, messageApi }: Props) => {
   // 공통 훅 사용으로 데이터 로직 분리
   const { stock, users, user, allUserSellPriceDesc, gameTimeInMinutes, myInfos, futureInfos, allProfitDesc, userId } =
     useStockInfo(stockId);
@@ -51,6 +52,7 @@ const Home = ({ stockId }: Props) => {
         futureInfos={futureInfos}
         gameTimeInMinutes={gameTimeInMinutes}
         myInfos={myInfos}
+        messageApi={messageApi}
       />
       <StickyBottom>
         <StartLoan stockId={stockId} money={user.money} loanCount={user.loanCount} allSellPrice={myAllSellPrice} />
@@ -66,16 +68,15 @@ interface StockInfoListProps {
   futureInfos: Array<{ company: string; price: number; timeIdx: number }>;
   gameTimeInMinutes: number;
   myInfos: Array<{ company: string; price: number; timeIdx: number }>;
+  messageApi: MessageInstance;
 }
 
-const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos }: StockInfoListProps) => {
+const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos, messageApi }: StockInfoListProps) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: stock, companiesPrice, timeIdx } = Query.Stock.useQueryStock(stockId);
-  const { isFreezed, user } = Query.Stock.useUser({ stockId, userId });
-
-  const [messageApi, contextHolder] = message.useMessage();
+  const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId);
+  const { user } = Query.Stock.useUser({ stockId, userId });
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState('');
@@ -127,7 +128,6 @@ const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos }: Sto
 
   return (
     <>
-      {contextHolder}
       <Wrapper>
         {/* 미래 정보 섹션 컴포넌트 */}
         <FutureInfoSection

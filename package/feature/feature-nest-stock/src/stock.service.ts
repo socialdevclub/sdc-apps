@@ -294,7 +294,6 @@ export class StockService {
         }
 
         for await (const user of users) {
-          const inventory = user.inventory as unknown as Map<string, number>;
           const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
           const remainingStocks = stock.remainingStocks as unknown as Map<string, number>;
 
@@ -302,13 +301,18 @@ export class StockService {
             Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
             9,
           );
-          inventory.forEach((amount, company) => {
-            const companyPrice = companies.get(company)[idx]?.가격;
-            const totalPrice = companyPrice * amount;
+
+          user.stockStorages.forEach((stockStorage) => {
+            const companyPrice = companies.get(stockStorage.companyName)[idx]?.가격;
+            const totalPrice = companyPrice * stockStorage.stockCountCurrent;
 
             user.money += totalPrice;
-            remainingStocks.set(company, remainingStocks.get(company) + amount);
-            inventory.set(company, 0);
+            remainingStocks.set(
+              stockStorage.companyName,
+              remainingStocks.get(stockStorage.companyName) + stockStorage.stockCountCurrent,
+            );
+            stockStorage.stockCountHistory[idx] -= stockStorage.stockCountCurrent;
+            stockStorage.stockCountCurrent = 0;
           });
 
           const loanMoney = user.loanCount * StockConfig.SETTLE_LOAN_PRICE;

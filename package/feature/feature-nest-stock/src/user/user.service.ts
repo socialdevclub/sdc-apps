@@ -272,15 +272,13 @@ ${JSON.stringify(userData)}`;
 
       const idx = Math.min(
         Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
-        9,
+        StockConfig.MAX_STOCK_IDX,
       );
 
-      const inventory = user.inventory as unknown as Map<string, number>;
-
-      const allCompaniesPrice = Array.from(inventory.entries()).reduce((acc, [name, amount]) => {
-        const companyInfo = companies.get(name);
+      const allCompaniesPrice = user.stockStorages.reduce((acc, { companyName, stockCountCurrent }) => {
+        const companyInfo = companies.get(companyName);
         const price = companyInfo[idx]?.가격;
-        return acc + price * amount;
+        return acc + price * stockCountCurrent;
       }, 0);
 
       const estimatedAllMoney = allCompaniesPrice + user.money;

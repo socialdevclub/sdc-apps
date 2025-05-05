@@ -51,16 +51,9 @@ export class UserController {
 
   @Post('/register')
   async registerUser(@Body() body: StockUser): Promise<Response.GetCreateUser> {
-    return this.httpService.axiosRef
-      .post<Response.GetCreateUser>('https://api.socialdev.club/queue/stock/user/register', body)
-      .then((res) => {
-        return res.data;
-      })
-      .catch(async (error) => {
-        console.error(error);
-        await this.userRepository.create(body);
-        return { messageId: 'direct' };
-      });
+    console.log('🚀 ~ UserController ~ registerUser ~ body:', body);
+    await this.userRepository.create(body);
+    return { messageId: 'direct' };
   }
 
   @Post('/align-index')

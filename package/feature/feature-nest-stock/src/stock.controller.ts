@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Patch, Post, Query } from '@nestjs/common';
 import type { Request, Response, StockSchema } from 'shared~type-stock';
 import { HttpService } from '@nestjs/axios';
 import type { Stock } from './stock.schema';
@@ -25,6 +25,10 @@ export class StockController {
   @Get()
   async getStock(@Query('stockId') stockId: string): Promise<Response.GetStock> {
     const stock = await this.stockService.findOneById(stockId);
+    if (!stock) {
+      throw new HttpException('Stock not found', HttpStatus.NOT_FOUND);
+    }
+
     return this.stockService.transStockToDto(stock);
   }
 

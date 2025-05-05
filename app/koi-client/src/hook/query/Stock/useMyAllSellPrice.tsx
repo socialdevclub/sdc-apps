@@ -1,4 +1,3 @@
-import { objectEntries } from '@toss/utils';
 import { useMemo } from 'react';
 import { Query } from '../..';
 
@@ -19,8 +18,8 @@ const useMyAllSellPrice = ({ stockId, userId }: Props) => {
       return 0;
     }
 
-    return objectEntries(user.inventory).reduce((price, [company, count]) => {
-      return price + companiesPrice[company] * count;
+    return user.stockStorages.reduce((acc, { companyName, stockCountCurrent }) => {
+      return acc + companiesPrice[companyName] * stockCountCurrent;
     }, 0);
   }, [companiesPrice, user]);
 
