@@ -25,8 +25,8 @@ export class StockProcessor {
     try {
       await session.withTransaction(async () => {
         const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const user = await this.userRepository.findOne({ stockId, userId }, undefined, { session });
-        const playerCount = await this.userRepository.countDocuments({ stockId }, { session });
+        const user = stock.users.find((user) => user.userId === userId);
+        const playerCount = stock.users.length;
 
         if (stock.round !== body.round) {
           throw new Error('주식 라운드가 변경되었습니다. 다시 시도해주세요');
@@ -94,29 +94,20 @@ export class StockProcessor {
           default:
         }
 
-        await this.userRepository.updateOne(
-          { _id: user._id },
-          {
-            $set: {
-              lastActivityTime: user.lastActivityTime,
-              money: user.money,
-              [`stockStorages.$[elem]`]: stockStorage,
-            },
-          },
-          {
-            arrayFilters: [{ 'elem.companyName': company }],
-            session,
-          },
-        );
-
         await this.stockRepository.updateOne(
           { _id: stockId },
           {
             $set: {
               remainingStocks: stock.remainingStocks,
+              [`users.$[userElem].lastActivityTime`]: user.lastActivityTime,
+              [`users.$[userElem].money`]: user.money,
+              [`users.$[userElem].stockStorages.$[stockElem]`]: stockStorage,
             },
           },
-          { session },
+          {
+            arrayFilters: [{ 'userElem.userId': userId }, { 'stockElem.companyName': company }],
+            session,
+          },
         );
 
         await this.logService.updateOne(
@@ -149,7 +140,7 @@ export class StockProcessor {
     try {
       await session.withTransaction(async () => {
         const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const user = await this.userRepository.findOne({ stockId, userId }, undefined, { session });
+        const user = stock.users.find((user) => user.userId === userId);
 
         if (stock.round !== body.round) {
           throw new Error('주식 라운드가 변경되었습니다. 다시 시도해주세요');
@@ -220,29 +211,20 @@ export class StockProcessor {
           default:
         }
 
-        await this.userRepository.updateOne(
-          { _id: user._id },
-          {
-            $set: {
-              lastActivityTime: user.lastActivityTime,
-              money: user.money,
-              [`stockStorages.$[elem]`]: stockStorage,
-            },
-          },
-          {
-            arrayFilters: [{ 'elem.companyName': company }],
-            session,
-          },
-        );
-
         await this.stockRepository.updateOne(
           { _id: stockId },
           {
             $set: {
               remainingStocks: stock.remainingStocks,
+              [`users.$[userElem].lastActivityTime`]: user.lastActivityTime,
+              [`users.$[userElem].money`]: user.money,
+              [`users.$[userElem].stockStorages.$[stockElem]`]: stockStorage,
             },
           },
-          { session },
+          {
+            arrayFilters: [{ 'userElem.userId': userId }, { 'stockElem.companyName': company }],
+            session,
+          },
         );
 
         await this.logService.updateOne(
@@ -257,7 +239,7 @@ export class StockProcessor {
         { queueId: attributes?.queueMessageId },
         { failedReason: error instanceof Error ? error.message : `${error}`, status: 'FAILED' },
       );
-      return;
+      throw error;
     } finally {
       await session.endSession();
       this.logService.deleteOldStatusLogs().catch(console.error);

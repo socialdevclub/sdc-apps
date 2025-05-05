@@ -191,7 +191,7 @@ export class StockService {
     try {
       await session.withTransaction(async () => {
         const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const user = await this.userRepository.findOne({ stockId, userId }, undefined, { session });
+        const user = await this.userRepository.findUser(stockId, userId);
 
         if (!stock.isTransaction) {
           throw new HttpException('지금은 거래할 수 없습니다', HttpStatus.CONFLICT);
@@ -260,9 +260,11 @@ export class StockService {
         user.money -= StockConfig.DEFAULT_DRAW_COST;
         user.lastActivityTime = new Date();
 
-        await user.save({
-          session,
-        });
+        // 해당 유저의 정보 업데이트
+        const userIndex = stock.users.findIndex((u) => u.userId === userId);
+        if (userIndex !== -1) {
+          stock.users[userIndex] = user;
+        }
 
         result = await stock.save({
           session,
@@ -287,13 +289,13 @@ export class StockService {
     try {
       await session.withTransaction(async () => {
         const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const users = await this.userRepository.find({ stockId }, undefined, { session });
+        const { users } = stock;
 
-        if (!users) {
+        if (!users || users.length === 0) {
           throw new Error('users not found');
         }
 
-        for await (const user of users) {
+        for (const user of users) {
           const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
           const remainingStocks = stock.remainingStocks as unknown as Map<string, number>;
 
@@ -318,9 +320,8 @@ export class StockService {
           const loanMoney = user.loanCount * StockConfig.SETTLE_LOAN_PRICE;
           user.money -= loanMoney;
           user.loanCount = 0;
-
-          await user.save({ session });
         }
+
         result = await stock.save({ session });
       });
     } catch (error) {
@@ -340,13 +341,13 @@ export class StockService {
     try {
       await session.withTransaction(async () => {
         const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const users = await this.userRepository.find({ stockId }, undefined, { session });
+        const { users } = stock;
 
-        if (!users) {
+        if (!users || users.length === 0) {
           throw new Error('users not found');
         }
 
-        for await (const user of users) {
+        for (const user of users) {
           await this.resultService.setResult(
             {
               money: user.money,

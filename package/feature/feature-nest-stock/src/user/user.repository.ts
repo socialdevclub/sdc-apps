@@ -1,38 +1,33 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import mongoose, {
-  FilterQuery,
-  Model,
-  MongooseQueryOptions,
-  ProjectionType,
-  QueryOptions,
-  UpdateQuery,
-} from 'mongoose';
-import { CountOptions, DeleteOptions, UpdateOptions } from 'mongodb';
+import mongoose, { FilterQuery, Model, UpdateQuery } from 'mongoose';
 import { StockConfig } from 'shared~config';
 import { StockStorageSchema } from 'shared~type-stock';
-import { StockUser, UserDocument } from './user.schema';
+import { StockUser } from './user.schema';
+import { Stock } from '../stock.schema';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectConnection() private readonly connection: mongoose.Connection,
-    @InjectModel(StockUser.name)
-    private readonly userModel: Model<StockUser>,
+    @InjectModel(Stock.name)
+    private readonly stockModel: Model<Stock>,
   ) {}
 
-  async create(user: StockUser): Promise<void> {
+  async addUserToStock(stockId: string, user: StockUser): Promise<void> {
     const session = await this.connection.startSession();
 
     try {
       await session.withTransaction(async () => {
-        const doc = await this.findOne({ stockId: user.stockId, userId: user.userId }, null, {
-          session,
-        });
-        if (!doc) {
+        const stock = await this.stockModel.findById(stockId).session(session);
+        if (!stock) {
+          throw new HttpException('Stock not found', 404);
+        }
+
+        const existingUser = stock.users.find((u) => u.userId === user.userId);
+        if (!existingUser) {
           const newStockUser = new StockUser(user, user);
-          const newDoc = new this.userModel(newStockUser);
-          await newDoc.save({ session });
+          await this.stockModel.updateOne({ _id: stockId }, { $push: { users: newStockUser } }, { session });
         }
       });
     } catch (err) {
@@ -43,68 +38,92 @@ export class UserRepository {
     }
   }
 
-  async count(filter: FilterQuery<StockUser>): Promise<number> {
-    return this.userModel.countDocuments(filter);
+  async countUsers(stockId: string, filter: FilterQuery<StockUser> = {}): Promise<number> {
+    const stock = await this.stockModel.findById(stockId);
+    if (!stock) return 0;
+
+    return stock.users.filter((user) => {
+      for (const key in filter) {
+        if (Object.prototype.hasOwnProperty.call(filter, key) && user[key] !== filter[key]) {
+          return false;
+        }
+      }
+      return true;
+    }).length;
   }
 
-  find(
-    filter?: FilterQuery<StockUser>,
-    projection?: ProjectionType<StockUser>,
-    options?: QueryOptions<StockUser>,
-  ): Promise<UserDocument[]> {
-    return this.userModel.find(filter, projection, { sort: { index: 1 }, ...options });
+  async findUsers(stockId: string): Promise<StockUser[]> {
+    const stock = await this.stockModel.findById(stockId);
+    if (!stock) return [];
+
+    let { users } = stock.toJSON();
+
+    // 정렬
+    users = users.sort((a, b) => a.index - b.index);
+
+    return users;
   }
 
-  findOne(
-    filter: FilterQuery<StockUser>,
-    projection?: ProjectionType<StockUser>,
-    options?: QueryOptions<StockUser>,
-  ): Promise<UserDocument> {
-    return this.userModel.findOne(filter, projection, options);
+  async findUser(stockId: string, userId: string): Promise<StockUser | null> {
+    const stock = await this.stockModel.findById(stockId);
+    if (!stock) throw new HttpException('Stock not found', 404);
+
+    return stock.toJSON().users.find((user) => user.userId === userId);
   }
 
-  findOneAndUpdate(
-    filter: FilterQuery<StockUser>,
-    update: UpdateQuery<StockUser>,
-    options?: QueryOptions<StockUser>,
-  ): Promise<UserDocument> {
-    return this.userModel.findOneAndUpdate(filter, update, { returnDocument: 'after', ...options });
+  async updateUser(stockId: string, userId: string, update: UpdateQuery<StockUser>): Promise<StockUser | null> {
+    const session = await this.connection.startSession();
+    let updatedUser = null;
+
+    try {
+      await session.withTransaction(async () => {
+        const stock = await this.stockModel.findById(stockId).session(session);
+        if (!stock) return;
+
+        const userIndex = stock.users.findIndex((user) => user.userId === userId);
+        if (userIndex === -1) return;
+
+        // 업데이트 적용
+        for (const key in update.$set) {
+          if (Object.prototype.hasOwnProperty.call(update.$set, key)) {
+            stock.users[userIndex][key] = update.$set[key];
+          }
+        }
+
+        await stock.save({ session });
+        updatedUser = stock.users[userIndex];
+      });
+    } catch (err) {
+      console.error(err);
+      throw new HttpException('Failed to update user', 500, { cause: err });
+    } finally {
+      await session.endSession();
+    }
+
+    return updatedUser;
   }
 
-  async deleteOne(
-    filter: FilterQuery<StockUser>,
-    options?: DeleteOptions & Omit<MongooseQueryOptions<StockUser>, 'lean' | 'timestamps'>,
-  ): Promise<boolean> {
-    return !!(await this.userModel.deleteOne(filter, options));
+  async removeUser(stockId: string, userId: string): Promise<boolean> {
+    try {
+      const result = await this.stockModel.updateOne({ _id: stockId }, { $pull: { users: { userId } } });
+      return result.modifiedCount > 0;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   }
 
-  async deleteMany(
-    filter: FilterQuery<StockUser>,
-    options?: DeleteOptions & Omit<MongooseQueryOptions<StockUser>, 'lean' | 'timestamps'>,
-  ): Promise<boolean> {
-    return !!(await this.userModel.deleteMany(filter, options));
+  async removeAllUsers(stockId: string): Promise<boolean> {
+    try {
+      const result = await this.stockModel.updateOne({ _id: stockId }, { $set: { users: [] } });
+      return result.modifiedCount > 0;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   }
 
-  async updateOne(
-    filter: FilterQuery<StockUser>,
-    update: UpdateQuery<StockUser>,
-    options?: UpdateOptions & Omit<MongooseQueryOptions<StockUser>, 'lean'>,
-  ): Promise<boolean> {
-    return !!(await this.userModel.updateOne(filter, update, options));
-  }
-
-  async updateMany(
-    filter: FilterQuery<StockUser>,
-    update: UpdateQuery<StockUser>,
-    options?: UpdateOptions & Omit<MongooseQueryOptions<StockUser>, 'lean'>,
-  ): Promise<boolean> {
-    return !!(await this.userModel.updateMany(filter, update, options));
-  }
-
-  async initializeUsers(
-    stockId: string,
-    options?: UpdateOptions & Omit<MongooseQueryOptions<StockUser>, 'lean'>,
-  ): Promise<boolean> {
+  async initializeUsers(stockId: string): Promise<boolean> {
     try {
       const companies = StockConfig.getRandomCompanyNames();
       const stockStorages = companies.map((company) => {
@@ -114,26 +133,20 @@ export class UserRepository {
           stockCountHistory: new Array(StockConfig.MAX_STOCK_IDX + 1).fill(0),
         } as StockStorageSchema;
       });
-      return !!(await this.userModel.updateMany(
-        { stockId },
+
+      const result = await this.stockModel.updateOne(
+        { _id: stockId },
         {
           $set: {
-            lastActivityTime: new Date(),
-            money: StockConfig.INIT_USER_MONEY,
-            stockStorages,
+            'users.$[].lastActivityTime': new Date(),
+            'users.$[].money': StockConfig.INIT_USER_MONEY,
+            'users.$[].stockStorages': stockStorages,
           },
         },
-        options,
-      ));
+      );
+      return result.modifiedCount > 0;
     } catch (e: unknown) {
       throw new Error(e as string);
     }
-  }
-
-  async countDocuments(
-    filter: FilterQuery<StockUser>,
-    options?: CountOptions & Omit<MongooseQueryOptions<StockUser>, 'lean' | 'timestamps'>,
-  ): Promise<number> {
-    return this.userModel.countDocuments(filter, options);
   }
 }

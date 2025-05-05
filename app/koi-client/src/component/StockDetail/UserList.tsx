@@ -48,7 +48,6 @@ const UserList: React.FC<UserListProps> = ({ stockId }) => {
 
             mutateRegisterUser({
               stockId,
-              stockStorages: [],
               userId: profileData.id,
               userInfo: {
                 gender: profileData.gender,
