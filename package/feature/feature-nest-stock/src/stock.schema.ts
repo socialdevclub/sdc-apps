@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { CompanyInfo, StockPhase, StockSchema } from 'shared~type-stock';
+import { StockUser } from './user/user.schema';
 
 @Schema()
 export class Stock implements StockSchema {
@@ -31,6 +32,9 @@ export class Stock implements StockSchema {
   @Prop()
   round: number;
 
+  @Prop({ type: [StockUser] })
+  users: StockUser[];
+
   constructor() {
     this.stockPhase = 'CROWDING';
     this.startedTime = new Date();
@@ -41,6 +45,7 @@ export class Stock implements StockSchema {
     this.transactionInterval = 0;
     this.fluctuationsInterval = 5;
     this.round = 0;
+    this.users = [];
   }
 }
 

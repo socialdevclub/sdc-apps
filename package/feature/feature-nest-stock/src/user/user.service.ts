@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import mongoose, { MongooseQueryOptions, ProjectionType } from 'mongoose';
+import mongoose, { MongooseQueryOptions } from 'mongoose';
 import { DeleteOptions, UpdateOptions } from 'mongodb';
 import { CompanyInfo, Response } from 'shared~type-stock';
 import dayjs from 'dayjs';
@@ -7,7 +7,7 @@ import { InjectConnection } from '@nestjs/mongoose';
 import { getDateDistance } from '@toss/date';
 import { StockConfig } from 'shared~config';
 import { OpenAI } from 'openai';
-import { StockUser, UserDocument } from './user.schema';
+import { StockUser } from './user.schema';
 import { UserRepository } from './user.repository';
 import { StockRepository } from '../stock.repository';
 
@@ -27,8 +27,8 @@ export class UserService {
     }
   }
 
-  transStockUserToDto(stockUser: UserDocument): Response.GetStockUser {
-    const user = { ...stockUser.toJSON({ versionKey: false }) } as Response.GetStockUser;
+  transStockUserToDto(stockUser: StockUser): Response.GetStockUser {
+    const user = { ...stockUser } as unknown as Response.GetStockUser;
 
     if (user.lastActivityTime) {
       user.lastActivityTime = dayjs(user.lastActivityTime).utcOffset('9').format('YYYY-MM-DDTHH:mm:ssZ');
@@ -37,17 +37,13 @@ export class UserService {
     return user;
   }
 
-  getUserList(
-    stockId: string,
-    projection?: ProjectionType<StockUser>,
-    options?: mongoose.QueryOptions<StockUser>,
-  ): Promise<UserDocument[]> {
-    return this.userRepository.find({ stockId }, projection, options);
+  getUserList(stockId: string): Promise<StockUser[]> {
+    return this.userRepository.findUsers(stockId);
   }
 
   async getRecommendedPartners(stockId: string, userId: string): Promise<string[]> {
     const stock = await this.stockRepository.findOneById(stockId, { companies: 1 });
-    const users = await this.getUserList(stockId, { userId: 1, userInfo: 1 });
+    const users = await this.getUserList(stockId);
 
     const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
 
@@ -81,12 +77,13 @@ export class UserService {
       .filter((user) => Boolean(user));
   }
 
-  findOneByUserId(stockId: string, userId: string, options?: mongoose.QueryOptions<StockUser>): Promise<UserDocument> {
-    return this.userRepository.findOne({ stockId, userId }, null, options);
+  findOneByUserId(stockId: string, userId: string): Promise<StockUser | null> {
+    return this.userRepository.findUser(stockId, userId);
   }
 
-  setUser(user: StockUser): Promise<boolean> {
-    return this.userRepository.updateOne({ stockId: user.stockId, userId: user.userId }, user);
+  async setUser(stockId: string, user: StockUser): Promise<boolean> {
+    const result = await this.userRepository.updateUser(stockId, user.userId, user);
+    return result !== null;
   }
 
   async alignIndex(stockId: string): Promise<void> {
@@ -98,7 +95,7 @@ export class UserService {
     const femaleUsers = allUsers.filter((user) => user.userInfo.gender === 'F');
 
     // 남녀 교차로 배치할 최종 순서 생성
-    const alignedUsers: UserDocument[] = [];
+    const alignedUsers: StockUser[] = [];
     const maxLength = Math.max(femaleUsers.length, maleUsers.length);
 
     for (let i = 0; i < maxLength; i++) {
@@ -114,7 +111,7 @@ export class UserService {
 
     // 인덱스 업데이트
     for (let i = 0; i < alignedUsers.length; i++) {
-      await this.userRepository.findOneAndUpdate({ stockId, userId: alignedUsers[i].userId }, { index: i });
+      await this.userRepository.updateUser(stockId, alignedUsers[i].userId, { $set: { index: i } });
     }
   }
 
@@ -205,7 +202,10 @@ ${JSON.stringify(userData)}`;
       }
 
       for (let i = 0; i < sortedNicknames.length; i++) {
-        await this.userRepository.findOneAndUpdate({ stockId, 'userInfo.nickname': sortedNicknames[i] }, { index: i });
+        const userToUpdate = allUsers.find((u) => u.userInfo.nickname === sortedNicknames[i]);
+        if (userToUpdate) {
+          await this.userRepository.updateUser(stockId, userToUpdate.userId, { $set: { index: i } });
+        }
       }
     } catch (e) {
       console.error(e);
@@ -214,15 +214,15 @@ ${JSON.stringify(userData)}`;
   }
 
   async setIntroduce(stockId: string, userId: string, introduction: string): Promise<StockUser> {
-    return this.userRepository.findOneAndUpdate(
-      { stockId, userId },
-      { $set: { 'userInfo.introduction': introduction } },
-    );
+    const updatedUser = await this.userRepository.updateUser(stockId, userId, {
+      $set: { 'userInfo.introduction': introduction },
+    });
+    return updatedUser;
   }
 
   removeUser(stockId: string, userId: string): Promise<boolean> {
     try {
-      return this.userRepository.deleteOne({ stockId, userId });
+      return this.userRepository.removeUser(stockId, userId);
     } catch (e: unknown) {
       throw new Error(e as string);
     }
@@ -233,7 +233,7 @@ ${JSON.stringify(userData)}`;
     options?: DeleteOptions & Omit<MongooseQueryOptions<StockUser>, 'lean' | 'timestamps'>,
   ): Promise<boolean> {
     try {
-      return this.userRepository.deleteMany({ stockId }, options);
+      return this.userRepository.removeAllUsers(stockId);
     } catch (e: unknown) {
       console.error(e);
       throw e;
@@ -246,7 +246,7 @@ ${JSON.stringify(userData)}`;
   ): Promise<boolean> {
     console.debug('initializeUsers');
     try {
-      return this.userRepository.initializeUsers(stockId, options);
+      return this.userRepository.initializeUsers(stockId);
     } catch (e: unknown) {
       throw new Error(e as string);
     }
@@ -257,7 +257,7 @@ ${JSON.stringify(userData)}`;
     try {
       session.startTransaction();
 
-      const user = await this.userRepository.findOne({ stockId, userId }, null, { session });
+      const user = await this.userRepository.findUser(stockId, userId);
       if (!user) {
         throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
       }
@@ -267,7 +267,7 @@ ${JSON.stringify(userData)}`;
         throw new HttpException('보유 금액이 100만원 이상인 경우 대출이 불가능합니다.', HttpStatus.BAD_REQUEST);
       }
 
-      const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
+      const stock = await this.stockRepository.findOneById(stockId);
       const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
 
       const idx = Math.min(
@@ -292,16 +292,14 @@ ${JSON.stringify(userData)}`;
       }
 
       // 대출 실행
-      await this.userRepository.updateMany(
-        { stockId, userId },
+      const result = await this.stockRepository.updateOne(
+        { _id: stockId, 'users.userId': userId },
         {
           $inc: {
-            // 100만원 대출
-            loanCount: 1,
-            money: StockConfig.LOAN_PRICE, // 대출 횟수 증가
+            'users.$.loanCount': 1,
+            'users.$.money': StockConfig.LOAN_PRICE, // 대출 횟수 증가
           },
         },
-        { session },
       );
 
       await session.commitTransaction();
@@ -319,7 +317,7 @@ ${JSON.stringify(userData)}`;
     try {
       session.startTransaction();
 
-      const user = await this.userRepository.findOne({ stockId, userId }, null, { session });
+      const user = await this.userRepository.findUser(stockId, userId);
       if (!user) {
         throw new HttpException('사용자를 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
       }
@@ -329,15 +327,14 @@ ${JSON.stringify(userData)}`;
       const finalMoney = user.money - loanAmount;
 
       // 대출금 회수 및 대출 횟수 초기화
-      await this.userRepository.updateMany(
-        { stockId, userId },
+      await this.stockRepository.updateOne(
+        { _id: stockId, 'users.userId': userId },
         {
           $set: {
-            loanCount: 0,
-            money: finalMoney,
+            'users.$.loanCount': 0,
+            'users.$.money': finalMoney,
           },
         },
-        { session },
       );
 
       await session.commitTransaction();

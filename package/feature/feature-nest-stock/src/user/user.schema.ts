@@ -36,9 +36,6 @@ export class StockUserInfo implements StockUserInfoSchema {
 @Schema({ autoIndex: true })
 export class StockUser implements StockUserSchema {
   @Prop()
-  stockId: string;
-
-  @Prop()
   userId: string;
 
   @Prop({ type: StockUserInfo })
@@ -61,7 +58,6 @@ export class StockUser implements StockUserSchema {
 
   constructor(required: Pick<StockUserSchema, StockUserRequired>, partial: StockUserForm) {
     this.userId = required.userId;
-    this.stockId = required.stockId;
     this.userInfo = required.userInfo;
 
     this.index = partial.index ?? 0;
@@ -86,5 +82,5 @@ export type UserDocument = HydratedDocument<StockUser>;
 
 export const userSchema = SchemaFactory.createForClass(StockUser);
 
-// eslint-disable-next-line sort-keys-fix/sort-keys-fix
-userSchema.index({ stockId: 1, index: 1 });
+// 인덱스 수정 - stockId 제거됨
+userSchema.index({ index: 1 });

@@ -6,7 +6,8 @@ import { StockUser } from './user.schema';
 export class UserProcessor {
   constructor(private readonly userRepository: UserRepository) {}
 
+  // @FIXME: 현재 사용하지 않음
   async registerUser(user: StockUser): Promise<void> {
-    return this.userRepository.create(user);
+    // return this.userRepository.create(user);
   }
 }

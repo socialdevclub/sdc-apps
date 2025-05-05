@@ -67,4 +67,4 @@ export type PostSetStockPhase = {
 };
 
 export type PostCreateUser = Pick<StockUserSchema, StockUserRequired> &
-  Omit<Partial<StockUserSchema>, StockUserRequired>;
+  Omit<Partial<StockUserSchema>, StockUserRequired> & { stockId: string };
