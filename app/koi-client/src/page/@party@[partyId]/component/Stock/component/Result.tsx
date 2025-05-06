@@ -43,7 +43,7 @@ const Result = ({ stockId }: Props) => {
     }
   };
 
-  if (!stock || !supabaseSession) {
+  if (!stock || !supabaseSession || !users) {
     return <></>;
   }
 
