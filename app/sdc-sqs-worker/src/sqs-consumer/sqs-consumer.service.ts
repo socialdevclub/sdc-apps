@@ -1,6 +1,6 @@
 import type { OnModuleInit } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
-import { StockProcessor, StockUser, UserProcessor } from 'feature-nest-stock';
+import { StockProcessor, UserProcessor } from 'feature-nest-stock';
 import { SqsService, SqsMessage } from 'lib-nest-sqs';
 import type { Request } from 'shared~type-stock';
 
@@ -21,9 +21,9 @@ export class SqsConsumerService implements OnModuleInit {
 
   async handleMessage(message: SqsMessage): Promise<void> {
     switch (message.action) {
-      case 'registerUser':
-        await this.handleUserRegistration(message.data as StockUser);
-        break;
+      // case 'registerUser':
+      //   await this.handleUserRegistration(message.data as StockUser);
+      //   break;
       case '/stock/buy': {
         const params = message.data as Request.PostBuyStock;
         await this.stockProcessor.buyStock(params.stockId, params, { queueMessageId: params.queueUniqueId });
@@ -90,8 +90,8 @@ export class SqsConsumerService implements OnModuleInit {
     }
   }
 
-  private async handleUserRegistration(userData: StockUser): Promise<void> {
-    this.logger.log(`사용자 등록 처리: ${userData.userId} (${userData.stockId})`);
-    await this.userProcessor.registerUser(userData);
-  }
+  // private async handleUserRegistration(userData: StockUser): Promise<void> {
+  //   this.logger.log(`사용자 등록 처리: ${userData.userId} (${userData.stockId})`);
+  //   await this.userProcessor.registerUser(userData);
+  // }
 }

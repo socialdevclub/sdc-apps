@@ -1,7 +1,7 @@
 export type * as Request from './Request';
 export type * as Response from './Response';
 
-export type StockUserRequired = 'stockId' | 'userId' | 'userInfo';
+export type StockUserRequired = 'userId' | 'userInfo';
 export type StockUserOmitted = 'lastActivityTime';
 export type StockUserForm = Pick<StockUserSchema, StockUserRequired> &
   Partial<Omit<StockUserSchema, StockUserRequired | StockUserOmitted>>;
@@ -19,7 +19,6 @@ export type StockStorageSchema = {
 };
 
 export type StockUserSchema = {
-  stockId: string;
   userId: string;
   userInfo: StockUserInfoSchema;
   index: number;
@@ -65,6 +64,10 @@ export type StockSchema = {
    * 2라운드 - 본선게임
    */
   round: number;
+  /**
+   * 유저 정보 배열
+   */
+  users: StockUserSchema[];
 };
 export type StockSchemaWithId = StockSchema & { _id: string };
 

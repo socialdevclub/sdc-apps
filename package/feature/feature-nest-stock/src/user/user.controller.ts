@@ -16,7 +16,7 @@ export class UserController {
   @Get()
   async getUsers(@Query('stockId') stockId: string): Promise<Response.GetStockUser[]> {
     const users = await this.userService.getUserList(stockId);
-    return users.map((user) => this.userService.transStockUserToDto(user));
+    return users.map((user) => this.userService.transStockUserToDto(user as unknown as StockUser));
   }
 
   @Get('/recommended-partners')
@@ -26,7 +26,7 @@ export class UserController {
 
   @Get('/count')
   async getUserCount(@Query('stockId') stockId: string): Promise<{ count: number }> {
-    const count = await this.userRepository.count({ stockId });
+    const count = await this.userRepository.countUsers(stockId);
     return { count };
   }
 
@@ -41,18 +41,25 @@ export class UserController {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    return this.userService.transStockUserToDto(user);
+    return this.userService.transStockUserToDto(user as unknown as StockUser);
   }
 
   @Post()
-  setUser(@Body() body: StockUser): Promise<boolean> {
-    return this.userService.setUser(body);
+  async setUser(@Body() body: StockUser & { stockId: string }): Promise<boolean> {
+    if (!body.stockId) {
+      throw new HttpException('Stock ID is required', HttpStatus.BAD_REQUEST);
+    }
+    return this.userService.setUser(body.stockId, body);
   }
 
   @Post('/register')
-  async registerUser(@Body() body: StockUser): Promise<Response.GetCreateUser> {
-    console.log('🚀 ~ UserController ~ registerUser ~ body:', body);
-    await this.userRepository.create(body);
+  async registerUser(@Body() body: Request.PostCreateUser): Promise<Response.GetCreateUser> {
+    if (!body.stockId) {
+      throw new HttpException('Stock ID is required', HttpStatus.BAD_REQUEST);
+    }
+
+    const stockUser = new StockUser(body, body);
+    await this.userRepository.addUserToStock(body.stockId, stockUser);
     return { messageId: 'direct' };
   }
 
