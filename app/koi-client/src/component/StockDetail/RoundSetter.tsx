@@ -6,7 +6,7 @@ interface Props {
 }
 
 const RoundSetter = ({ stockId }: Props) => {
-  const { data: game } = Query.Stock.useQueryStock(stockId);
+  const { data: game } = Query.Stock.useQueryStock({ stockId });
   const { mutateAsync: mutateUpdateGame } = Query.Stock.useUpdateStock();
 
   // 주식 가치 계산을 위한 훅 추가

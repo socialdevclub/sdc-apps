@@ -21,7 +21,7 @@ const DrawStockInfo = ({ stockId }: Props) => {
   const [open, setOpen] = useState(false);
   const modalRef = useRef<HTMLUListElement>(null);
   const [messageApi, contextHolder] = message.useMessage();
-  const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId);
+  const { data: stock, timeIdx } = Query.Stock.useQueryStock({ stockId });
 
   const onClickDrawStockInfo = () => {
     if (!userId) return;

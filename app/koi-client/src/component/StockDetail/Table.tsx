@@ -13,7 +13,7 @@ interface Props {
 }
 
 const Table = ({ elapsedTime, pov, stockId }: Props) => {
-  const { data: game } = Query.Stock.useQueryStock(stockId);
+  const { data: game } = Query.Stock.useQueryStock({ stockId });
   const { data: users } = Query.Stock.useUserList(stockId);
   const { data: profiles } = Query.Supabase.useQueryProfileById(users?.map((v) => v.userId) ?? []);
   const { data: results } = Query.Stock.useQueryResult(stockId);

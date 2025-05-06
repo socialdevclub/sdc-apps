@@ -23,10 +23,13 @@ const getTimeDistanceWithCurrent = (date: Date) => {
 // 29 - 10
 // 30 - 10
 export default function StockScreen({ party }: Props) {
-  const { data: stock } = Query.Stock.useQueryStock(party.activityName, {
-    keepPreviousData: false,
-    refetchInterval: 500,
-  });
+  const { data: stock } = Query.Stock.useQueryStock(
+    { stockId: party.activityName },
+    {
+      keepPreviousData: false,
+      refetchInterval: 500,
+    },
+  );
 
   const startedTime = useMemo(() => dayjs(stock?.startedTime).toDate(), [stock?.startedTime]);
   const isTransaction = stock?.isTransaction ?? false;

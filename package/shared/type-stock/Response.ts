@@ -10,6 +10,7 @@ export type UploadAvatar = {
 export type GetStock = Omit<StockSchema, 'startedTime'> & {
   _id?: string;
   startedTime: string;
+  user?: StockUserSchema;
 };
 
 export type GetStockPhase = {

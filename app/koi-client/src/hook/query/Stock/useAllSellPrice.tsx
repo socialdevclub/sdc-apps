@@ -15,7 +15,7 @@ interface Options {
 const useAllSellPrice = ({ stockId }: Props, options?: Options) => {
   const enabled = options?.enabled ?? false;
 
-  const { companiesPrice } = Query.Stock.useQueryStock(stockId);
+  const { companiesPrice } = Query.Stock.useQueryStock({ stockId });
   const { data: users } = Query.Stock.useUserList(stockId, { enabled });
 
   const allSellPriceCallback = useCallback(

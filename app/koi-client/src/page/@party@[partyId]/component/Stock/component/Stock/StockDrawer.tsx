@@ -47,7 +47,7 @@ const StockDrawer = ({
     companiesPrice,
     timeIdx,
     companies,
-  } = Query.Stock.useQueryStock(stockId, { refetchInterval: Number.POSITIVE_INFINITY });
+  } = Query.Stock.useQueryStock({ stockId }, { refetchInterval: Number.POSITIVE_INFINITY });
   const { data: userCount } = Query.Stock.useUserCount({ stockId });
 
   const stockCountCurrent = getStockStorage(selectedCompany)?.stockCountCurrent;

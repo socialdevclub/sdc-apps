@@ -11,7 +11,7 @@ export const useStockInfo = (stockId: string) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: stock, refetch, timeIdx, companies } = Query.Stock.useQueryStock(stockId);
+  const { data: stock, refetch, timeIdx, companies } = Query.Stock.useQueryStock({ stockId });
   const { user } = Query.Stock.useUser({ stockId, userId });
   const { allUserSellPriceDesc } = Query.Stock.useAllUserSellPriceDesc(stockId);
   const { gameTime } = useTimeRaceCheck({ refetch, stock });

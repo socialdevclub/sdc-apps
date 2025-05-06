@@ -6,7 +6,7 @@ interface Props {
 }
 
 const Rule = ({ stockId }: Props) => {
-  const { data: stock } = Query.Stock.useQueryStock(stockId);
+  const { data: stock } = Query.Stock.useQueryStock({ stockId });
   const { data: users } = Query.Stock.useUserList(stockId);
 
   if (!users) {

@@ -6,20 +6,35 @@ import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import { serverApiUrl } from '../../../config/baseUrl';
 
+interface Params {
+  stockId: string | undefined;
+  /**
+   * 모든 유저 정보를 로드할지 여부 (되도록 쓰지 마세요)
+   */
+  isLoadAllUser?: boolean;
+  /**
+   * 특정 유저 정보를 로드할지 여부
+   */
+  userId?: string;
+}
+
 interface Options {
   keepPreviousData?: boolean;
   refetchInterval?: number;
 }
 
-const useQueryStock = (stockId: string | undefined, options?: Options) => {
+const useQueryStock = (params: Params, options?: Options) => {
+  const userId = params.userId ? `&userId=${params.userId}` : '';
+  const isLoadAllUser = params.isLoadAllUser ? `&isLoadAllUser=${params.isLoadAllUser}` : '';
+
   const { data, refetch } = useQuery<Response.GetStock>({
     api: {
       hostname: serverApiUrl,
       method: 'GET',
-      pathname: `/stock?stockId=${stockId}`,
+      pathname: `/stock?stockId=${params.stockId}${userId}${isLoadAllUser}`,
     },
     reactQueryOption: {
-      enabled: !!stockId,
+      enabled: !!params.stockId,
       refetchInterval: 1500,
       ...options,
     },

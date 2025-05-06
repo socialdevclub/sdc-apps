@@ -75,7 +75,7 @@ const StockInfoList = ({ stockId, futureInfos, gameTimeInMinutes, myInfos, messa
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: stock, timeIdx, companies } = Query.Stock.useQueryStock(stockId);
+  const { data: stock, timeIdx, companies } = Query.Stock.useQueryStock({ stockId });
   const { user } = Query.Stock.useUser({ stockId, userId });
 
   const [drawerOpen, setDrawerOpen] = useState(false);

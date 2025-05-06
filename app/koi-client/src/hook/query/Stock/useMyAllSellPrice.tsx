@@ -10,7 +10,7 @@ interface Props {
  * 모두 팔았을 때 가격
  */
 const useMyAllSellPrice = ({ stockId, userId }: Props) => {
-  const { companiesPrice } = Query.Stock.useQueryStock(stockId);
+  const { companiesPrice } = Query.Stock.useQueryStock({ stockId });
   const { data: user } = Query.Stock.useUserFindOne(stockId, userId);
 
   const myAllSellPrice = useMemo(() => {

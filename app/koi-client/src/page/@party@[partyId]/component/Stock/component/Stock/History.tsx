@@ -18,7 +18,7 @@ const History = ({ stockId }: Props) => {
   const userId = supabaseSession?.user.id;
 
   const { data: logList } = Query.Stock.useQueryLog({ stockId, userId });
-  const { data: game } = Query.Stock.useQueryStock(stockId);
+  const { data: game } = Query.Stock.useQueryStock({ stockId });
 
   if (!game) {
     return <></>;

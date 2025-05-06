@@ -14,9 +14,12 @@ interface Props {
 }
 
 const useUser = ({ stockId, userId, userRefetchInterval, stockRefetchInterval }: Props) => {
-  const { data: stock, refetch: refetchStock } = Query.Stock.useQueryStock(stockId, {
-    refetchInterval: stockRefetchInterval,
-  });
+  const { data: stock, refetch: refetchStock } = Query.Stock.useQueryStock(
+    { stockId },
+    {
+      refetchInterval: stockRefetchInterval,
+    },
+  );
   const { data: user, refetch: refetchUser } = Query.Stock.useUserFindOne(stockId, userId, {
     refetchInterval: userRefetchInterval,
   });

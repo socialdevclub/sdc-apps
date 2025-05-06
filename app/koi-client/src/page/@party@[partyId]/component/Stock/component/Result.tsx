@@ -16,7 +16,7 @@ interface Props {
 const Result = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
 
-  const { data: stock } = Query.Stock.useQueryStock(stockId);
+  const { data: stock } = Query.Stock.useQueryStock({ stockId });
   const { data: users } = Query.Stock.useUserList(stockId);
   const { getRound0Avg, getRound12Avg } = Query.Stock.useQueryResult(stockId);
 

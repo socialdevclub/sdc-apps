@@ -11,7 +11,7 @@ interface Props {
 const PlayingWrapper = ({ children, stockId }: Props) => {
   const audioRef = React.useRef<HTMLAudioElement>(null);
 
-  const { data: game } = Query.Stock.useQueryStock(stockId);
+  const { data: game } = Query.Stock.useQueryStock({ stockId });
 
   const startedTime = dayjs(game?.startedTime).toDate();
   const { seconds, minutes } = getDateDistance(startedTime, new Date());

@@ -27,7 +27,7 @@ export default function StockDetail({ stockId }: Props) {
   const { mutateAsync: mutateSetResult } = Query.Stock.useSetResult(stockId);
 
   const { data: users } = Query.Stock.useUserList(stockId);
-  const { data: stock } = Query.Stock.useQueryStock(stockId);
+  const { data: stock } = Query.Stock.useQueryStock({ stockId });
 
   // 주식 가치 계산을 위한 훅 추가
   const { allUserSellPriceDesc } = Query.Stock.useAllUserSellPriceDesc(stockId);

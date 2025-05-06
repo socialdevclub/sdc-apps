@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Query } from '../..';
 
 const useAllUserSellPriceDesc = (stockId: string) => {
-  const { data: stock } = Query.Stock.useQueryStock(stockId);
+  const { data: stock } = Query.Stock.useQueryStock({ stockId });
 
   const enabled = stock?.isVisibleRank ?? false;
   const { allSellPriceCallback } = Query.Stock.useAllSellPrice({ stockId }, { enabled });

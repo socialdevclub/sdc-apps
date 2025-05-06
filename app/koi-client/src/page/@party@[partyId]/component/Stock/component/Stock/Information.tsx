@@ -22,7 +22,7 @@ const Information = ({ stockId, messageApi }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: stock, timeIdx, companies } = Query.Stock.useQueryStock(stockId);
+  const { data: stock, timeIdx, companies } = Query.Stock.useQueryStock({ stockId });
   const { user } = Query.Stock.useUser({ stockId, userId });
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -101,7 +101,7 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: stock, refetch } = Query.Stock.useQueryStock(stockId);
+  const { data: stock, refetch } = Query.Stock.useQueryStock({ stockId });
   const { user } = Query.Stock.useUser({ stockId, userId });
   const [gameTime, setGameTime] = useState(getFormattedGameTime(stock?.startedTime));
   const gameTimeRef = useRef(gameTime);

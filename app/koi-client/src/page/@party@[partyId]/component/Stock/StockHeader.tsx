@@ -8,7 +8,7 @@ interface Props {
 }
 
 const StockHeader = ({ stockId }: Props) => {
-  const { data: stock } = Query.Stock.useQueryStock(stockId);
+  const { data: stock } = Query.Stock.useQueryStock({ stockId });
 
   if (stock?.stockPhase !== 'PLAYING') {
     return <></>;
