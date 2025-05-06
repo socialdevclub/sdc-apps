@@ -4,7 +4,9 @@ import { Response } from 'shared~type-stock';
 import { useQuery } from 'lib-react-query';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
+import { useAtomValue } from 'jotai';
 import { serverApiUrl } from '../../../config/baseUrl';
+import { UserStore } from '../../../store';
 
 interface Params {
   stockId: string | undefined;
@@ -19,22 +21,27 @@ interface Params {
 }
 
 interface Options {
+  enabled?: boolean;
   keepPreviousData?: boolean;
   refetchInterval?: number;
 }
 
 const useQueryStock = (params: Params, options?: Options) => {
-  const userId = params.userId ? `&userId=${params.userId}` : '';
-  const isLoadAllUser = params.isLoadAllUser ? `&isLoadAllUser=${params.isLoadAllUser}` : '';
+  const supabaseSession = useAtomValue(UserStore.supabaseSession);
+  const userId = supabaseSession?.user.id;
+
+  const enabled = options?.enabled ?? true;
+  const userIdQuery = params.userId ? `&userId=${params.userId}` : `&userId=${userId}`;
+  const isLoadAllUserQuery = params.isLoadAllUser ? `&isLoadAllUser=${params.isLoadAllUser}` : '';
 
   const { data, refetch } = useQuery<Response.GetStock>({
     api: {
       hostname: serverApiUrl,
       method: 'GET',
-      pathname: `/stock?stockId=${params.stockId}${userId}${isLoadAllUser}`,
+      pathname: `/stock?stockId=${params.stockId}${userIdQuery}${isLoadAllUserQuery}`,
     },
     reactQueryOption: {
-      enabled: !!params.stockId,
+      enabled: !!params.stockId && enabled,
       refetchInterval: 1500,
       ...options,
     },

@@ -28,9 +28,8 @@ export class StockController {
     @Query('userId') userId: string,
     @Query('isLoadAllUser') isLoadAllUser: boolean,
   ): Promise<Response.GetStock> {
-    const stock = await this.stockService.findOneById(stockId, {
-      users: isLoadAllUser ? true : userId ? { $elemMatch: { userId } } : false,
-    });
+    const stock = await this.stockService.findOneById(stockId);
+
     if (!stock) {
       throw new HttpException('Stock not found', HttpStatus.NOT_FOUND);
     }
@@ -38,12 +37,12 @@ export class StockController {
     const transformedStock = this.stockService.transStockToDto(stock);
 
     if (!isLoadAllUser && userId) {
-      const user = transformedStock.users[0];
+      const user = transformedStock.users.find((user) => user.userId === userId);
       delete transformedStock.users;
       return { ...transformedStock, user };
     }
 
-    return this.stockService.transStockToDto(stock);
+    return transformedStock;
   }
 
   @Delete()
