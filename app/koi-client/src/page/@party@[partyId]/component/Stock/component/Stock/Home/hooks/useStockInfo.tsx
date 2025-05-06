@@ -1,5 +1,6 @@
 import { useAtomValue } from 'jotai';
 import { objectEntries } from '@toss/utils';
+import { useMemo } from 'react';
 import { Query } from '../../../../../../../../hook';
 import { UserStore } from '../../../../../../../../store';
 import useTimeRaceCheck from '../../../../../../../../hook/useTimeRaceCheck';
@@ -10,7 +11,7 @@ export const useStockInfo = (stockId: string) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: stock, refetch, timeIdx } = Query.Stock.useQueryStock(stockId);
+  const { data: stock, refetch, timeIdx, companies } = Query.Stock.useQueryStock(stockId);
   const { user } = Query.Stock.useUser({ stockId, userId });
   const { allUserSellPriceDesc } = Query.Stock.useAllUserSellPriceDesc(stockId);
   const { gameTime } = useTimeRaceCheck({ refetch, stock });
@@ -24,8 +25,9 @@ export const useStockInfo = (stockId: string) => {
   const gameTimeInMinutes = Math.ceil(parseInt(gameTime.split(':')[0], 10));
 
   // 내 예측 정보 계산
-  const myInfos = stock
-    ? objectEntries(stock.companies).reduce((myInfos, [company, companyInfos]) => {
+  const myInfos = useMemo(
+    () =>
+      objectEntries(companies).reduce((myInfos, [company, companyInfos]) => {
         companyInfos.forEach((companyInfo, idx) => {
           if (companyInfo.정보.some((name) => name === userId)) {
             myInfos.push({
@@ -36,8 +38,9 @@ export const useStockInfo = (stockId: string) => {
           }
         });
         return myInfos;
-      }, [] as Array<{ company: string; timeIdx: number; price: number }>)
-    : [];
+      }, [] as Array<{ company: string; timeIdx: number; price: number }>),
+    [companies, userId],
+  );
 
   // 현재 시간 이후의 정보만 필터링
   const futureInfos = myInfos

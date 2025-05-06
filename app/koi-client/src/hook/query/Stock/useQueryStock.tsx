@@ -25,9 +25,13 @@ const useQueryStock = (stockId: string | undefined, options?: Options) => {
     },
   });
 
-  const timeIdx = data?.startedTime
-    ? Math.floor(getDateDistance(dayjs(data.startedTime).toDate(), new Date()).minutes / data.fluctuationsInterval)
-    : undefined;
+  const timeIdx = useMemo(
+    () =>
+      data?.startedTime
+        ? Math.floor(getDateDistance(dayjs(data.startedTime).toDate(), new Date()).minutes / data.fluctuationsInterval)
+        : undefined,
+    [data?.fluctuationsInterval, data?.startedTime],
+  );
 
   const companiesPrice = useMemo(
     () =>
@@ -45,7 +49,9 @@ const useQueryStock = (stockId: string | undefined, options?: Options) => {
     [data?.companies, data?.startedTime, timeIdx],
   );
 
-  return { companiesPrice, data, refetch, timeIdx };
+  const companies = useMemo(() => data?.companies ?? {}, [data?.companies]);
+
+  return { companies, companiesPrice, data, refetch, timeIdx };
 };
 
 export default useQueryStock;

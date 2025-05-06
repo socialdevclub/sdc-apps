@@ -19,7 +19,7 @@ const StockList = ({ stockId, messageApi }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId);
+  const { data: stock, timeIdx, companies } = Query.Stock.useQueryStock(stockId);
   const { user } = Query.Stock.useUser({ stockId, userId });
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -27,11 +27,11 @@ const StockList = ({ stockId, messageApi }: Props) => {
 
   const priceData = useMemo(() => {
     const result: Record<string, number[]> = {};
-    objectEntries(stock?.companies ?? {}).forEach(([company, companyInfos]) => {
+    objectEntries(companies ?? {}).forEach(([company, companyInfos]) => {
       result[company] = companyInfos.map(({ 가격 }) => 가격);
     });
     return result;
-  }, [stock?.companies]);
+  }, [companies]);
 
   const 보유주식 = useMemo(() => {
     return (
@@ -52,7 +52,7 @@ const StockList = ({ stockId, messageApi }: Props) => {
     return <>불러오는 중</>;
   }
 
-  const myInfos = objectEntries(stock.companies).flatMap(([company, companyInfos]) =>
+  const myInfos = objectEntries(companies).flatMap(([company, companyInfos]) =>
     companyInfos.reduce((acc, companyInfo, idx) => {
       if (companyInfo.정보.includes(userId)) {
         acc.push({
