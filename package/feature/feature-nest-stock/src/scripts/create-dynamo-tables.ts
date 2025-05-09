@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 
-import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  CreateTableCommand,
+  ScalarAttributeType,
+  KeyType,
+  ProjectionType,
+  CreateTableCommandInput,
+  CreateTableCommandOutput,
+} from '@aws-sdk/client-dynamodb';
 import {
   dynamoDBConfig,
   STOCK_TABLE_NAME,
@@ -9,11 +17,11 @@ import {
   RESULT_TABLE_NAME,
 } from '../config/dynamodb.config';
 
-const createStockTable = async (ddbClient: DynamoDBClient) => {
-  const params = {
-    AttributeDefinitions: [{ AttributeName: '_id', AttributeType: 'S' }],
+const createStockTable = async (ddbClient: DynamoDBClient): Promise<CreateTableCommandOutput> => {
+  const params: CreateTableCommandInput = {
+    AttributeDefinitions: [{ AttributeName: '_id', AttributeType: ScalarAttributeType.S }],
     KeySchema: [
-      { AttributeName: '_id', KeyType: 'HASH' }, // Partition key
+      { AttributeName: '_id', KeyType: KeyType.HASH }, // Partition key
     ],
     ProvisionedThroughput: {
       ReadCapacityUnits: 5,
@@ -32,19 +40,19 @@ const createStockTable = async (ddbClient: DynamoDBClient) => {
   }
 };
 
-const createStockUserTable = async (ddbClient: DynamoDBClient) => {
-  const params = {
+const createStockUserTable = async (ddbClient: DynamoDBClient): Promise<CreateTableCommandOutput> => {
+  const params: CreateTableCommandInput = {
     AttributeDefinitions: [
-      { AttributeName: 'stockId', AttributeType: 'S' },
-      { AttributeName: 'userId', AttributeType: 'S' },
+      { AttributeName: 'stockId', AttributeType: ScalarAttributeType.S },
+      { AttributeName: 'userId', AttributeType: ScalarAttributeType.S },
     ],
     // stockId-index 글로벌 보조 인덱스 추가
     GlobalSecondaryIndexes: [
       {
         IndexName: 'stockId-index',
-        KeySchema: [{ AttributeName: 'stockId', KeyType: 'HASH' }],
+        KeySchema: [{ AttributeName: 'stockId', KeyType: KeyType.HASH }],
         Projection: {
-          ProjectionType: 'ALL',
+          ProjectionType: ProjectionType.ALL,
         },
         ProvisionedThroughput: {
           ReadCapacityUnits: 5,
@@ -54,8 +62,8 @@ const createStockUserTable = async (ddbClient: DynamoDBClient) => {
     ],
 
     KeySchema: [
-      { AttributeName: 'stockId', KeyType: 'HASH' }, // Partition key
-      { AttributeName: 'userId', KeyType: 'RANGE' }, // Sort key
+      { AttributeName: 'stockId', KeyType: KeyType.HASH }, // Partition key
+      { AttributeName: 'userId', KeyType: KeyType.RANGE }, // Sort key
     ],
 
     ProvisionedThroughput: {
@@ -75,23 +83,23 @@ const createStockUserTable = async (ddbClient: DynamoDBClient) => {
   }
 };
 
-const createStockLogTable = async (ddbClient: DynamoDBClient) => {
-  const params = {
+const createStockLogTable = async (ddbClient: DynamoDBClient): Promise<CreateTableCommandOutput> => {
+  const params: CreateTableCommandInput = {
     AttributeDefinitions: [
-      { AttributeName: 'stockId', AttributeType: 'S' },
-      { AttributeName: 'date', AttributeType: 'S' },
-      { AttributeName: 'userId', AttributeType: 'S' },
+      { AttributeName: 'stockId', AttributeType: ScalarAttributeType.S },
+      { AttributeName: 'date', AttributeType: ScalarAttributeType.S },
+      { AttributeName: 'userId', AttributeType: ScalarAttributeType.S },
     ],
     // userId에 대한 글로벌 보조 인덱스 추가
     GlobalSecondaryIndexes: [
       {
         IndexName: 'userId-index',
         KeySchema: [
-          { AttributeName: 'userId', KeyType: 'HASH' },
-          { AttributeName: 'date', KeyType: 'RANGE' },
+          { AttributeName: 'userId', KeyType: KeyType.HASH },
+          { AttributeName: 'date', KeyType: KeyType.RANGE },
         ],
         Projection: {
-          ProjectionType: 'ALL',
+          ProjectionType: ProjectionType.ALL,
         },
         ProvisionedThroughput: {
           ReadCapacityUnits: 5,
@@ -101,8 +109,8 @@ const createStockLogTable = async (ddbClient: DynamoDBClient) => {
     ],
 
     KeySchema: [
-      { AttributeName: 'stockId', KeyType: 'HASH' }, // Partition key
-      { AttributeName: 'date', KeyType: 'RANGE' }, // Sort key
+      { AttributeName: 'stockId', KeyType: KeyType.HASH }, // Partition key
+      { AttributeName: 'date', KeyType: KeyType.RANGE }, // Sort key
     ],
 
     ProvisionedThroughput: {
@@ -122,23 +130,23 @@ const createStockLogTable = async (ddbClient: DynamoDBClient) => {
   }
 };
 
-const createResultTable = async (ddbClient: DynamoDBClient) => {
-  const params = {
+const createResultTable = async (ddbClient: DynamoDBClient): Promise<CreateTableCommandOutput> => {
+  const params: CreateTableCommandInput = {
     AttributeDefinitions: [
-      { AttributeName: 'stockId', AttributeType: 'S' },
-      { AttributeName: 'userId', AttributeType: 'S' },
-      { AttributeName: 'round', AttributeType: 'N' },
+      { AttributeName: 'stockId', AttributeType: ScalarAttributeType.S },
+      { AttributeName: 'userId', AttributeType: ScalarAttributeType.S },
+      { AttributeName: 'round', AttributeType: ScalarAttributeType.N },
     ],
     // round에 대한 글로벌 보조 인덱스 추가
     GlobalSecondaryIndexes: [
       {
         IndexName: 'round-index',
         KeySchema: [
-          { AttributeName: 'stockId', KeyType: 'HASH' },
-          { AttributeName: 'round', KeyType: 'RANGE' },
+          { AttributeName: 'stockId', KeyType: KeyType.HASH },
+          { AttributeName: 'round', KeyType: KeyType.RANGE },
         ],
         Projection: {
-          ProjectionType: 'ALL',
+          ProjectionType: ProjectionType.ALL,
         },
         ProvisionedThroughput: {
           ReadCapacityUnits: 5,
@@ -148,8 +156,8 @@ const createResultTable = async (ddbClient: DynamoDBClient) => {
     ],
 
     KeySchema: [
-      { AttributeName: 'stockId', KeyType: 'HASH' }, // Partition key
-      { AttributeName: 'userId', KeyType: 'RANGE' }, // Sort key
+      { AttributeName: 'stockId', KeyType: KeyType.HASH }, // Partition key
+      { AttributeName: 'userId', KeyType: KeyType.RANGE }, // Sort key
     ],
 
     ProvisionedThroughput: {
@@ -169,7 +177,7 @@ const createResultTable = async (ddbClient: DynamoDBClient) => {
   }
 };
 
-(async () => {
+(async (): Promise<void> => {
   try {
     const ddbClient = new DynamoDBClient(dynamoDBConfig);
 
