@@ -1,13 +1,9 @@
 import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
-import type { CompanyInfo, Request, Response, StockPhase } from 'shared~type-stock';
+import type { CompanyInfo, Request, Response, StockPhase, StockSchemaWithId } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
 import { ceilToUnit } from '@toss/utils';
-import type { ProjectionType, QueryOptions } from 'mongoose';
-import mongoose from 'mongoose';
-import { InjectConnection } from '@nestjs/mongoose';
 import dayjs from 'dayjs';
 import { StockConfig } from 'shared~config';
-import type { Stock, StockDocument } from './stock.schema';
 import { UserService } from './user/user.service';
 import { LogService } from './log/log.service';
 import { ResultService } from './result/result.service';
@@ -18,7 +14,6 @@ import { UserRepository } from './user/user.repository';
 @Injectable()
 export class StockService {
   constructor(
-    @InjectConnection() private readonly connection: mongoose.Connection,
     private readonly stockRepository: StockRepository,
     @Inject(forwardRef(() => UserRepository))
     private readonly userRepository: UserRepository,
@@ -28,70 +23,58 @@ export class StockService {
     private readonly resultService: ResultService,
   ) {}
 
-  transStockToDto(stock: StockDocument): Response.GetStock {
+  transStockToDto(stock: StockSchemaWithId): Response.GetStock {
     return {
-      ...stock.toJSON({ versionKey: false }),
+      ...stock,
       startedTime: dayjs(stock.startedTime).utcOffset('9').format('YYYY-MM-DDTHH:mm:ssZ'),
     };
   }
 
-  async find(options?: mongoose.QueryOptions<Stock>): Promise<Stock[]> {
-    return this.stockRepository.find(undefined, undefined, options);
+  async find(): Promise<StockSchemaWithId[]> {
+    return this.stockRepository.find();
   }
 
-  async findOneById(
-    stockId: string,
-    projection?: ProjectionType<Stock>,
-    options?: QueryOptions<Stock>,
-  ): Promise<StockDocument> {
-    return this.stockRepository.findOneById(stockId, projection, options);
+  async findOneById(stockId: string): Promise<StockSchemaWithId | null> {
+    return this.stockRepository.findOneById(stockId);
   }
 
-  async findOneByIdAndUpdate(stock: Request.PatchUpdateStock, options?: QueryOptions<Stock>): Promise<Stock> {
-    return this.stockRepository.findOneByIdAndUpdate(stock._id, stock, options);
+  async findOneByIdAndUpdate(stock: Request.PatchUpdateStock): Promise<StockSchemaWithId | null> {
+    return this.stockRepository.findOneByIdAndUpdate(stock._id, stock);
   }
 
-  async createStock(): Promise<Stock> {
+  async createStock(): Promise<StockSchemaWithId> {
     return this.stockRepository.create();
   }
 
-  async resetStock(stockId: string): Promise<Stock> {
-    let stock: Stock;
-
-    const session = await this.connection.startSession();
+  async resetStock(stockId: string): Promise<StockSchemaWithId | null> {
     try {
-      await session.withTransaction(async () => {
-        stock = await this.stockRepository.findOneAndUpdate(
-          stockId,
-          {
-            $set: {
-              companies: {},
-              fluctuationsInterval: 5,
-              isTransaction: false,
-              isVisibleRank: false,
-              remainingStocks: {},
-              round: 0,
-              startedTime: new Date(),
-              stockPhase: 'CROWDING',
-              transactionInterval: 0,
-            },
-          },
-          { session },
-        );
-        await this.userService.initializeUsers(stockId, { session });
-        await this.logService.deleteAllByStock(stockId, { session });
+      // 스톡 업데이트
+      const stock = await this.stockRepository.findOneAndUpdate(stockId, {
+        companies: {},
+        fluctuationsInterval: 5,
+        isTransaction: false,
+        isVisibleRank: false,
+        remainingStocks: {},
+        round: 0,
+        startedTime: new Date(),
+        stockPhase: 'CROWDING',
+        transactionInterval: 0,
       });
+
+      // 사용자 초기화
+      await this.userService.initializeUsers(stockId);
+
+      // 로그 삭제
+      await this.logService.deleteAllByStock(stockId);
+
+      return stock;
     } catch (error) {
       console.error(error);
       throw error;
-    } finally {
-      await session.endSession();
     }
-
-    return stock;
   }
 
-  async initStock(stockId: string): Promise<Stock> {
+  async initStock(stockId: string): Promise<StockSchemaWithId | null> {
     const players = await this.userService.getUserList(stockId);
 
     const companyPriceChange: string[][] = [[]];
@@ -166,236 +149,243 @@ export class StockService {
       remainingStocks[company] = players.length * 3;
     });
 
-    const result = this.stockRepository.findOneAndUpdate(stockId, {
-      $set: {
-        companies: newCompanies,
-        fluctuationsInterval: 5,
-        isTransaction: false,
-        isVisibleRank: false,
-        remainingStocks,
-        startedTime: new Date(),
-        stockPhase: 'PLAYING',
-        transactionInterval: 0,
-      },
-    });
-
+    // DynamoDB 업데이트
     await this.logService.deleteAllByStock(stockId);
-    return result;
+
+    return this.stockRepository.findOneAndUpdate(stockId, {
+      companies: newCompanies,
+      fluctuationsInterval: 5,
+      isTransaction: false,
+      isVisibleRank: false,
+      remainingStocks,
+      startedTime: new Date(),
+      stockPhase: 'PLAYING',
+      transactionInterval: 0,
+    });
   }
 
-  async drawStockInfo(stockId: string, body: Request.PostDrawStockInfo): Promise<Stock> {
-    const { userId } = body;
-    let result: Stock;
-
-    const session = await this.connection.startSession();
+  async drawStockInfo(stockId: string, body: Request.PostDrawStockInfo): Promise<StockSchemaWithId | null> {
     try {
-      await session.withTransaction(async () => {
-        const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const user = await this.userRepository.findOne({ stockId, userId }, undefined, { session });
+      const { userId } = body;
 
-        if (!stock.isTransaction) {
-          throw new HttpException('지금은 거래할 수 없습니다', HttpStatus.CONFLICT);
-        }
+      const stock = await this.stockRepository.findOneById(stockId);
+      const user = await this.userRepository.findOne({ stockId, userId });
 
-        if (!user) {
-          throw new HttpException('유저 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
-        }
+      if (!stock) {
+        throw new HttpException('스톡을 찾을 수 없습니다', HttpStatus.NOT_FOUND);
+      }
 
-        // 현재 라운드에 해당하는 시점의 idx
-        const timeIdx = Math.min(
-          Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
-          9,
-        );
+      if (!stock.isTransaction) {
+        throw new HttpException('지금은 거래할 수 없습니다', HttpStatus.CONFLICT);
+      }
 
-        const nextTimeIdx = timeIdx + StockConfig.ROUND_SKIP_STEP;
+      if (!user) {
+        throw new HttpException('유저 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
+      }
 
-        if (user.money < StockConfig.DEFAULT_DRAW_COST) {
-          throw new HttpException('잔액이 부족합니다', HttpStatus.CONFLICT);
-        }
+      // 현재 라운드에 해당하는 시점의 idx
+      const timeIdx = Math.min(
+        Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
+        9,
+      );
 
-        const companies = stock.companies as unknown as Map<string, Array<{ 가격: number; 정보: string[] }>>;
-        // 이미 정보를 가지고 있지 않은 회사들 중에서만 선택
-        const availableCompanies = Array.from(companies.entries())
-          .filter(([_, companyInfos]) => {
-            // nextTimeIdx 이후의 모든 시점에서 정보를 가지고 있지 않은 회사만 선택
-            return companyInfos.slice(nextTimeIdx).some((info) => !info.정보.includes(userId));
-          })
-          .map(([company]) => company);
+      const nextTimeIdx = timeIdx + StockConfig.ROUND_SKIP_STEP;
 
-        if (availableCompanies.length === 0) {
-          throw new HttpException('더 이상 뽑을 수 있는 정보가 없습니다', HttpStatus.CONFLICT);
-        }
+      if (user.money < StockConfig.DEFAULT_DRAW_COST) {
+        throw new HttpException('잔액이 부족합니다', HttpStatus.CONFLICT);
+      }
 
-        // 랜덤으로 회사 선택
-        const randomIndex = Math.floor(Math.random() * availableCompanies.length);
-        const selectedCompany = availableCompanies[randomIndex];
+      const companies = stock.companies as unknown as Map<string, Array<{ 가격: number; 정보: string[] }>>;
 
-        // 랜덤으로 시점 선택 (정보를 가지고 있는 시점만 선택)
-        let randomTimeIndex =
+      // 이미 정보를 가지고 있지 않은 회사들 중에서만 선택
+      const availableCompanies = Array.from(companies.entries())
+        .filter(([_, companyInfos]) => {
+          // nextTimeIdx 이후의 모든 시점에서 정보를 가지고 있지 않은 회사만 선택
+          return companyInfos.slice(nextTimeIdx).some((info) => !info.정보.includes(userId));
+        })
+        .map(([company]) => company);
+
+      if (availableCompanies.length === 0) {
+        throw new HttpException('더 이상 뽑을 수 있는 정보가 없습니다', HttpStatus.CONFLICT);
+      }
+
+      // 랜덤으로 회사 선택
+      const randomIndex = Math.floor(Math.random() * availableCompanies.length);
+      const selectedCompany = availableCompanies[randomIndex];
+
+      // 랜덤으로 시점 선택 (정보를 가지고 있는 시점만 선택)
+      let randomTimeIndex =
+        Math.floor(Math.random() * (companies.get(selectedCompany).length - nextTimeIdx)) + nextTimeIdx;
+
+      // 선택된 회사의 정보 업데이트
+      const companyInfos = [...companies.get(selectedCompany)]; // 배열 복사
+
+      // 해당 배열안에 이미 user Id가 있는지 확인
+      let isExistUser = companyInfos[randomTimeIndex].정보.find((v) => v === userId);
+      // user Id가 있는 때는 randomTimeIndex를 다시 생성
+      while (isExistUser) {
+        randomTimeIndex =
           Math.floor(Math.random() * (companies.get(selectedCompany).length - nextTimeIdx)) + nextTimeIdx;
+        isExistUser = companyInfos[randomTimeIndex].정보.find((v) => v === userId);
+      }
 
-        // 선택된 회사의 정보 업데이트
-        const companyInfos = [...companies.get(selectedCompany)]; // 배열 복사
+      companyInfos[randomTimeIndex] = {
+        ...companyInfos[randomTimeIndex],
+        정보: [...companyInfos[randomTimeIndex].정보, userId],
+      };
 
-        // 해당 배열안에 이미 user Id가 있는지 확인
-        let isExistUser = companyInfos[randomTimeIndex].정보.find((v) => v === userId);
-        // user Id가 있는 때는 randomTimeIndex를 다시 생성
-        while (isExistUser) {
-          randomTimeIndex =
-            Math.floor(Math.random() * (companies.get(selectedCompany).length - nextTimeIdx)) + nextTimeIdx;
-          isExistUser = companyInfos[randomTimeIndex].정보.find((v) => v === userId);
-        }
+      // 업데이트된 회사 정보로 객체 생성
+      const updatedCompanies = Object.fromEntries(companies.entries());
+      updatedCompanies[selectedCompany] = companyInfos;
 
-        companyInfos[randomTimeIndex] = {
-          ...companyInfos[randomTimeIndex],
-          정보: [...companyInfos[randomTimeIndex].정보, userId],
-        };
-
-        // stock 객체 직접 업데이트 (Record 형식으로 변환)
-        // ! companies의 set 메소드가 동작을 안함
-        const updatedCompanies = Object.fromEntries(companies.entries());
-        updatedCompanies[selectedCompany] = companyInfos;
-        stock.companies = updatedCompanies;
-
-        user.money -= StockConfig.DEFAULT_DRAW_COST;
-        user.lastActivityTime = new Date();
-
-        await user.save({
-          session,
-        });
-
-        result = await stock.save({
-          session,
-        });
-
-        // TODO: 로그를 심고 싶으면 좀 더 범용적으로 설계를 해야할 것만 같은 기분이 듬
+      // 스톡 정보 업데이트
+      await this.stockRepository.findOneAndUpdate(stockId, {
+        companies: updatedCompanies,
       });
+
+      // 사용자 정보 업데이트
+      await this.userRepository.findOneAndUpdate(
+        { stockId, userId },
+        {
+          lastActivityTime: new Date(),
+          money: user.money - StockConfig.DEFAULT_DRAW_COST,
+        },
+      );
+
+      // 최종 정보 반환
+      return this.stockRepository.findOneById(stockId);
     } catch (error) {
       console.error(error);
       throw error;
-    } finally {
-      await session.endSession();
     }
-
-    return result;
   }
 
-  async allUserSellStock(stockId: string): Promise<Stock> {
-    let result: Stock;
-
-    const session = await this.connection.startSession();
+  async allUserSellStock(stockId: string): Promise<StockSchemaWithId | null> {
     try {
-      await session.withTransaction(async () => {
-        const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const users = await this.userRepository.find({ stockId }, undefined, { session });
+      const stock = await this.stockRepository.findOneById(stockId);
+      const users = await this.userRepository.find({ stockId });
 
-        if (!users) {
-          throw new Error('users not found');
-        }
+      if (!stock) {
+        throw new Error('stock not found');
+      }
 
-        for await (const user of users) {
-          const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
-          const remainingStocks = stock.remainingStocks as unknown as Map<string, number>;
+      if (!users || users.length === 0) {
+        throw new Error('users not found');
+      }
 
-          const idx = Math.min(
-            Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
-            9,
-          );
+      const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
+      const remainingStocks = stock.remainingStocks as unknown as Record<string, number>;
 
-          user.stockStorages.forEach((stockStorage) => {
-            const companyPrice = companies.get(stockStorage.companyName)[idx]?.가격;
-            const totalPrice = companyPrice * stockStorage.stockCountCurrent;
+      const idx = Math.min(
+        Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
+        9,
+      );
 
-            user.money += totalPrice;
-            remainingStocks.set(
-              stockStorage.companyName,
-              remainingStocks.get(stockStorage.companyName) + stockStorage.stockCountCurrent,
-            );
-            stockStorage.stockCountHistory[idx] -= stockStorage.stockCountCurrent;
-            stockStorage.stockCountCurrent = 0;
-          });
+      // 각 사용자의 주식 판매 처리
+      for (const user of users) {
+        let updatedMoney = user.money;
+        let updatedStockStorages = [...user.stockStorages];
 
-          const loanMoney = user.loanCount * StockConfig.SETTLE_LOAN_PRICE;
-          user.money -= loanMoney;
-          user.loanCount = 0;
+        // 사용자의 모든 주식 판매 처리
+        updatedStockStorages = updatedStockStorages.map((stockStorage) => {
+          const companyPrice = companies.get(stockStorage.companyName)[idx]?.가격;
+          const totalPrice = companyPrice * stockStorage.stockCountCurrent;
 
-          await user.save({ session });
-        }
-        result = await stock.save({ session });
+          // 사용자 잔액 증가
+          updatedMoney += totalPrice;
+
+          // 재고 업데이트
+          const companyRemainingStock = remainingStocks[stockStorage.companyName] || 0;
+          remainingStocks[stockStorage.companyName] = companyRemainingStock + stockStorage.stockCountCurrent;
+
+          // 주식 보유량 이력 업데이트
+          const updatedStockCountHistory = [...stockStorage.stockCountHistory];
+          updatedStockCountHistory[idx] -= stockStorage.stockCountCurrent;
+
+          return {
+            ...stockStorage,
+            stockCountCurrent: 0,
+            stockCountHistory: updatedStockCountHistory,
+          };
+        });
+
+        // 대출금 상환
+        const loanMoney = user.loanCount * StockConfig.SETTLE_LOAN_PRICE;
+        updatedMoney -= loanMoney;
+
+        // 사용자 정보 업데이트
+        await this.userRepository.findOneAndUpdate(
+          { stockId, userId: user.userId },
+          {
+            loanCount: 0,
+            money: updatedMoney,
+            stockStorages: updatedStockStorages,
+          },
+        );
+      }
+
+      // 재고 정보 업데이트
+      return this.stockRepository.findOneAndUpdate(stockId, {
+        remainingStocks,
       });
     } catch (error) {
       console.error(error);
       throw error;
-    } finally {
-      await session.endSession();
     }
-
-    return result;
   }
 
   async saveStockResult(stockId: string): Promise<Result[]> {
-    let results: Result[];
-
-    const session = await this.connection.startSession();
     try {
-      await session.withTransaction(async () => {
-        const stock = await this.stockRepository.findOneById(stockId, undefined, { session });
-        const users = await this.userRepository.find({ stockId }, undefined, { session });
+      const stock = await this.stockRepository.findOneById(stockId);
+      const users = await this.userRepository.find({ stockId });
 
-        if (!users) {
-          throw new Error('users not found');
-        }
+      if (!stock) {
+        throw new Error('stock not found');
+      }
 
-        for await (const user of users) {
-          await this.resultService.setResult(
-            {
-              money: user.money,
-              round: stock.round,
-              stockId,
-              userId: user.userId,
-            },
-            {
-              session,
-            },
-          );
-        }
+      if (!users || users.length === 0) {
+        throw new Error('users not found');
+      }
 
-        results = await this.resultService.getResults(undefined, { session });
-        results = results.filter((v) => v.round === stock.round);
+      const resultPromises = users.map((user) => {
+        return this.resultService.setResult({
+          money: user.money,
+          round: stock.round,
+          stockId,
+          userId: user.userId,
+        });
       });
+
+      await Promise.all(resultPromises);
+
+      // 현재 라운드 결과만 반환
+      const results = await this.resultService.getResults();
+      return results.filter((v) => v.round === stock.round);
     } catch (error) {
       console.error(error);
       throw error;
-    } finally {
-      await session.endSession();
     }
-
-    return results;
   }
 
   async deleteStock(stockId: string): Promise<boolean> {
-    const session = await this.connection.startSession();
     try {
-      await session.withTransaction(async () => {
-        await this.resultService.deleteResult({ stockId }, { session });
-        await this.logService.deleteAllByStock(stockId, { session });
-        await this.userService.removeAllUser(stockId, { session });
-        await this.stockRepository.deleteMany({ _id: stockId }, { session });
-      });
+      // 관련된 데이터 모두 삭제
+      await this.resultService.deleteResult({ stockId });
+      await this.logService.deleteAllByStock(stockId);
+      await this.userService.removeAllUser(stockId);
+      await this.stockRepository.deleteMany({ _id: stockId });
+
+      return true;
     } catch (error) {
       console.error(error);
       throw error;
-    } finally {
-      await session.endSession();
     }
-
-    return true;
   }
 
-  async setStockPhase(stockId: string, phase: StockPhase): Promise<Stock> {
+  async setStockPhase(stockId: string, phase: StockPhase): Promise<StockSchemaWithId | null> {
     if (phase === 'INTRO_RESULT') {
       await this.userService.alignIndexByOpenAI(stockId);
     }
-    return this.stockRepository.findOneAndUpdate(stockId, { $set: { stockPhase: phase } });
+    return this.stockRepository.findOneAndUpdate(stockId, { stockPhase: phase });
   }
 }

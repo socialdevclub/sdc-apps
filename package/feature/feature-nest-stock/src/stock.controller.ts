@@ -17,8 +17,8 @@ export class StockController {
   ) {}
 
   @Get('/list')
-  async getStockList(@Body() body: Request.GetStockList): Promise<Stock[]> {
-    const stockList = await this.stockService.find(body);
+  async getStockList(): Promise<Stock[]> {
+    const stockList = await this.stockService.find();
     return stockList;
   }
 
@@ -39,7 +39,7 @@ export class StockController {
 
   @Get('/phase')
   async getStockPhase(@Query('stockId') stockId: string): Promise<Response.GetStockPhase> {
-    const stock = await this.stockService.findOneById(stockId, { stockPhase: true });
+    const stock = await this.stockService.findOneById(stockId);
     return { stockPhase: stock.stockPhase };
   }
 
