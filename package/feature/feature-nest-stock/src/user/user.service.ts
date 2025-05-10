@@ -20,24 +20,6 @@ export class UserService {
     }
   }
 
-  transStockUserToDto(stockUser: StockUserSchema): Response.GetStockUser {
-    let lastActivityTimeStr = '';
-    if (stockUser.lastActivityTime) {
-      lastActivityTimeStr = dayjs(stockUser.lastActivityTime).utcOffset('9').format('YYYY-MM-DDTHH:mm:ssZ');
-    }
-
-    return {
-      index: stockUser.index,
-      lastActivityTime: lastActivityTimeStr,
-      loanCount: stockUser.loanCount,
-      money: stockUser.money,
-      stockId: stockUser.stockId,
-      stockStorages: stockUser.stockStorages,
-      userId: stockUser.userId,
-      userInfo: stockUser.userInfo,
-    };
-  }
-
   getUserList(stockId: string): Promise<StockUserSchema[]> {
     return this.userRepository.find({ stockId });
   }
