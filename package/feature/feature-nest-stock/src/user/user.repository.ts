@@ -268,6 +268,7 @@ export class UserRepository {
           {
             lastActivityTime: dayjs().toISOString(),
             money: StockConfig.INIT_USER_MONEY,
+            resultByRound: [...(user.resultByRound ?? [])],
             stockStorages,
           },
         );
