@@ -8,7 +8,7 @@ import {
   ScanCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { StockSchemaWithId } from 'shared~type-stock';
-import { randomInt } from 'crypto';
+import { randomUUID } from 'crypto';
 import { STOCK_TABLE_NAME } from './config/dynamodb.config';
 import { Stock } from './stock.schema';
 
@@ -35,7 +35,22 @@ export class StockRepository {
     }
   }
 
-  async findOneByIdAndUpdate(stockId: string, update: Partial<Stock>): Promise<StockSchemaWithId | null> {
+  async findOneById(stockId: string): Promise<StockSchemaWithId | null> {
+    try {
+      const command = new GetCommand({
+        Key: { _id: stockId },
+        TableName: STOCK_TABLE_NAME,
+      });
+
+      const { Item } = await this.dynamoDBClient.send(command);
+      return Item as StockSchemaWithId;
+    } catch (error) {
+      console.error('Error getting stock by id', error);
+      throw error;
+    }
+  }
+
+  async findOneAndUpdate(stockId: string, update: Partial<Stock>): Promise<StockSchemaWithId | null> {
     try {
       const { updateExpression, expressionAttributeValues, expressionAttributeNames } =
         this.buildUpdateExpression(update);
@@ -57,30 +72,11 @@ export class StockRepository {
     }
   }
 
-  async findOneById(stockId: string): Promise<StockSchemaWithId | null> {
-    try {
-      const command = new GetCommand({
-        Key: { _id: stockId },
-        TableName: STOCK_TABLE_NAME,
-      });
-
-      const { Item } = await this.dynamoDBClient.send(command);
-      return Item as StockSchemaWithId;
-    } catch (error) {
-      console.error('Error getting stock by id', error);
-      throw error;
-    }
-  }
-
-  async findOneAndUpdate(stockId: string, update: Partial<Stock>): Promise<StockSchemaWithId | null> {
-    return this.findOneByIdAndUpdate(stockId, update);
-  }
-
   async create(): Promise<StockSchemaWithId> {
     try {
       const newStock = new Stock();
 
-      const _id = `${randomInt(1000000)}`.padStart(6, '0');
+      const _id = randomUUID();
       const stockWithId = { ...newStock, _id };
 
       const command = new PutCommand({
@@ -107,7 +103,7 @@ export class StockRepository {
       }
 
       const stockId = stocks[0]._id;
-      await this.findOneByIdAndUpdate(stockId, update);
+      await this.findOneAndUpdate(stockId, update);
       return true;
     } catch (error) {
       console.error('Error updating stock', error);

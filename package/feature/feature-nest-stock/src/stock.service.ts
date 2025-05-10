@@ -39,7 +39,7 @@ export class StockService {
   }
 
   async findOneByIdAndUpdate(stock: Request.PatchUpdateStock): Promise<StockSchemaWithId | null> {
-    return this.stockRepository.findOneByIdAndUpdate(stock._id, stock);
+    return this.stockRepository.findOneAndUpdate(stock._id, stock);
   }
 
   async createStock(): Promise<StockSchemaWithId> {
