@@ -24,7 +24,7 @@ export type StockUserSchema = {
   userInfo: StockUserInfoSchema;
   index: number;
   money: number;
-  lastActivityTime: Date;
+  lastActivityTime: string;
   loanCount: number;
   stockStorages: StockStorageSchema[];
 };
@@ -45,8 +45,9 @@ export type CompanyInfo = {
 };
 
 export type StockSchema = {
+  _id: string;
   stockPhase: StockPhase;
-  startedTime: Date;
+  startedTime: string;
   companies: Record<string, CompanyInfo[]>;
   remainingStocks: Record<string, number>;
   isVisibleRank: boolean;
@@ -66,7 +67,7 @@ export type StockSchema = {
    */
   round: number;
 };
-export type StockSchemaWithId = StockSchema & { _id: string };
+export type StockSchemaWithId = StockSchema;
 
 export type StockLogAction = 'BUY' | 'SELL';
 export type StockLogSchema = {

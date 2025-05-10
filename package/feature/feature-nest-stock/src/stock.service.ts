@@ -56,7 +56,7 @@ export class StockService {
         isVisibleRank: false,
         remainingStocks: {},
         round: 0,
-        startedTime: new Date(),
+        startedTime: dayjs().toISOString(),
         stockPhase: 'CROWDING',
         transactionInterval: 0,
       });
@@ -158,7 +158,7 @@ export class StockService {
       isTransaction: false,
       isVisibleRank: false,
       remainingStocks,
-      startedTime: new Date(),
+      startedTime: dayjs().toISOString(),
       stockPhase: 'PLAYING',
       transactionInterval: 0,
     });
@@ -185,7 +185,7 @@ export class StockService {
 
       // 현재 라운드에 해당하는 시점의 idx
       const timeIdx = Math.min(
-        Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
+        Math.floor(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes / stock.fluctuationsInterval),
         9,
       );
 
@@ -247,7 +247,7 @@ export class StockService {
       await this.userRepository.findOneAndUpdate(
         { stockId, userId },
         {
-          lastActivityTime: new Date(),
+          lastActivityTime: dayjs().toISOString(),
           money: user.money - StockConfig.DEFAULT_DRAW_COST,
         },
       );
@@ -277,7 +277,7 @@ export class StockService {
       const remainingStocks = stock.remainingStocks as unknown as Record<string, number>;
 
       const idx = Math.min(
-        Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
+        Math.floor(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes / stock.fluctuationsInterval),
         9,
       );
 

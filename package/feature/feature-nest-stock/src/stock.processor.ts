@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nest
 import type { CompanyInfo, Request } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
 import { isStockOverLimit } from 'shared~config/dist/stock';
+import dayjs from 'dayjs';
 import { UserRepository } from './user/user.repository';
 import { StockRepository } from './stock.repository';
 import { LogService } from './log/log.service';
@@ -53,7 +54,7 @@ export class StockProcessor {
       }
 
       const idx = Math.min(
-        Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
+        Math.floor(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes / stock.fluctuationsInterval),
         9,
       );
       const companyPrice = companyInfo[idx].가격;
@@ -105,7 +106,7 @@ export class StockProcessor {
       await this.userRepository.updateOne(
         { stockId, userId },
         {
-          lastActivityTime: new Date(),
+          lastActivityTime: dayjs().toISOString(),
           money: user.money - totalPrice,
           stockStorages: updatedStockStorages,
         },
@@ -167,7 +168,7 @@ export class StockProcessor {
       const isNotQueued = !attributes?.queueMessageId;
 
       if (isNotQueued) {
-        const { minutes, seconds } = getDateDistance(user.lastActivityTime, new Date());
+        const { minutes, seconds } = getDateDistance(dayjs(user.lastActivityTime).toDate(), new Date());
         if (minutes === 0 && seconds < stock.transactionInterval) {
           throw new Error(`너무 빠른 거래입니다`);
         }
@@ -193,7 +194,7 @@ export class StockProcessor {
       }
 
       const idx = Math.min(
-        Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
+        Math.floor(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes / stock.fluctuationsInterval),
         9,
       );
       const companyPrice = companyInfo[idx].가격;
@@ -231,7 +232,7 @@ export class StockProcessor {
       await this.userRepository.updateOne(
         { stockId, userId },
         {
-          lastActivityTime: new Date(),
+          lastActivityTime: dayjs().toISOString(),
           money: user.money + totalPrice,
           stockStorages: updatedStockStorages,
         },

@@ -10,6 +10,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { StockConfig } from 'shared~config';
 import { StockStorageSchema, StockUserSchema } from 'shared~type-stock';
+import dayjs from 'dayjs';
 import { StockUser } from './user.schema';
 import { STOCK_USER_TABLE_NAME } from '../config/dynamodb.config';
 
@@ -265,7 +266,7 @@ export class UserRepository {
         return this.findOneAndUpdate(
           { stockId: user.stockId, userId: user.userId },
           {
-            lastActivityTime: new Date(),
+            lastActivityTime: dayjs().toISOString(),
             money: StockConfig.INIT_USER_MONEY,
             stockStorages,
           },

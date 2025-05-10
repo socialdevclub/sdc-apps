@@ -1,39 +1,32 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, SchemaTypes } from 'mongoose';
+import { randomUUID } from 'crypto';
+import dayjs from 'dayjs';
 import { CompanyInfo, StockPhase, StockSchema } from 'shared~type-stock';
 
-@Schema()
 export class Stock implements StockSchema {
-  @Prop()
+  _id: string;
+
   stockPhase: StockPhase;
 
-  @Prop({ type: SchemaTypes.Date })
-  startedTime: Date;
+  startedTime: string;
 
-  @Prop({ type: SchemaTypes.Map })
   companies: Record<string, CompanyInfo[]>;
 
-  @Prop({ type: SchemaTypes.Map })
   remainingStocks: Record<string, number>;
 
-  @Prop()
   isVisibleRank: boolean;
 
-  @Prop()
   isTransaction: boolean;
 
-  @Prop()
   transactionInterval: number;
 
-  @Prop()
   fluctuationsInterval: number;
 
-  @Prop()
   round: number;
 
   constructor() {
+    this._id = randomUUID();
     this.stockPhase = 'CROWDING';
-    this.startedTime = new Date();
+    this.startedTime = dayjs().toISOString();
     this.remainingStocks = {};
     this.companies = {};
     this.isVisibleRank = false;
@@ -43,7 +36,3 @@ export class Stock implements StockSchema {
     this.round = 0;
   }
 }
-
-export type StockDocument = HydratedDocument<Stock>;
-
-export const stockSchema = SchemaFactory.createForClass(Stock);

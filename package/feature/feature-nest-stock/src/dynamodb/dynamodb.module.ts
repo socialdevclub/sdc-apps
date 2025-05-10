@@ -12,7 +12,7 @@ import { dynamoDBConfig } from '../config/dynamodb.config';
         const client = new DynamoDBClient(dynamoDBConfig);
         return DynamoDBDocumentClient.from(client, {
           marshallOptions: {
-            convertClassInstanceToMap: true,
+            convertClassInstanceToMap: false,
             removeUndefinedValues: true,
           },
         });

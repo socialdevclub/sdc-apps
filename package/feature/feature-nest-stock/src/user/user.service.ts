@@ -256,7 +256,7 @@ ${JSON.stringify(userData)}`;
     const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
 
     const idx = Math.min(
-      Math.floor(getDateDistance(stock.startedTime, new Date()).minutes / stock.fluctuationsInterval),
+      Math.floor(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes / stock.fluctuationsInterval),
       StockConfig.MAX_STOCK_IDX,
     );
 
