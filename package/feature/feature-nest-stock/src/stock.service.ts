@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable, Inject, forwardRef } from '@nestjs/common';
-import type { CompanyInfo, Request, Response, StockPhase, StockSchemaWithId } from 'shared~type-stock';
+import type { CompanyInfo, Request, StockPhase, StockSchemaWithId } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
 import { ceilToUnit } from '@toss/utils';
 import dayjs from 'dayjs';
@@ -22,13 +22,6 @@ export class StockService {
     private readonly logService: LogService,
     private readonly resultService: ResultService,
   ) {}
-
-  transStockToDto(stock: StockSchemaWithId): Response.GetStock {
-    return {
-      ...stock,
-      startedTime: dayjs(stock.startedTime).utcOffset('9').format('YYYY-MM-DDTHH:mm:ssZ'),
-    };
-  }
 
   async find(): Promise<StockSchemaWithId[]> {
     return this.stockRepository.find();

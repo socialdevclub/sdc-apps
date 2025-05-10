@@ -24,7 +24,7 @@ export class StockController {
       throw new HttpException('Stock not found', HttpStatus.NOT_FOUND);
     }
 
-    return this.stockService.transStockToDto(stock);
+    return stock;
   }
 
   @Patch()
