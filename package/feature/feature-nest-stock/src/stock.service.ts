@@ -303,6 +303,12 @@ export class StockService {
         const loanMoney = user.loanCount * StockConfig.SETTLE_LOAN_PRICE;
         updatedMoney -= loanMoney;
 
+        user.resultByRound = user.resultByRound ?? [];
+        for (let i = 0; i < stock.round; i++) {
+          if (typeof user.resultByRound[i] !== 'number') {
+            user.resultByRound[i] = null;
+          }
+        }
         user.resultByRound[stock.round] = updatedMoney;
 
         // 사용자 정보 업데이트
