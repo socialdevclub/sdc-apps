@@ -8,7 +8,6 @@ export { default as useBuyStock } from './useBuyStock';
 export { default as useSellStock } from './useSellStock';
 export { default as useFinishStock } from './useFinishStock';
 export { default as useQueryResult } from './useQueryResult';
-export { default as useSetResult } from './useSetResult';
 export { default as useUser } from './useUser';
 export { default as useUserList } from './useUserList';
 export { default as useSetUser } from './useSetUser';

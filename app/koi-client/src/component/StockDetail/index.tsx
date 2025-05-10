@@ -24,7 +24,6 @@ export default function StockDetail({ stockId }: Props) {
   const { mutateAsync: mutateBuyStock } = Query.Stock.useBuyStock();
   const { mutateAsync: mutateSellStock } = Query.Stock.useSellStock();
   const { mutateAsync: mutateFinishStock } = Query.Stock.useFinishStock(stockId);
-  const { mutateAsync: mutateSetResult } = Query.Stock.useSetResult(stockId);
 
   const { data: users } = Query.Stock.useUserList(stockId);
   const { data: stock } = Query.Stock.useQueryStock(stockId);
@@ -312,18 +311,6 @@ export default function StockDetail({ stockId }: Props) {
                   color="primary"
                 >
                   주식 종료 및 정산
-                </ControlButton>
-                <ControlButton
-                  onClick={() => {
-                    if (!isAllSellPriceZero) {
-                      alert('주식 종료 및 정산을 먼저 해주세요');
-                      return;
-                    }
-                    mutateSetResult({});
-                  }}
-                  color="info"
-                >
-                  라운드 저장
                 </ControlButton>
                 <ControlButton
                   onClick={() => {
