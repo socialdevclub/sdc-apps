@@ -16,12 +16,6 @@ export class StockController {
     private readonly logService: LogService,
   ) {}
 
-  @Get('/list')
-  async getStockList(): Promise<Stock[]> {
-    const stockList = await this.stockService.find();
-    return stockList;
-  }
-
   @Get()
   async getStock(@Query('stockId') stockId: string): Promise<Response.GetStock> {
     const stock = await this.stockService.findOneById(stockId);
@@ -32,9 +26,20 @@ export class StockController {
     return this.stockService.transStockToDto(stock);
   }
 
+  @Patch()
+  updateStock(@Body() body: Request.PatchUpdateStock): Promise<StockSchema> {
+    return this.stockService.findOneByIdAndUpdate(body);
+  }
+
   @Delete()
   async deleteStock(@Query('stockId') stockId: string): Promise<boolean> {
     return this.stockService.deleteStock(stockId);
+  }
+
+  @Get('/list')
+  async getStockList(): Promise<Stock[]> {
+    const stockList = await this.stockService.find();
+    return stockList;
   }
 
   @Get('/phase')
@@ -51,11 +56,6 @@ export class StockController {
   @Post('/create')
   createStock(): Promise<StockSchema> {
     return this.stockService.createStock();
-  }
-
-  @Patch()
-  updateStock(@Body() body: Request.PatchUpdateStock): Promise<StockSchema> {
-    return this.stockService.findOneByIdAndUpdate(body);
   }
 
   @Post('/reset')
