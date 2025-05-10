@@ -298,7 +298,7 @@ export default function StockDetail({ stockId }: Props) {
                     mutateUpdateGame({
                       _id: stockId,
                       isTransaction: true,
-                      startedTime: new Date(),
+                      startedTime: dayjs().toISOString(),
                     });
                   }}
                   color="success"
@@ -365,7 +365,7 @@ export default function StockDetail({ stockId }: Props) {
                   onClick={() => {
                     mutateUpdateGame({
                       _id: stockId,
-                      startedTime: new Date(startedTime.getTime() - 60 * 1000),
+                      startedTime: dayjs(startedTime).subtract(1, 'minute').toISOString(),
                     });
                   }}
                 >
@@ -375,7 +375,7 @@ export default function StockDetail({ stockId }: Props) {
                   onClick={() => {
                     mutateUpdateGame({
                       _id: stockId,
-                      startedTime: new Date(startedTime.getTime() - 10 * 1000),
+                      startedTime: dayjs(startedTime).subtract(10, 'second').toISOString(),
                     });
                   }}
                 >
@@ -385,7 +385,7 @@ export default function StockDetail({ stockId }: Props) {
                   onClick={() => {
                     mutateUpdateGame({
                       _id: stockId,
-                      startedTime: new Date(startedTime.getTime() + 10 * 1000),
+                      startedTime: dayjs(startedTime).add(10, 'second').toISOString(),
                     });
                   }}
                 >
@@ -395,7 +395,7 @@ export default function StockDetail({ stockId }: Props) {
                   onClick={() => {
                     mutateUpdateGame({
                       _id: stockId,
-                      startedTime: new Date(startedTime.getTime() + 60 * 1000),
+                      startedTime: dayjs(startedTime).add(1, 'minute').toISOString(),
                     });
                   }}
                 >

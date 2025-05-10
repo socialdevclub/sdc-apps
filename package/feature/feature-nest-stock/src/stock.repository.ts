@@ -52,6 +52,10 @@ export class StockRepository {
 
   async findOneAndUpdate(stockId: string, update: Partial<Stock>): Promise<StockSchemaWithId | null> {
     try {
+      if (update._id) {
+        delete update._id;
+      }
+
       const { updateExpression, expressionAttributeValues, expressionAttributeNames } =
         this.buildUpdateExpression(update);
 
