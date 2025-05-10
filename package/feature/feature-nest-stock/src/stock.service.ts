@@ -303,12 +303,15 @@ export class StockService {
         const loanMoney = user.loanCount * StockConfig.SETTLE_LOAN_PRICE;
         updatedMoney -= loanMoney;
 
+        user.resultByRound[stock.round] = updatedMoney;
+
         // 사용자 정보 업데이트
         await this.userRepository.findOneAndUpdate(
           { stockId, userId: user.userId },
           {
             loanCount: 0,
             money: updatedMoney,
+            resultByRound: user.resultByRound,
             stockStorages: updatedStockStorages,
           },
         );

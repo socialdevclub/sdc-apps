@@ -27,6 +27,7 @@ export type StockUserSchema = {
   lastActivityTime: string;
   loanCount: number;
   stockStorages: StockStorageSchema[];
+  resultByRound: number[];
 };
 
 const StockPhase = {
@@ -61,7 +62,7 @@ export type StockSchema = {
    */
   fluctuationsInterval: number;
   /**
-   * 0라운드 - 연습게일
+   * 0라운드 - 연습게임
    * 1라운드 - 본선게임
    * 2라운드 - 본선게임
    */

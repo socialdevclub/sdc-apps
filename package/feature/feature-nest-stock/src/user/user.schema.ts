@@ -41,6 +41,8 @@ export class StockUser implements StockUserSchema {
 
   stockStorages: StockStorageSchema[];
 
+  resultByRound: number[];
+
   constructor(required: Pick<StockUserSchema, StockUserRequired>, partial: StockUserForm) {
     this.userId = required.userId;
     this.stockId = required.stockId;
@@ -61,5 +63,6 @@ export class StockUser implements StockUserSchema {
     });
 
     this.stockStorages = partial.stockStorages ?? stockStorages;
+    this.resultByRound = [];
   }
 }
