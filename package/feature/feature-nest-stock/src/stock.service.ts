@@ -195,10 +195,10 @@ export class StockService {
         throw new HttpException('잔액이 부족합니다', HttpStatus.CONFLICT);
       }
 
-      const companies = stock.companies as unknown as Map<string, Array<{ 가격: number; 정보: string[] }>>;
+      const { companies } = stock;
 
       // 이미 정보를 가지고 있지 않은 회사들 중에서만 선택
-      const availableCompanies = Array.from(companies.entries())
+      const availableCompanies = Object.entries(companies)
         .filter(([_, companyInfos]) => {
           // nextTimeIdx 이후의 모든 시점에서 정보를 가지고 있지 않은 회사만 선택
           return companyInfos.slice(nextTimeIdx).some((info) => !info.정보.includes(userId));
@@ -214,18 +214,16 @@ export class StockService {
       const selectedCompany = availableCompanies[randomIndex];
 
       // 랜덤으로 시점 선택 (정보를 가지고 있는 시점만 선택)
-      let randomTimeIndex =
-        Math.floor(Math.random() * (companies.get(selectedCompany).length - nextTimeIdx)) + nextTimeIdx;
+      let randomTimeIndex = Math.floor(Math.random() * (companies[selectedCompany].length - nextTimeIdx)) + nextTimeIdx;
 
       // 선택된 회사의 정보 업데이트
-      const companyInfos = [...companies.get(selectedCompany)]; // 배열 복사
+      const companyInfos = [...companies[selectedCompany]]; // 배열 복사
 
       // 해당 배열안에 이미 user Id가 있는지 확인
       let isExistUser = companyInfos[randomTimeIndex].정보.find((v) => v === userId);
       // user Id가 있는 때는 randomTimeIndex를 다시 생성
       while (isExistUser) {
-        randomTimeIndex =
-          Math.floor(Math.random() * (companies.get(selectedCompany).length - nextTimeIdx)) + nextTimeIdx;
+        randomTimeIndex = Math.floor(Math.random() * (companies[selectedCompany].length - nextTimeIdx)) + nextTimeIdx;
         isExistUser = companyInfos[randomTimeIndex].정보.find((v) => v === userId);
       }
 
@@ -235,7 +233,7 @@ export class StockService {
       };
 
       // 업데이트된 회사 정보로 객체 생성
-      const updatedCompanies = Object.fromEntries(companies.entries());
+      const updatedCompanies = { ...companies };
       updatedCompanies[selectedCompany] = companyInfos;
 
       // 스톡 정보 업데이트
@@ -273,8 +271,7 @@ export class StockService {
         throw new Error('users not found');
       }
 
-      const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
-      const remainingStocks = stock.remainingStocks as unknown as Record<string, number>;
+      const { companies, remainingStocks } = stock;
 
       const idx = Math.min(
         Math.floor(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes / stock.fluctuationsInterval),
@@ -288,7 +285,7 @@ export class StockService {
 
         // 사용자의 모든 주식 판매 처리
         updatedStockStorages = updatedStockStorages.map((stockStorage) => {
-          const companyPrice = companies.get(stockStorage.companyName)[idx]?.가격;
+          const companyPrice = companies[stockStorage.companyName][idx]?.가격;
           const totalPrice = companyPrice * stockStorage.stockCountCurrent;
 
           // 사용자 잔액 증가

@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Patch, Post, Query } from '@nestjs/common';
 import type { Request, Response, StockSchema } from 'shared~type-stock';
 import { HttpService } from '@nestjs/axios';
+import { randomUUID } from 'crypto';
 import type { Stock } from './stock.schema';
 import { StockService } from './stock.service';
 import { StockProcessor } from './stock.processor';
@@ -74,10 +75,8 @@ export class StockController {
   }
 
   @Post('/buy')
-  async buyStock(@Body() body: Request.PostBuyStock): Promise<StockSchema> {
-    const timestamp = Date.now();
-    const randomUUID = crypto.randomUUID();
-    const queueUniqueId = `${timestamp}-${randomUUID}`;
+  async buyStock(@Body() body: Request.PostBuyStock): Promise<{ messageId: string }> {
+    const queueUniqueId = randomUUID();
 
     await this.logService.addLog(
       new StockLog({
@@ -94,16 +93,21 @@ export class StockController {
       }),
     );
 
-    return this.httpService.axiosRef
-      .post('https://api.socialdev.club/queue/stock/buy', { ...body, queueUniqueId })
-      .then(async (res) => {
-        return res.data;
-      })
-      .catch(async (error) => {
-        console.error(error);
-        await this.stockProcessor.buyStock(body.stockId, body, { queueMessageId: queueUniqueId });
-        return { messageId: 'direct' };
-      });
+    if (false) {
+      return this.httpService.axiosRef
+        .post('https://api.socialdev.club/queue/stock/buy', { ...body, queueUniqueId })
+        .then(async (res) => {
+          return res.data;
+        })
+        .catch(async (error) => {
+          console.error(error);
+          await this.stockProcessor.buyStock(body.stockId, body, { queueMessageId: queueUniqueId });
+          return { messageId: 'direct' };
+        });
+    }
+
+    await this.stockProcessor.buyStock(body.stockId, body, { queueMessageId: queueUniqueId });
+    return { messageId: 'direct' };
   }
 
   @Post('/draw-info')
@@ -112,10 +116,8 @@ export class StockController {
   }
 
   @Post('/sell')
-  async sellStock(@Body() body: Request.PostSellStock): Promise<StockSchema> {
-    const timestamp = Date.now();
-    const randomUUID = crypto.randomUUID();
-    const queueUniqueId = `${timestamp}-${randomUUID}`;
+  async sellStock(@Body() body: Request.PostSellStock): Promise<{ messageId: string }> {
+    const queueUniqueId = randomUUID();
 
     await this.logService.addLog(
       new StockLog({
@@ -132,16 +134,21 @@ export class StockController {
       }),
     );
 
-    return this.httpService.axiosRef
-      .post('https://api.socialdev.club/queue/stock/sell', { ...body, queueUniqueId })
-      .then(async (res) => {
-        return res.data;
-      })
-      .catch(async (error) => {
-        console.error(error);
-        await this.stockProcessor.sellStock(body.stockId, body, { queueMessageId: queueUniqueId });
-        return { messageId: 'direct' };
-      });
+    if (false) {
+      return this.httpService.axiosRef
+        .post('https://api.socialdev.club/queue/stock/sell', { ...body, queueUniqueId })
+        .then(async (res) => {
+          return res.data;
+        })
+        .catch(async (error) => {
+          console.error(error);
+          await this.stockProcessor.sellStock(body.stockId, body, { queueMessageId: queueUniqueId });
+          return { messageId: 'direct' };
+        });
+    }
+
+    await this.stockProcessor.sellStock(body.stockId, body, { queueMessageId: queueUniqueId });
+    return { messageId: 'direct' };
   }
 
   @Post('/finish')

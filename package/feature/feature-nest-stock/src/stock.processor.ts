@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
-import type { CompanyInfo, Request } from 'shared~type-stock';
+import type { Request } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
 import { isStockOverLimit } from 'shared~config/dist/stock';
 import dayjs from 'dayjs';
@@ -41,10 +41,10 @@ export class StockProcessor {
         throw new Error('유저 정보를 불러올 수 없습니다');
       }
 
-      const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
+      const { companies } = stock;
       const remainingStocks = stock.remainingStocks as unknown as Record<string, number>;
 
-      const companyInfo = companies.get(company);
+      const companyInfo = companies[company];
       if (!companyInfo) {
         throw new Error('회사를 찾을 수 없습니다');
       }
@@ -165,18 +165,8 @@ export class StockProcessor {
         throw new Error('지금은 거래할 수 없습니다');
       }
 
-      const isNotQueued = !attributes?.queueMessageId;
-
-      if (isNotQueued) {
-        const { minutes, seconds } = getDateDistance(dayjs(user.lastActivityTime).toDate(), new Date());
-        if (minutes === 0 && seconds < stock.transactionInterval) {
-          throw new Error(`너무 빠른 거래입니다`);
-        }
-      }
-
-      const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
-      const remainingStocks = stock.remainingStocks as unknown as Record<string, number>;
-      const companyInfo = companies.get(company);
+      const { companies, remainingStocks } = stock;
+      const companyInfo = companies[company];
       const remainingCompanyStock = remainingStocks[company];
 
       if (!companyInfo) {

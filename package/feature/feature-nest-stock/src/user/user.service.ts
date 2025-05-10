@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { CompanyInfo, Response, StockUserSchema, StockUserInfoSchema } from 'shared~type-stock';
+import { Response, StockUserSchema, StockUserInfoSchema } from 'shared~type-stock';
 import dayjs from 'dayjs';
 import { getDateDistance } from '@toss/date';
 import { StockConfig } from 'shared~config';
@@ -46,15 +46,15 @@ export class UserService {
     const stock = await this.stockRepository.findOneById(stockId);
     const users = await this.getUserList(stockId);
 
-    const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
+    const { companies } = stock;
 
-    const [partnerIds] = Array.from(companies.entries()).reduce(
-      (reducer, [_, companyInfos]) => {
+    const [partnerIds] = Object.entries(companies).reduce(
+      (reducer, [company, companyInfos]) => {
         const [partnerIds] = reducer;
 
-        companyInfos.forEach((_, idx) => {
-          if (companyInfos[idx].정보.some((name) => name === userId)) {
-            const partners = companyInfos[idx].정보.filter((name) => name !== userId);
+        companyInfos.forEach((companyInfo, idx) => {
+          if (companyInfo.정보.some((name) => name === userId)) {
+            const partners = companyInfo.정보.filter((name) => name !== userId);
             partners.forEach((partner) => {
               if (partner && !partnerIds.some((v) => v === partner)) {
                 partnerIds.push(partner);
@@ -253,7 +253,7 @@ ${JSON.stringify(userData)}`;
     }
 
     const stock = await this.stockRepository.findOneById(stockId);
-    const companies = stock.companies as unknown as Map<string, CompanyInfo[]>;
+    const { companies } = stock.companies;
 
     const idx = Math.min(
       Math.floor(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes / stock.fluctuationsInterval),
@@ -261,7 +261,7 @@ ${JSON.stringify(userData)}`;
     );
 
     const allCompaniesPrice = user.stockStorages.reduce((acc, { companyName, stockCountCurrent }) => {
-      const companyInfo = companies.get(companyName);
+      const companyInfo = companies[companyName];
       const price = companyInfo[idx]?.가격;
       return acc + price * stockCountCurrent;
     }, 0);
