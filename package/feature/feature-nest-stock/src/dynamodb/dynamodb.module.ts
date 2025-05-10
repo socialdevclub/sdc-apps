@@ -10,7 +10,12 @@ import { dynamoDBConfig } from '../config/dynamodb.config';
       provide: 'DYNAMODB_CLIENT',
       useFactory: (): DynamoDBDocumentClient => {
         const client = new DynamoDBClient(dynamoDBConfig);
-        return DynamoDBDocumentClient.from(client);
+        return DynamoDBDocumentClient.from(client, {
+          marshallOptions: {
+            convertClassInstanceToMap: true,
+            removeUndefinedValues: true,
+          },
+        });
       },
     },
   ],
