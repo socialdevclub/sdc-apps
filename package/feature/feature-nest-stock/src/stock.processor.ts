@@ -78,17 +78,17 @@ export class StockProcessor {
       }
 
       // 필요한 로그 확인
-      const log = await this.logService.findOne({ queueId: attributes?.queueMessageId });
+      // const log = await this.logService.findOne({ queueId: attributes?.queueMessageId });
 
-      switch (log?.status) {
-        case 'CANCEL':
-          throw new Error('취소된 요청입니다');
-        case 'FAILED':
-          throw new Error('실패된 요청입니다');
-        case 'SUCCESS':
-          throw new Error('이미 처리된 요청입니다');
-        default:
-      }
+      // switch (log?.status) {
+      //   case 'CANCEL':
+      //     throw new Error('취소된 요청입니다');
+      //   case 'FAILED':
+      //     throw new Error('실패된 요청입니다');
+      //   case 'SUCCESS':
+      //     throw new Error('이미 처리된 요청입니다');
+      //   default:
+      // }
 
       // 주식 및 보유량 업데이트
       const updatedStockStorage = {
@@ -195,16 +195,17 @@ export class StockProcessor {
       }
 
       // 필요한 로그 확인
-      const log = await this.logService.findOne({ queueId: attributes?.queueMessageId });
-      switch (log?.status) {
-        case 'CANCEL':
-          throw new Error('취소된 요청입니다');
-        case 'FAILED':
-          throw new Error('실패된 요청입니다');
-        case 'SUCCESS':
-          throw new Error('이미 처리된 요청입니다');
-        default:
-      }
+      // const log = await this.logService.findOne({ queueId: attributes?.queueMessageId });
+
+      // switch (log?.status) {
+      //   case 'CANCEL':
+      //     throw new Error('취소된 요청입니다');
+      //   case 'FAILED':
+      //     throw new Error('실패된 요청입니다');
+      //   case 'SUCCESS':
+      //     throw new Error('이미 처리된 요청입니다');
+      //   default:
+      // }
 
       // 주식 및 보유량 업데이트
       const updatedStockStorage = {

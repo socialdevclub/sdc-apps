@@ -73,22 +73,23 @@ export class StockController {
   async buyStock(@Body() body: Request.PostBuyStock): Promise<{ messageId: string }> {
     const queueUniqueId = randomUUID();
 
-    await this.logService.addLog(
-      new StockLog({
-        action: 'BUY',
-        company: body.company,
-        date: new Date(),
-        price: body.unitPrice * body.amount,
-        quantity: body.amount,
-        queueId: queueUniqueId,
-        round: body.round,
-        status: 'QUEUING',
-        stockId: body.stockId,
-        userId: body.userId,
-      }),
-    );
-
+    // SQS 관련 로직 (지금은 안씀)
     if (false) {
+      await this.logService.addLog(
+        new StockLog({
+          action: 'BUY',
+          company: body.company,
+          date: new Date(),
+          price: body.unitPrice * body.amount,
+          quantity: body.amount,
+          queueId: queueUniqueId,
+          round: body.round,
+          status: 'QUEUING',
+          stockId: body.stockId,
+          userId: body.userId,
+        }),
+      );
+
       return this.httpService.axiosRef
         .post('https://api.socialdev.club/queue/stock/buy', { ...body, queueUniqueId })
         .then(async (res) => {
@@ -114,22 +115,23 @@ export class StockController {
   async sellStock(@Body() body: Request.PostSellStock): Promise<{ messageId: string }> {
     const queueUniqueId = randomUUID();
 
-    await this.logService.addLog(
-      new StockLog({
-        action: 'SELL',
-        company: body.company,
-        date: new Date(),
-        price: body.unitPrice * body.amount,
-        quantity: body.amount,
-        queueId: queueUniqueId,
-        round: body.round,
-        status: 'QUEUING',
-        stockId: body.stockId,
-        userId: body.userId,
-      }),
-    );
-
+    // SQS 관련 로직 (지금은 안씀)
     if (false) {
+      await this.logService.addLog(
+        new StockLog({
+          action: 'SELL',
+          company: body.company,
+          date: new Date(),
+          price: body.unitPrice * body.amount,
+          quantity: body.amount,
+          queueId: queueUniqueId,
+          round: body.round,
+          status: 'QUEUING',
+          stockId: body.stockId,
+          userId: body.userId,
+        }),
+      );
+
       return this.httpService.axiosRef
         .post('https://api.socialdev.club/queue/stock/sell', { ...body, queueUniqueId })
         .then(async (res) => {
