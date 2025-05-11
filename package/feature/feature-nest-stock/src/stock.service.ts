@@ -6,8 +6,6 @@ import dayjs from 'dayjs';
 import { StockConfig } from 'shared~config';
 import { UserService } from './user/user.service';
 import { LogService } from './log/log.service';
-import { ResultService } from './result/result.service';
-import type { Result } from './result/result.schema';
 import { StockRepository } from './stock.repository';
 import { UserRepository } from './user/user.repository';
 
@@ -20,7 +18,6 @@ export class StockService {
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly logService: LogService,
-    private readonly resultService: ResultService,
   ) {}
 
   async find(): Promise<StockSchemaWithId[]> {
@@ -333,43 +330,9 @@ export class StockService {
     }
   }
 
-  async saveStockResult(stockId: string): Promise<Result[]> {
-    try {
-      const stock = await this.stockRepository.findOneById(stockId);
-      const users = await this.userRepository.find({ stockId });
-
-      if (!stock) {
-        throw new Error('stock not found');
-      }
-
-      if (!users || users.length === 0) {
-        throw new Error('users not found');
-      }
-
-      const resultPromises = users.map((user) => {
-        return this.resultService.setResult({
-          money: user.money,
-          round: stock.round,
-          stockId,
-          userId: user.userId,
-        });
-      });
-
-      await Promise.all(resultPromises);
-
-      // 현재 라운드 결과만 반환
-      const results = await this.resultService.getResults();
-      return results.filter((v) => v.round === stock.round);
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-
   async deleteStock(stockId: string): Promise<boolean> {
     try {
       // 관련된 데이터 모두 삭제
-      await this.resultService.deleteResult({ stockId });
       await this.logService.deleteAllByStock(stockId);
       await this.userService.removeAllUser(stockId);
       await this.stockRepository.deleteMany({ _id: stockId });

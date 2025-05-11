@@ -83,10 +83,3 @@ export type StockLogSchema = {
   status: 'QUEUING' | 'SUCCESS' | 'FAILED' | 'CANCEL';
   failedReason?: string;
 };
-
-export type ResultSchema = {
-  stockId: string;
-  userId: string;
-  round: number;
-  money: number;
-};

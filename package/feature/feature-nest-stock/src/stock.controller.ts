@@ -64,11 +64,6 @@ export class StockController {
     return this.stockService.resetStock(stockId);
   }
 
-  @Post('/result')
-  saveStockResult(@Query('stockId') stockId: string): Promise<Response.Result[]> {
-    return this.stockService.saveStockResult(stockId);
-  }
-
   @Post('/init')
   initStock(@Query('stockId') stockId: string): Promise<StockSchema> {
     return this.stockService.initStock(stockId);
