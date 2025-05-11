@@ -21,9 +21,9 @@ const useUser = ({ stockId, userId, userRefetchInterval, stockRefetchInterval }:
     refetchInterval: userRefetchInterval,
   });
 
-  const refetch = () => {
-    refetchStock();
-    refetchUser();
+  const refetch = async () => {
+    await refetchStock();
+    await refetchUser();
   };
 
   const getStockStorage = useCallback(
