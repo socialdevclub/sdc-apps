@@ -23,7 +23,7 @@ const UserSummary = ({
   allProfitDesc,
   stock,
 }: UserSummaryProps) => {
-  if (!user || !stock || !users) return null;
+  if (!user || !stock) return null;
 
   return (
     <>
