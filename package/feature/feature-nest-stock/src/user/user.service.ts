@@ -235,7 +235,7 @@ ${JSON.stringify(userData)}`;
     }
 
     const stock = await this.stockRepository.findOneById(stockId);
-    const { companies } = stock.companies;
+    const { companies } = stock;
 
     const idx = Math.min(
       Math.floor(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes / stock.fluctuationsInterval),
