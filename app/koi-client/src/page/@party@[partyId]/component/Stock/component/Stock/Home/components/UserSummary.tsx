@@ -23,7 +23,7 @@ const UserSummary = ({
   allProfitDesc,
   stock,
 }: UserSummaryProps) => {
-  if (!user || !stock || !users) return null;
+  if (!user || !stock) return null;
 
   return (
     <>
@@ -34,7 +34,7 @@ const UserSummary = ({
           value={`₩${commaizeNumber(user.money)}`}
           valueColor={COLOR.pastelGreen}
           rightComponent={
-            stock.isVisibleRank ? (
+            stock.isVisibleRank && users ? (
               <>{users.sort((a, b) => b.money - a.money).findIndex((v) => v.userId === userId) + 1}위</>
             ) : (
               <></>
