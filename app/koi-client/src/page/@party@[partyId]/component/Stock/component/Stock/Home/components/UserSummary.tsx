@@ -7,8 +7,11 @@ import { type UseStockInfo } from '../hooks/useStockInfo';
 
 type UserSummaryProps = Pick<
   UseStockInfo,
-  'user' | 'users' | 'userId' | 'allSellPrice' | 'allUserSellPriceDesc' | 'moneyRatio' | 'allProfitDesc' | 'stock'
->;
+  'user' | 'users' | 'userId' | 'allUserSellPriceDesc' | 'allProfitDesc' | 'stock'
+> & {
+  moneyRatio: string;
+  allSellPrice: number;
+};
 
 const UserSummary = ({
   user,
@@ -20,7 +23,7 @@ const UserSummary = ({
   allProfitDesc,
   stock,
 }: UserSummaryProps) => {
-  if (!user || !stock) return null;
+  if (!user || !stock || !users) return null;
 
   return (
     <>

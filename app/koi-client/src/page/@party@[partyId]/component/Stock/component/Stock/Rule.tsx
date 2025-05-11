@@ -9,6 +9,10 @@ const Rule = ({ stockId }: Props) => {
   const { data: stock } = Query.Stock.useQueryStock(stockId);
   const { data: users } = Query.Stock.useUserList(stockId);
 
+  if (!users) {
+    return <></>;
+  }
+
   return (
     <>
       <Line>1. 다른 사람에게 자신의 휴대폰 화면을 보여줄 수 없습니다</Line>

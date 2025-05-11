@@ -110,7 +110,7 @@ const Poll = () => {
                   key={vote.title}
                 >
                   <span style={{ color: 'white' }}>
-                    {countAll}명 <CaretDownFilled />
+                    {countAll}명 <CaretDownFilled onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
                   </span>
                 </Dropdown>,
               ]}
