@@ -1,35 +1,33 @@
-import { Response } from 'shared~type-stock';
 import { useCallback } from 'react';
-import { useQuery } from 'lib-react-query';
-import { serverApiUrl } from '../../../config/baseUrl';
+import { Query } from '../..';
 
 const useQueryResult = (stockId: string | undefined) => {
-  const { data } = useQuery<Response.Result[]>({
-    api: {
-      hostname: serverApiUrl,
-      method: 'GET',
-      pathname: `/stock/result?stockId=${stockId}`,
-    },
-    reactQueryOption: {
-      refetchInterval: 1500,
-    },
-  });
+  const { data: users } = Query.Stock.useUserList(stockId);
 
   const getRound0Avg = useCallback(
     (userId: string) => {
-      return data?.filter((v) => v.userId === userId && v.round === 0).reduce((acc, v) => acc + v.money, 0) ?? 0;
+      return users?.find((v) => v.userId === userId)?.resultByRound[0] ?? 0;
     },
-    [data],
+    [users],
   );
 
   const getRound12Avg = useCallback(
     (userId?: string) => {
-      return data ? Math.max(...data.filter((v) => v.userId === userId && v.round > 0).map((v) => v.money)) : 0;
+      const resultByRound = users
+        ?.find((v) => v.userId === userId)
+        ?.resultByRound.slice(1)
+        .filter((money) => typeof money === 'number');
+
+      if (!resultByRound) {
+        return 0;
+      }
+
+      return resultByRound.reduce((acc, money) => acc + money, 0) / resultByRound.length;
     },
-    [data],
+    [users],
   );
 
-  return { data: data ?? [], getRound0Avg, getRound12Avg };
+  return { getRound0Avg, getRound12Avg };
 };
 
 export default useQueryResult;
