@@ -4,5 +4,6 @@
     "jsx": "react-jsx",
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
+    "allowImportingTsExtensions": true,
   }
 }

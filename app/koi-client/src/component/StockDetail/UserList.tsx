@@ -11,9 +11,9 @@ interface UserListProps {
 
 const UserList: React.FC<UserListProps> = ({ stockId }) => {
   const { data: users } = Query.Stock.useUserList(stockId);
-  const { data: profiles } = Query.Supabase.useQueryProfileById(users.map((v) => v.userId));
+  const { data: profiles } = Query.Supabase.useQueryProfileById(users?.map((v) => v.userId) ?? []);
 
-  const introNotCompletedUsers = users.filter((user) => !user.userInfo.introduction);
+  const introNotCompletedUsers = users?.filter((user) => !user.userInfo.introduction) ?? [];
 
   const { mutateAsync: mutateRemoveUser } = Query.Stock.useRemoveUser();
   const { mutateAsync: mutateRegisterUser } = Query.Stock.useRegisterUser();
@@ -27,7 +27,7 @@ const UserList: React.FC<UserListProps> = ({ stockId }) => {
           if (event.key === 'Enter' && event.currentTarget.value) {
             const username = event.currentTarget.value;
 
-            if (users.find((v) => v.userInfo.nickname === username)) {
+            if (users?.find((v) => v.userInfo.nickname === username)) {
               alert('이미 참가자입니다.');
               return;
             }
@@ -48,6 +48,7 @@ const UserList: React.FC<UserListProps> = ({ stockId }) => {
 
             mutateRegisterUser({
               stockId,
+              stockStorages: [],
               userId: profileData.id,
               userInfo: {
                 gender: profileData.gender,

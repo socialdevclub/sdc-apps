@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { SwitchCase } from '@toss/react';
 import { Suspense, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { message } from 'antd';
 import Home from './Home/Home';
 import Information from './Information';
 import StockList from './StockList';
@@ -28,6 +29,7 @@ interface Props {
 
 const Stock = ({ stockId }: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -62,15 +64,16 @@ const Stock = ({ stockId }: Props) => {
       <Tabs defaultActiveKey={searchParams.get('page') ?? '홈'} items={items} onChange={onClickTab} />
       <ContentContainer>
         <Suspense fallback={<></>}>
+          {contextHolder}
           <SwitchCase
             value={searchParams.get('page') ?? '홈'}
             caseBy={{
               // 룰: <Rule stockId={stockId} />,
-              정보: <Information stockId={stockId} />,
-              주식: <StockList stockId={stockId} />,
-              홈: <Home stockId={stockId} />,
+              정보: <Information stockId={stockId} messageApi={messageApi} />,
+              주식: <StockList stockId={stockId} messageApi={messageApi} />,
+              홈: <Home stockId={stockId} messageApi={messageApi} />,
             }}
-            defaultComponent={<Home stockId={stockId} />}
+            defaultComponent={<Home stockId={stockId} messageApi={messageApi} />}
           />
         </Suspense>
       </ContentContainer>

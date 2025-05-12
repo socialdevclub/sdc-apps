@@ -9,6 +9,8 @@ import mongoose, {
   UpdateQuery,
 } from 'mongoose';
 import { CountOptions, DeleteOptions, UpdateOptions } from 'mongodb';
+import { StockConfig } from 'shared~config';
+import { StockStorageSchema } from 'shared~type-stock';
 import { StockUser, UserDocument } from './user.schema';
 
 @Injectable()
@@ -104,13 +106,21 @@ export class UserRepository {
     options?: UpdateOptions & Omit<MongooseQueryOptions<StockUser>, 'lean'>,
   ): Promise<boolean> {
     try {
+      const companies = StockConfig.getRandomCompanyNames();
+      const stockStorages = companies.map((company) => {
+        return {
+          companyName: company,
+          stockCountCurrent: 0,
+          stockCountHistory: new Array(StockConfig.MAX_STOCK_IDX + 1).fill(0),
+        } as StockStorageSchema;
+      });
       return !!(await this.userModel.updateMany(
         { stockId },
         {
           $set: {
-            inventory: {},
             lastActivityTime: new Date(),
-            money: 1000000,
+            money: StockConfig.INIT_USER_MONEY,
+            stockStorages,
           },
         },
         options,

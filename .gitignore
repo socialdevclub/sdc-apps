@@ -14,6 +14,7 @@ dist
 out
 node_modules
 turbo-build.log
+mcp.json
 
 # mac
 .DS_Store
@@ -28,5 +29,7 @@ turbo-build.log
 /blob-report/
 /playwright/.cache/
 
-# windsurf rules
+# IDE rules
 .windsurfrules
+.cursor/
+.cursorrules

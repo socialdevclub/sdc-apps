@@ -65,14 +65,19 @@ export class StockProcessor {
           throw new Error('주가가 변동되었습니다. 다시 시도해주세요');
         }
 
-        const inventory = user.inventory as unknown as Map<string, number>;
-        const companyCount = inventory.get(company) || 0;
+        const stockStorage = user.stockStorages.find((v) => v.companyName === company);
+        if (!stockStorage) {
+          throw new Error(`주식 보유 정보 ${company}를 불러올 수 없습니다`);
+        }
+
+        const companyCount = stockStorage.stockCountCurrent;
 
         if (isStockOverLimit(playerCount, companyCount, amount)) {
           throw new Error('주식 보유 한도 초과');
         }
 
-        inventory.set(company, companyCount + amount);
+        stockStorage.stockCountCurrent = companyCount + amount;
+        stockStorage.stockCountHistory[idx] += amount;
         remainingStocks.set(company, remainingStocks.get(company) - amount);
         user.money -= totalPrice;
         user.lastActivityTime = new Date();
@@ -93,12 +98,15 @@ export class StockProcessor {
           { _id: user._id },
           {
             $set: {
-              inventory: user.inventory,
               lastActivityTime: user.lastActivityTime,
               money: user.money,
+              [`stockStorages.$[elem]`]: stockStorage,
             },
           },
-          { session },
+          {
+            arrayFilters: [{ 'elem.companyName': company }],
+            session,
+          },
         );
 
         await this.stockRepository.updateOne(
@@ -173,8 +181,13 @@ export class StockProcessor {
           throw new HttpException('회사 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
         }
 
-        const inventory = user.inventory as unknown as Map<string, number>;
-        if (!inventory.get(company) || inventory.get(company) < amount) {
+        const stockStorage = user.stockStorages.find((v) => v.companyName === company);
+        if (!stockStorage) {
+          throw new Error(`주식 보유 정보 ${company}를 불러올 수 없습니다`);
+        }
+
+        const companyCount = stockStorage.stockCountCurrent;
+        if (companyCount < amount) {
           throw new HttpException('주식을 보유하고 있지 않습니다', HttpStatus.CONFLICT);
         }
 
@@ -189,7 +202,8 @@ export class StockProcessor {
           throw new HttpException('주가가 변동되었습니다. 다시 시도해주세요', HttpStatus.CONFLICT);
         }
 
-        inventory.set(company, inventory.get(company) - amount);
+        stockStorage.stockCountCurrent = companyCount - amount;
+        stockStorage.stockCountHistory[idx] -= amount;
         user.money += totalPrice;
         user.lastActivityTime = new Date();
 
@@ -210,12 +224,15 @@ export class StockProcessor {
           { _id: user._id },
           {
             $set: {
-              inventory: user.inventory,
               lastActivityTime: user.lastActivityTime,
               money: user.money,
+              [`stockStorages.$[elem]`]: stockStorage,
             },
           },
-          { session },
+          {
+            arrayFilters: [{ 'elem.companyName': company }],
+            session,
+          },
         );
 
         await this.stockRepository.updateOne(

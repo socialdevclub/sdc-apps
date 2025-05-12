@@ -17,9 +17,10 @@ interface Props {
 const Phase = ({ stockId }: Props) => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
 
-  const { stockPhase } = Query.Stock.useQueryStockPhase(stockId);
+  const { data: stock } = Query.Stock.useQueryStock(stockId);
   const { data: user } = Query.Stock.useUserFindOne(stockId, supabaseSession?.user.id);
 
+  const stockPhase = stock?.stockPhase;
   const isEntry = Boolean(user);
 
   if (!supabaseSession || !stockPhase) {

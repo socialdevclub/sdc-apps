@@ -1,4 +1,3 @@
-import { objectEntries } from '@toss/utils';
 import { useCallback } from 'react';
 import { Query } from '../..';
 
@@ -27,8 +26,8 @@ const useAllSellPrice = ({ stockId }: Props, options?: Options) => {
         return 0;
       }
 
-      return objectEntries(selectedUser.inventory).reduce((price, [company, count]) => {
-        return price + companiesPrice[company] * count;
+      return selectedUser.stockStorages.reduce((price, { companyName, stockCountCurrent }) => {
+        return price + companiesPrice[companyName] * stockCountCurrent;
       }, 0);
     },
     [companiesPrice, users],
