@@ -9,8 +9,9 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { StockSchemaWithId } from 'shared~type-stock';
 import { randomUUID } from 'crypto';
-import { STOCK_TABLE_NAME } from './config/dynamodb.config';
 import { Stock } from './stock.schema';
+
+const STOCK_TABLE_NAME = 'sdc-stock';
 
 @Injectable()
 export class StockRepository {

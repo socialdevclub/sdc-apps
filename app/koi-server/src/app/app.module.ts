@@ -5,6 +5,7 @@ import { StockModule } from 'feature-nest-stock';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PartyModule } from './party/party.module';
+import { DynamoDBModule } from './dynamodb/dynamodb.module';
 
 @Module({
   controllers: [AppController],
@@ -13,6 +14,7 @@ import { PartyModule } from './party/party.module';
       ignoreUndefined: true,
       maxIdleTimeMS: 60000,
     }),
+    DynamoDBModule,
     PollModule,
     StockModule,
     PartyModule,

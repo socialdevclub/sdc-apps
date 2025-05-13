@@ -12,7 +12,8 @@ import { StockConfig } from 'shared~config';
 import { StockStorageSchema, StockUserSchema } from 'shared~type-stock';
 import dayjs from 'dayjs';
 import { StockUser } from './user.schema';
-import { STOCK_USER_TABLE_NAME } from '../config/dynamodb.config';
+
+const STOCK_USER_TABLE_NAME = 'sdc-stock-user';
 
 @Injectable()
 export class UserRepository {

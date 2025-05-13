@@ -11699,6 +11699,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "koi-server@workspace:app/koi-server"
   dependencies:
+    "@aws-sdk/client-dynamodb": "npm:^3.804.0"
+    "@aws-sdk/credential-providers": "npm:^3.806.0"
+    "@aws-sdk/lib-dynamodb": "npm:^3.804.0"
+    "@aws-sdk/util-dynamodb": "npm:^3.804.0"
     "@codegenie/serverless-express": "npm:^4.13.0"
     "@nestjs/cli": "npm:^10.3.0"
     "@nestjs/common": "npm:^10.3.0"

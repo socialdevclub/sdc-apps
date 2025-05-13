@@ -15758,6 +15758,10 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./app/koi-server/",\
         "packageDependencies": [\
           ["koi-server", "workspace:app/koi-server"],\
+          ["@aws-sdk/client-dynamodb", "npm:3.804.0"],\
+          ["@aws-sdk/credential-providers", "npm:3.806.0"],\
+          ["@aws-sdk/lib-dynamodb", "virtual:cfdbbaf53af87e056d7cde7bc92962e5fc54b10c8ebda6abfda1066b1044a3c5391849a370a5a0589066f908fcb5d109ab574d891f2828f6e903a3c099c3f1fc#npm:3.804.0"],\
+          ["@aws-sdk/util-dynamodb", "virtual:cfdbbaf53af87e056d7cde7bc92962e5fc54b10c8ebda6abfda1066b1044a3c5391849a370a5a0589066f908fcb5d109ab574d891f2828f6e903a3c099c3f1fc#npm:3.804.0"],\
           ["@codegenie/serverless-express", "npm:4.13.0"],\
           ["@nestjs/cli", "virtual:ce395be6b7426ea598ea4e8ed1669116613a7e400e65e428fdb6306685b33da86346a368fe102e4a42279e9137bdf836fdf4043cbb75e24b471a2ccb7a6a329b#npm:10.3.0"],\
           ["@nestjs/common", "virtual:ce395be6b7426ea598ea4e8ed1669116613a7e400e65e428fdb6306685b33da86346a368fe102e4a42279e9137bdf836fdf4043cbb75e24b471a2ccb7a6a329b#npm:10.3.0"],\
