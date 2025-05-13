@@ -258,6 +258,8 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
       })}
       {pastInfos.length === 0 && <Empty>현재 시각 이전의 정보가 없습니다</Empty>}
 
+      <Divider />
+
       <RecommendedPartners stockId={stockId} />
 
       <StickyBottom>
