@@ -148,6 +148,39 @@ KOI-SERVER는 파티 게임 플랫폼의 백엔드 애플리케이션입니다. 
   ```
   `.env` 파일의 환경 변수 키와 값이 올바르게 설정되어 있는지 확인하세요.
 
+### AWS 자격 증명 오류
+
+  다음과 같은 에러 발생 시:
+  ```bash
+  [Nest] 36546  - 2025. 05. 13. 오후 11:30:57   ERROR [ExceptionsHandler] Could not load credentials from any providers
+  ```
+
+  이 에러는 AWS 자격 증명을 불러올 수 없을 때 발생합니다. 다음 해결 방법을 시도해보세요:
+
+  1. AWS SSO 로그인 재실행:
+     ```bash
+     aws sso login --profile [your_profile_name]
+     ```
+
+  2. AWS_PROFILE 환경 변수가 올바르게 설정되어 있는지 확인:
+     ```bash
+     echo $AWS_PROFILE  # macOS/Linux
+     echo %AWS_PROFILE% # Windows 명령 프롬프트
+     ```
+
+  3. 현재 AWS 자격 증명 상태 확인:
+     ```bash
+     aws sts get-caller-identity --profile [your_profile_name]
+     ```
+     
+  4. 터미널/명령 프롬프트 재시작 후 다시 시도
+
+  5. SSO 세션이 만료된 경우 다시 로그인:
+     ```bash
+     aws configure sso --profile [your_profile_name]
+     aws sso login --profile [your_profile_name]
+     ```
+
 ## API 명세
 
 ### 주식 API
