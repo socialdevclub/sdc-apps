@@ -27,7 +27,7 @@ export default function IntroduceResult({ HeaderComponent = <></>, stockId }: Pr
 
   useDisableScrollView();
 
-  if (!userId || !user) {
+  if (!userId || !user || !userList) {
     return <></>;
   }
 

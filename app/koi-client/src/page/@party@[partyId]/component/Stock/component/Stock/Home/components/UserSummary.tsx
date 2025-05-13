@@ -7,8 +7,11 @@ import { type UseStockInfo } from '../hooks/useStockInfo';
 
 type UserSummaryProps = Pick<
   UseStockInfo,
-  'user' | 'users' | 'userId' | 'allSellPrice' | 'allUserSellPriceDesc' | 'moneyRatio' | 'allProfitDesc' | 'stock'
->;
+  'user' | 'users' | 'userId' | 'allUserSellPriceDesc' | 'allProfitDesc' | 'stock'
+> & {
+  moneyRatio: string;
+  allSellPrice: number;
+};
 
 const UserSummary = ({
   user,
@@ -31,7 +34,7 @@ const UserSummary = ({
           value={`₩${commaizeNumber(user.money)}`}
           valueColor={COLOR.pastelGreen}
           rightComponent={
-            stock.isVisibleRank ? (
+            stock.isVisibleRank && users ? (
               <>{users.sort((a, b) => b.money - a.money).findIndex((v) => v.userId === userId) + 1}위</>
             ) : (
               <></>

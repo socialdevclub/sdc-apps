@@ -37,7 +37,12 @@ const StockDrawer = ({
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { isFreezed, user, getStockStorage } = Query.Stock.useUser({
+  const {
+    refetch: refetchUser,
+    isFreezed,
+    user,
+    getStockStorage,
+  } = Query.Stock.useUser({
     stockId,
     userId,
     userRefetchInterval: 500,
@@ -144,8 +149,9 @@ const StockDrawer = ({
     return <>불러오는 중</>;
   }
 
-  const onClickBuy = (company: string) => {
-    buyStock({ amount: 1, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId });
+  const onClickBuy = async (company: string) => {
+    await buyStock({ amount: 1, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId });
+    await refetchUser();
     // .then(() => {
     //   messageApi.destroy();
     //   messageApi.open({
@@ -164,8 +170,9 @@ const StockDrawer = ({
     // });
   };
 
-  const onClickSell = (company: string, amount = 1) => {
-    sellStock({ amount, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId });
+  const onClickSell = async (company: string, amount = 1) => {
+    await sellStock({ amount, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId });
+    await refetchUser();
     // .then(() => {
     //   messageApi.destroy();
     //   messageApi.open({

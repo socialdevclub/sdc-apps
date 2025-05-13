@@ -64,7 +64,7 @@ export default function AvatarSetter() {
         ref={avatarImageRef}
         size={96}
         src={avatarUrl}
-        icon={<UserOutlined />}
+        icon={<UserOutlined onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />}
         style={{
           cursor: isHover ? 'pointer' : 'default',
         }}

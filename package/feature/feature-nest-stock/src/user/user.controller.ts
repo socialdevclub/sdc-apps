@@ -16,7 +16,7 @@ export class UserController {
   @Get()
   async getUsers(@Query('stockId') stockId: string): Promise<Response.GetStockUser[]> {
     const users = await this.userService.getUserList(stockId);
-    return users.map((user) => this.userService.transStockUserToDto(user));
+    return users;
   }
 
   @Get('/recommended-partners')
@@ -41,7 +41,7 @@ export class UserController {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    return this.userService.transStockUserToDto(user);
+    return user;
   }
 
   @Post()
