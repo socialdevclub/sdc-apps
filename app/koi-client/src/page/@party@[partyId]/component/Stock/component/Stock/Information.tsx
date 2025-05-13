@@ -12,6 +12,7 @@ import { UserStore } from '../../../../../../store';
 import { getAnimalImageSource, getFormattedGameTime, getStockMessages } from '../../../../../../utils/stock';
 import DrawStockInfo from './DrawInfo';
 import StockDrawer from './StockDrawer';
+import RecommendedPartners from './RecommendedPartners';
 
 interface Props {
   stockId: string;
@@ -152,8 +153,16 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
       return acc;
     },
     {
-      futureInfos: [] as Array<{ company: string; timeIdx: number; price: number }>,
-      pastInfos: [] as Array<{ company: string; timeIdx: number; price: number }>,
+      futureInfos: [] as Array<{
+        company: string;
+        timeIdx: number;
+        price: number;
+      }>,
+      pastInfos: [] as Array<{
+        company: string;
+        timeIdx: number;
+        price: number;
+      }>,
     },
   );
 
@@ -248,6 +257,9 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
         );
       })}
       {pastInfos.length === 0 && <Empty>현재 시각 이전의 정보가 없습니다</Empty>}
+
+      <RecommendedPartners stockId={stockId} />
+
       <StickyBottom>
         <DrawStockInfo stockId={stockId} />
       </StickyBottom>
