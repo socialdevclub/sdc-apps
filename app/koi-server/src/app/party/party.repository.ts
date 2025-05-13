@@ -214,6 +214,7 @@ export class PartyRepository {
     let updateExpression = 'SET ';
     const expressionAttributeValues = {};
     const expressionAttributeNames = {};
+    let isFirstAttribute = true;
 
     Object.entries(update).forEach(([key, value], index) => {
       if (key === '_id') return; // _id는 업데이트 대상에서 제외
@@ -224,7 +225,12 @@ export class PartyRepository {
       expressionAttributeNames[attrName] = key;
       expressionAttributeValues[attrValue] = value;
 
-      updateExpression += index > 0 ? `, ${attrName} = ${attrValue}` : `${attrName} = ${attrValue}`;
+      if (isFirstAttribute) {
+        updateExpression += `${attrName} = ${attrValue}`;
+        isFirstAttribute = false;
+      } else {
+        updateExpression += `, ${attrName} = ${attrValue}`;
+      }
     });
 
     return {
