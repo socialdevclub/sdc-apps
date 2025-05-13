@@ -6,12 +6,11 @@ import { LogModule } from './log/log.module';
 import { StockRepository } from './stock.repository';
 import { UserModule } from './user/user.module';
 import { StockProcessor } from './stock.processor';
-import { DynamoDBModule } from './dynamodb/dynamodb.module';
 
 @Module({
   controllers: [StockController],
   exports: [StockService, StockRepository, StockProcessor],
-  imports: [HttpModule, DynamoDBModule, forwardRef(() => UserModule), LogModule],
+  imports: [HttpModule, forwardRef(() => UserModule), LogModule],
   providers: [StockService, StockRepository, StockProcessor],
 })
 export class StockModule {}

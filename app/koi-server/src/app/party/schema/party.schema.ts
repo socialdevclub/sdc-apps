@@ -1,62 +1,45 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, SchemaTypes } from 'mongoose';
+import dayjs from 'dayjs';
 import { PartyOmited, PartyRequired, PartySchema } from 'shared~type-party';
 
-@Schema()
+// DynamoDB용 Party 클래스
 export class Party implements PartySchema {
-  @Prop()
+  _id: string; // 파티션 키로 사용
+
   title: string;
 
-  @Prop()
   description: string;
 
-  @Prop()
   activityId: string;
 
-  @Prop()
   activityName: string;
 
-  @Prop()
   authorId?: string;
 
-  @Prop()
   status: string;
 
-  @Prop()
   pendingUserIds: string[];
 
-  @Prop()
   joinedUserIds: string[];
 
-  @Prop()
   likedUserIds: string[];
 
-  @Prop()
   limitAllCount: number;
 
-  @Prop()
   limitMaleCount: number;
 
-  @Prop()
   limitFemaleCount: number;
 
-  @Prop()
   publicScope: 'DRAFT' | 'PUBLIC' | 'PRIVATE' | 'CLOSED';
 
-  @Prop()
   privatePassword?: string;
 
-  @Prop()
   price: number;
 
-  @Prop({ type: SchemaTypes.Date })
-  createdAt: Date;
+  createdAt: string;
 
-  @Prop({ type: SchemaTypes.Date })
-  updatedAt: Date;
+  updatedAt: string;
 
-  @Prop({ type: SchemaTypes.Date })
-  deletedAt?: Date;
+  deletedAt?: string;
 
   constructor(required: Pick<Party, PartyRequired>, partial: Partial<Omit<Party, PartyRequired | PartyOmited>>) {
     this.title = required.title;
@@ -74,11 +57,7 @@ export class Party implements PartySchema {
     this.joinedUserIds = [];
     this.likedUserIds = [];
     this.pendingUserIds = [];
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
+    this.createdAt = dayjs().toISOString();
+    this.updatedAt = dayjs().toISOString();
   }
 }
-
-export type PartyDocument = HydratedDocument<Party>;
-
-export const partySchema = SchemaFactory.createForClass(Party);

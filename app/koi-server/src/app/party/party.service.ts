@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { Request } from 'shared~type-party';
 import { PartyRepository } from './party.repository';
-import { Party, PartyDocument } from './schema/party.schema';
+import { Party } from './schema/party.schema';
 
 @Injectable()
 export class PartyService {
   constructor(private readonly partyRepository: PartyRepository) {}
 
-  queryParty(partyId: string): Promise<PartyDocument> {
+  queryParty(partyId: string): Promise<Party> {
     return this.partyRepository.findById(partyId);
   }
 
-  queryParties(): Promise<PartyDocument[]> {
+  queryParties(): Promise<Party[]> {
     return this.partyRepository.find();
   }
 
-  createParty(party: Party): Promise<PartyDocument> {
+  createParty(party: Party): Promise<Party> {
     return this.partyRepository.create(party);
   }
 
