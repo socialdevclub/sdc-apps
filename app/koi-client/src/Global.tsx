@@ -10,6 +10,7 @@ import BackofficePoll from './page/@backoffice@poll';
 import Profile from './page/@profile';
 import Party from './page/@party@[partyId]';
 import Backoffice from './page/@backoffice';
+import RoomsSearch from './page/@rooms@search';
 import BackofficeParty from './page/@backoffice@party';
 import NoSession from './component/NoSession';
 import BackofficeStock from './page/@backoffice@stock';
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
   {
     element: <Profile />,
     path: '/profile',
+  },
+  {
+    element: <RoomsSearch />,
+    path: '/rooms/search',
   },
   {
     element: <Backoffice />,
