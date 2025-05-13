@@ -98,6 +98,10 @@ const Result = ({ stockId }: Props) => {
       ? '타고난 리더십으로 팀을 이끌고 신뢰를 쌓아가는 호랑이예요. 함께하면 더 큰 시너지를 만들어낼 수 있어요.'
       : '전설적인 케미의 드래곤이예요. 뛰어난 통찰력과 매력으로 모든 이의 마음을 사로잡고 최고의 팀워크를 만들어요.';
 
+  if (!users) {
+    return <></>;
+  }
+
   const sortedUser = [...users].sort((a, b) => getRoundAvg(b.userId) - getRoundAvg(a.userId));
   const rank = sortedUser.findIndex((v) => v.userId === userId) + 1;
   const rankPercentage = Math.floor(Math.max(((rank - 1) / users.length) * 100, 1));

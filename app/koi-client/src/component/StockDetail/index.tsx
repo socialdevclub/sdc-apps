@@ -24,7 +24,6 @@ export default function StockDetail({ stockId }: Props) {
   const { mutateAsync: mutateBuyStock } = Query.Stock.useBuyStock();
   const { mutateAsync: mutateSellStock } = Query.Stock.useSellStock();
   const { mutateAsync: mutateFinishStock } = Query.Stock.useFinishStock(stockId);
-  const { mutateAsync: mutateSetResult } = Query.Stock.useSetResult(stockId);
 
   const { data: users } = Query.Stock.useUserList(stockId);
   const { data: stock } = Query.Stock.useQueryStock(stockId);
@@ -298,7 +297,7 @@ export default function StockDetail({ stockId }: Props) {
                     mutateUpdateGame({
                       _id: stockId,
                       isTransaction: true,
-                      startedTime: new Date(),
+                      startedTime: dayjs().toISOString(),
                     });
                   }}
                   color="success"
@@ -312,18 +311,6 @@ export default function StockDetail({ stockId }: Props) {
                   color="primary"
                 >
                   주식 종료 및 정산
-                </ControlButton>
-                <ControlButton
-                  onClick={() => {
-                    if (!isAllSellPriceZero) {
-                      alert('주식 종료 및 정산을 먼저 해주세요');
-                      return;
-                    }
-                    mutateSetResult({});
-                  }}
-                  color="info"
-                >
-                  라운드 저장
                 </ControlButton>
                 <ControlButton
                   onClick={() => {
@@ -365,7 +352,7 @@ export default function StockDetail({ stockId }: Props) {
                   onClick={() => {
                     mutateUpdateGame({
                       _id: stockId,
-                      startedTime: new Date(startedTime.getTime() - 60 * 1000),
+                      startedTime: dayjs(startedTime).subtract(1, 'minute').toISOString(),
                     });
                   }}
                 >
@@ -375,7 +362,7 @@ export default function StockDetail({ stockId }: Props) {
                   onClick={() => {
                     mutateUpdateGame({
                       _id: stockId,
-                      startedTime: new Date(startedTime.getTime() - 10 * 1000),
+                      startedTime: dayjs(startedTime).subtract(10, 'second').toISOString(),
                     });
                   }}
                 >
@@ -385,7 +372,7 @@ export default function StockDetail({ stockId }: Props) {
                   onClick={() => {
                     mutateUpdateGame({
                       _id: stockId,
-                      startedTime: new Date(startedTime.getTime() + 10 * 1000),
+                      startedTime: dayjs(startedTime).add(10, 'second').toISOString(),
                     });
                   }}
                 >
@@ -395,7 +382,7 @@ export default function StockDetail({ stockId }: Props) {
                   onClick={() => {
                     mutateUpdateGame({
                       _id: stockId,
-                      startedTime: new Date(startedTime.getTime() + 60 * 1000),
+                      startedTime: dayjs(startedTime).add(1, 'minute').toISOString(),
                     });
                   }}
                 >

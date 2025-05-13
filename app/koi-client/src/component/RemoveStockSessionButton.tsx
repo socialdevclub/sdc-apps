@@ -11,12 +11,14 @@ interface RemoveStockSessionButtonProps {
 const RemoveStockSessionButton: React.FC<RemoveStockSessionButtonProps> = ({ stockId }) => {
   const queryClient = useQueryClient();
   const { mutateAsync } = Query.Stock.useRemoveStockSession(stockId);
+  const { refetch } = Query.Stock.useQueryStockList();
 
   return (
     <button
-      onClick={() => {
+      onClick={async () => {
         if (window.confirm('정말 삭제하시겠습니까?')) {
-          mutateAsync({});
+          await mutateAsync({});
+          refetch();
           queryClient.invalidateQueries(
             getQueryKey({
               hostname: serverApiUrl,

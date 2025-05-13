@@ -3,23 +3,20 @@ import { useQuery } from 'lib-react-query';
 import { serverApiUrl } from '../../../config/baseUrl';
 
 const useQueryStockList = (options?: Request.GetStockList) => {
-  const { data } = useQuery<StockSchemaWithId[]>({
+  const { data, refetch } = useQuery<StockSchemaWithId[]>({
     api: {
       body: options,
       hostname: serverApiUrl,
       method: 'GET',
       pathname: `/stock/list`,
     },
-    reactQueryOption: {
-      refetchInterval: 1500,
-    },
   });
 
   if (!data) {
-    return { data: [] };
+    return { data: [], refetch };
   }
 
-  return { data };
+  return { data, refetch };
 };
 
 export default useQueryStockList;

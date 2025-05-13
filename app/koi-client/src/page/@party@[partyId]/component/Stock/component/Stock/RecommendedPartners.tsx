@@ -58,7 +58,7 @@ const PartnersTitle = styled.h3`
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 12px;
-  margin-top: 20px;
+  margin-top: 0;
 `;
 
 const PartnersDescription = styled.p`

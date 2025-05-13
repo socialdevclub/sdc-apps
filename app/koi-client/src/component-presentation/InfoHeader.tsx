@@ -12,7 +12,6 @@ interface InfoHeaderProps {
   badge?: {
     text: string;
     color: string;
-    backgroundColor: string;
   };
   rightContent?: React.ReactNode;
   src?: string;
@@ -49,10 +48,10 @@ const InfoHeader = (props: InfoHeaderProps) => {
             {subtitle && <Subtitle style={{ color: subTitleColor }}>{subtitle}</Subtitle>}
           </FlexColumn>
         </div>
-        <FlexColumn style={{ alignItems: 'flex-end', rowGap: '16px' }}>
+        <FlexColumn style={{ alignItems: 'flex-end', rowGap: '8px' }}>
           <Value style={{ color: valueColor }}>{valueFormatted || value}</Value>
           {badge && (
-            <Badge style={{ backgroundColor: badge.backgroundColor }}>
+            <Badge>
               <BadgeText style={{ color: badge.color }}>{badge.text}</BadgeText>
             </Badge>
           )}
