@@ -29,7 +29,7 @@ export default function Party() {
 
       <RoomCodeInput />
       <Divider />
-      <RoomCreateButton />
+      <RoomCreateButton username={username} />
     </MobileLayout>
   );
 }
