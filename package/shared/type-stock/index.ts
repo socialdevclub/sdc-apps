@@ -24,9 +24,10 @@ export type StockUserSchema = {
   userInfo: StockUserInfoSchema;
   index: number;
   money: number;
-  lastActivityTime: Date;
+  lastActivityTime: string;
   loanCount: number;
   stockStorages: StockStorageSchema[];
+  resultByRound: number[];
 };
 
 const StockPhase = {
@@ -45,8 +46,9 @@ export type CompanyInfo = {
 };
 
 export type StockSchema = {
+  _id: string;
   stockPhase: StockPhase;
-  startedTime: Date;
+  startedTime: string;
   companies: Record<string, CompanyInfo[]>;
   remainingStocks: Record<string, number>;
   isVisibleRank: boolean;
@@ -60,13 +62,13 @@ export type StockSchema = {
    */
   fluctuationsInterval: number;
   /**
-   * 0라운드 - 연습게일
+   * 0라운드 - 연습게임
    * 1라운드 - 본선게임
    * 2라운드 - 본선게임
    */
   round: number;
 };
-export type StockSchemaWithId = StockSchema & { _id: string };
+export type StockSchemaWithId = StockSchema;
 
 export type StockLogAction = 'BUY' | 'SELL';
 export type StockLogSchema = {
@@ -80,11 +82,4 @@ export type StockLogSchema = {
   quantity: number;
   status: 'QUEUING' | 'SUCCESS' | 'FAILED' | 'CANCEL';
   failedReason?: string;
-};
-
-export type ResultSchema = {
-  stockId: string;
-  userId: string;
-  round: number;
-  money: number;
 };

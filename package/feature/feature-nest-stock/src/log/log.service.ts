@@ -3,7 +3,6 @@ import type {
   CreateOptions,
   FilterQuery,
   MongooseQueryOptions,
-  ProjectionType,
   QueryOptions,
   UpdateQuery,
   UpdateWriteOpResult,
@@ -36,13 +35,13 @@ export class LogService {
     return logs;
   }
 
-  async findOne(
-    filter: FilterQuery<StockLog>,
-    projection?: ProjectionType<StockLog>,
-    options?: QueryOptions<StockLog>,
-  ): Promise<StockLogDocument> {
-    return this.stockLogRepository.findOne(filter, projection, options);
-  }
+  // async findOne(
+  //   filter: FilterQuery<StockLog>,
+  //   projection?: ProjectionType<StockLog>,
+  //   options?: QueryOptions<StockLog>,
+  // ): Promise<StockLogDocument> {
+  //   return this.stockLogRepository.findOne(filter, projection, options);
+  // }
 
   async addLog(log: StockLog, options?: CreateOptions): Promise<void> {
     await this.stockLogRepository.create(log, options);
@@ -52,7 +51,11 @@ export class LogService {
     stockId: string,
     options?: DeleteOptions & Omit<MongooseQueryOptions<StockLog>, 'lean' | 'timestamps'>,
   ): Promise<void> {
-    await this.stockLogRepository.deleteMany({ stockId }, options);
+    if (false) {
+      await this.stockLogRepository.deleteMany({ stockId }, options);
+    }
+
+    return null;
   }
 
   async updateOne(
@@ -60,7 +63,11 @@ export class LogService {
     update: UpdateQuery<StockLog>,
     options?: UpdateOptions & Omit<MongooseQueryOptions<StockLog>, 'lean'>,
   ): Promise<UpdateWriteOpResult> {
-    return this.stockLogRepository.updateOne(filter, update, options);
+    if (false) {
+      return this.stockLogRepository.updateOne(filter, update, options);
+    }
+
+    return null;
   }
 
   /**
@@ -70,15 +77,19 @@ export class LogService {
   async deleteOldStatusLogs(
     options?: DeleteOptions & Omit<MongooseQueryOptions<StockLog>, 'lean' | 'timestamps'>,
   ): Promise<boolean> {
-    const oneMinuteAgo = new Date();
-    oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
+    if (false) {
+      const oneMinuteAgo = new Date();
+      oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
 
-    return this.stockLogRepository.deleteMany(
-      {
-        date: { $lt: oneMinuteAgo },
-        status: { $in: ['CANCEL', 'FAILED', 'QUEUING'] },
-      },
-      options,
-    );
+      return this.stockLogRepository.deleteMany(
+        {
+          date: { $lt: oneMinuteAgo },
+          status: { $in: ['CANCEL', 'FAILED', 'QUEUING'] },
+        },
+        options,
+      );
+    }
+
+    return null;
   }
 }

@@ -7,6 +7,7 @@ export type PartyRequired = 'title' | 'limitAllCount';
 export type PartyOmited = 'createdAt' | 'updatedAt' | 'deletedAt';
 export type PartyForm = Pick<PartySchema, PartyRequired> & Partial<Omit<PartySchema, PartyRequired | PartyOmited>>;
 export type PartySchema = {
+  _id: string;
   title: string;
   description: string;
   activityId: string;
@@ -21,8 +22,8 @@ export type PartySchema = {
   publicScope: PublicScope;
   privatePassword?: string;
   price: number;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
 };
-export type PartySchemaWithId = PartySchema & { _id: string };
+export type PartySchemaWithId = PartySchema;
