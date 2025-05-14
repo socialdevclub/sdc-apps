@@ -197,3 +197,20 @@ export const getAnimalImageSource = (companyName: string): string => {
   // 유효하지 않은 회사 이름이면 기본값으로 햄찌금융 이미지 반환
   return `/no_bg_animal/${ANIMAL_NAME['햄찌금융']}.webp`;
 };
+
+export const secondsToMMSS = (seconds: number): string => {
+  // 음수인 경우 처리
+  if (seconds < 0) {
+    return `-${secondsToMMSS(-seconds)}`;
+  }
+
+  // 분과 초 계산
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+
+  // 두 자리 숫자로 포맷팅
+  const formattedMinutes = String(minutes).padStart(2, '0');
+  const formattedSeconds = String(remainingSeconds).padStart(2, '0');
+
+  return `${formattedMinutes}:${formattedSeconds}`;
+};

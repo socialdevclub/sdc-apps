@@ -14,7 +14,7 @@ interface Props {
  * @param {Response.GetStock} [params.stock] - 주식 정보 객체 (startedTime 및 fluctuationsInterval 속성 포함)
  *                                             fluctuationsInterval은 분 단위의 라운드 시간입니다.
  * @param {Function} params.refetch - 분이 변경될 때 호출할 데이터 리페치 함수
- * @returns {{elapsedTime: number, remainingTime: number, roundTime: number}} 경과 시간, 남은 시간 및 라운드 총 시간을 초 단위 숫자로 반환
+ * @returns {{elapsedTime: number, remainingTime: number, roundTime: number, round}} 경과 시간, 남은 시간 및 라운드 총 시간, 현재 라운드를 초 단위 숫자로 반환
  *
  * @example
  * // 기본 사용법 - stock.fluctuationsInterval에서 라운드 시간을 가져옴
@@ -167,6 +167,7 @@ const useRoundTimeRaceCheck = ({ stock, refetch }: Props) => {
   return {
     elapsedTime: state.elapsedTime,
     remainingTime,
+    round: stock?.round,
     roundTime: roundTimeInSeconds,
   };
 };

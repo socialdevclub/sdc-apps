@@ -12,6 +12,7 @@ import RandomStockPreview from './components/RandomStockPreview';
 import UserSummary from './components/UserSummary';
 import { useStockInfo } from './hooks/useStockInfo';
 import StockDrawer from '../StockDrawer';
+import TimeIndicator from './components/TimeIndicator.tsx';
 
 interface Props {
   stockId: string;
@@ -45,6 +46,10 @@ const Home = ({ stockId, messageApi }: Props) => {
           allProfitDesc={allProfitDesc}
           stock={stock}
         />
+      </Container>
+      <Divider />
+      <Container>
+        <TimeIndicator />
       </Container>
       <Divider />
       <StockInfoList
