@@ -3,7 +3,6 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import { QueryClientProvider } from 'lib-react-query';
 import { useAtom } from 'jotai';
-import Main from './page/@';
 import SupabaseProvider from './library/supabase/SupabaseProvider';
 import { UserStore } from './store';
 import BackofficePoll from './page/@backoffice@poll';
@@ -20,7 +19,10 @@ import BackofficePartyDetailPage from './page/@backoffice@party@[partyId]';
 
 const router = createBrowserRouter([
   {
-    element: <Main />,
+    // 원래 파티 리스트 페이지가 있었는데, 대체되었습니다.
+    // 폴더 명이 @rooms@search 로 되어있는데, @로 추후 변경 예정입니다.
+    // 히스토리가 변경되어 임시로 @rooms@search 로 진행하였습니다.
+    element: <RoomsSearch />,
     path: '/',
   },
   {
@@ -30,10 +32,6 @@ const router = createBrowserRouter([
   {
     element: <Profile />,
     path: '/profile',
-  },
-  {
-    element: <RoomsSearch />,
-    path: '/rooms/search',
   },
   {
     element: <Backoffice />,
