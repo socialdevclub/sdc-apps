@@ -1,12 +1,10 @@
 import { Button, Space } from 'antd';
 import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SwitchCase } from '@toss/react';
-import { ChevronLeft, RefreshCcw, Lightbulb } from 'lucide-react';
+import { ChevronLeft, RefreshCcw } from 'lucide-react';
 import Header from '../../../component-presentation/Header';
 import ProfileValidator from '../../../component/ProfileValidator';
 import { Query } from '../../../hook';
-import RecommendedPartnersModal from './Stock/component/Stock/RecommendedPartnersModal';
 
 const PartyHeader = () => {
   const { partyId } = useParams();
@@ -66,7 +64,8 @@ const PartyHeader = () => {
         RightComponent={
           <Space>
             {/* 대화 추천 상대 리스트 모달 버튼 */}
-            <SwitchCase
+            {/* 추천 상대 기능 정보 탭 하단으로 이동 Deprecated */}
+            {/* <SwitchCase
               value={party?.activityId ?? ''}
               caseBy={{
                 STOCK: (
@@ -76,13 +75,19 @@ const PartyHeader = () => {
                   />
                 ),
               }}
-            />
+            /> */}
             {/* 페이지 새로고침 버튼 */}
             <Button
               ghost
               style={{ border: 'none' }}
               icon={<RefreshCcw color="white" />}
-              onClick={() => (window.location as { reload: (isForceReload: boolean) => void }).reload(true)}
+              onClick={() =>
+                (
+                  window.location as {
+                    reload: (isForceReload: boolean) => void;
+                  }
+                ).reload(true)
+              }
             />
             {/* 하이안: 잠깐 기능 닫아놈 */}
             {/* <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">

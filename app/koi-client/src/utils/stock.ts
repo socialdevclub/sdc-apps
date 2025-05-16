@@ -2,6 +2,7 @@ import { getDateDistance } from '@toss/date';
 import { objectEntries, objectValues } from '@toss/utils';
 import dayjs from 'dayjs';
 import { COMPANY_NAMES, CompanyNames } from 'shared~config/dist/stock';
+import { GetStock } from 'shared~type-stock/Response';
 import {
   ANIMAL_NAME,
   REMAINING_STOCK_THRESHOLD,
@@ -181,6 +182,45 @@ export const renderProfitBadge = (
   }
   return {
     backgroundColor: 'rgba(148, 163, 184, 0.2)',
+    color: '#94A3B8',
+    text: '0% 변동 없음',
+  };
+};
+
+export const renderStockChangesInfo = (
+  selectedCompany: string,
+  stock: GetStock,
+  companiesPrice: Record<string, number>,
+  timeIdx: number,
+): { color: string; text: string } => {
+  const currentPrice = companiesPrice[selectedCompany];
+  const previousPrice = stock.companies[selectedCompany][timeIdx - 1]?.가격 || 0;
+
+  if (previousPrice > 0) {
+    const priceChange = currentPrice - previousPrice;
+    const changePercent = Math.round((priceChange / previousPrice) * 100);
+
+    if (changePercent === 0) {
+      return {
+        color: '#94A3B8',
+        text: '0% 변동 없음',
+      };
+    }
+
+    if (changePercent > 0) {
+      return {
+        color: '#F87171',
+        text: `+${priceChange.toLocaleString()} (${changePercent}%)`,
+      };
+    }
+
+    return {
+      color: '#60a5fa',
+      text: `${priceChange.toLocaleString()} (${changePercent}%)`,
+    };
+  }
+
+  return {
     color: '#94A3B8',
     text: '0% 변동 없음',
   };
