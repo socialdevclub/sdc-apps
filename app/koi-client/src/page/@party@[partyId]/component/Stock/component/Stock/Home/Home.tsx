@@ -12,6 +12,8 @@ import RandomStockPreview from './components/RandomStockPreview';
 import UserSummary from './components/UserSummary';
 import { useStockInfo } from './hooks/useStockInfo';
 import StockDrawer from '../StockDrawer';
+import TimeIndicator from './components/TimeIndicator.tsx';
+import { StockHoldingsList } from './components/StockInfoList.tsx';
 
 interface Props {
   stockId: string;
@@ -47,13 +49,18 @@ const Home = ({ stockId, messageApi }: Props) => {
         />
       </Container>
       <Divider />
-      <StockInfoList
-        stockId={stockId}
-        futureInfos={futureInfos}
-        gameTimeInMinutes={gameTimeInMinutes}
-        myInfos={myInfos}
-        messageApi={messageApi}
-      />
+      <Container>
+        <TimeIndicator />
+      </Container>
+      <Divider />
+      {/* <StockInfoList*/}
+      {/*  stockId={stockId}*/}
+      {/*  futureInfos={futureInfos}*/}
+      {/*  gameTimeInMinutes={gameTimeInMinutes}*/}
+      {/*  myInfos={myInfos}*/}
+      {/*  messageApi={messageApi}*/}
+      {/*/ >*/}
+      <StockHoldingsList stockId={stockId} userId={userId} />
       <StickyBottom>
         <StartLoan stockId={stockId} money={user.money} loanCount={user.loanCount} allSellPrice={myAllSellPrice} />
       </StickyBottom>
