@@ -7,12 +7,13 @@ import { MessageInstance } from 'antd/es/message/interface';
 import { StockConfig } from 'shared~config';
 import { MEDIA_QUERY } from '../../../../../../config/common';
 import InfoHeader from '../../../../../../component-presentation/InfoHeader';
-import { calculateProfitRate, getAnimalImageSource, renderProfitBadge } from '../../../../../../utils/stock';
+import { calculateProfitRate, getAnimalImageSource, renderStockChangesInfo } from '../../../../../../utils/stock';
 import MessageBalloon from '../../../../../../component-presentation/MessageBalloon';
 import StockLineChart from '../../../../../../component-presentation/StockLineChart';
 import ButtonGroup from '../../../../../../component-presentation/ButtonGroup';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
+import StockBuyingNotification from './StockBuyingNotification';
 
 interface Props {
   drawerOpen: boolean;
@@ -51,7 +52,9 @@ const StockDrawer = ({
     data: stock,
     companiesPrice,
     timeIdx,
-  } = Query.Stock.useQueryStock(stockId, { refetchInterval: Number.POSITIVE_INFINITY });
+  } = Query.Stock.useQueryStock(stockId, {
+    refetchInterval: Number.POSITIVE_INFINITY,
+  });
   const { data: userCount } = Query.Stock.useUserCount({ stockId });
 
   const stockCountCurrent = getStockStorage(selectedCompany)?.stockCountCurrent;
@@ -194,10 +197,21 @@ const StockDrawer = ({
   const isLoading = isBuyLoading || isFreezed || isSellLoading;
   const isDisabled = timeIdx === undefined || timeIdx >= StockConfig.MAX_STOCK_IDX || !stock.isTransaction || isLoading;
 
-  const remainingStock = stock.remainingStocks[selectedCompany];
+  // Todo:: 선택한 회사가 없을 때도 계속 계산하고 있으므로 컴포넌트를 분리하는게 좋을 것 같습니다.
+  // 또한 변수가 많아 가시성이 떨어짐
+  const remainingStock = stock.remainingStocks[selectedCompany]; // 선택한 주식의 남은 개수
+  const maxBuyableCount = Math.floor(user.money / companiesPrice[selectedCompany]); // 내가 가진 돈으로 선택한 주식을 얼마나 살 수 있는가
   const isBuyable = user.money >= companiesPrice[selectedCompany];
   const isRemainingStock = Boolean(remainingStock);
   const isCanBuy = isBuyable && isRemainingStock;
+
+  // 주식 구매 한도 계산
+  const currentStockCount = getStockStorage(selectedCompany)?.stockCountCurrent ?? 0; // 내가 보유한 해당 주식의 개수
+  const playerCount = userCount?.count ?? 0; // 플레이어의 수
+  const maxStockLimitByPlayer = Math.max(0, playerCount - currentStockCount); // 플레이어 수 제한에 따른 최대 구매 가능 개수
+
+  // 최종 구매 가능 개수 계산 (돈, 남은 주식, 플레이어 수 제한 고려)
+  const maxBuyableCountWithLimit = Math.min(maxBuyableCount, remainingStock ?? 0, maxStockLimitByPlayer);
 
   return (
     <Drawer
@@ -233,31 +247,39 @@ const StockDrawer = ({
         },
       }}
     >
-      <InfoHeader
-        title={selectedCompany.slice(0, 4)}
-        subtitle={`보유 주식: ${getStockStorage(selectedCompany)?.stockCountCurrent ?? 0}`}
-        subTitleColor={
-          isStockOverLimit(
-            userCount?.count ?? Number.NEGATIVE_INFINITY,
-            보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-            1,
-          ) || !isRemainingStock
-            ? 'red'
-            : '#d1d5db'
-        }
-        value={selectedCompany ? companiesPrice[selectedCompany] : 0}
-        valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
-        valueColor={isBuyable ? 'white' : 'red'}
-        badge={renderProfitBadge(stockProfitRate)}
-        src={getAnimalImageSource(selectedCompany)}
-        width={50}
-      />
+      {selectedCompany && (
+        <InfoHeader
+          title={selectedCompany.slice(0, 4)}
+          subtitle={`보유 주식: ${currentStockCount}`}
+          subTitleColor={
+            isStockOverLimit(
+              userCount?.count ?? Number.NEGATIVE_INFINITY,
+              보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+              1,
+            ) || !isRemainingStock
+              ? 'red'
+              : '#d1d5db'
+          }
+          value={selectedCompany ? companiesPrice[selectedCompany] : 0}
+          valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
+          valueColor={isBuyable ? 'white' : 'red'}
+          badge={renderStockChangesInfo(selectedCompany, stock, companiesPrice, 9)}
+          src={getAnimalImageSource(selectedCompany)}
+          width={50}
+        />
+      )}
+
       <MessageBalloon messages={stockMessages} />
       <StockLineChart
         company={selectedCompany}
         priceData={chartPriceData}
         fluctuationsInterval={stock.fluctuationsInterval}
         averagePurchasePrice={averagePurchasePrice}
+      />
+      <StockBuyingNotification
+        stockProfitRate={stockProfitRate}
+        remainingStock={remainingStock}
+        maxBuyableCountWithLimit={maxBuyableCountWithLimit}
       />
       <ButtonGroup
         buttons={[
