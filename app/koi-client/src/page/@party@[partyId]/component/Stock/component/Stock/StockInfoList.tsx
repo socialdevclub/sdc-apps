@@ -3,9 +3,12 @@ import { objectEntries } from '@toss/utils';
 import { ChevronRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { MessageInstance } from 'antd/es/message/interface';
+import { useAtomValue } from 'jotai';
 import useStockChanges from '../../../../../../hook/query/Stock/useStockChange.ts';
-import { getAnimalImageSource } from '../../../../../../utils/stock.ts';
+import { getAnimalImageSource, getStockMessages } from '../../../../../../utils/stock.ts';
 import { useQueryStock } from '../../../../../../hook/query/Stock';
+import { UserStore } from '../../../../../../store';
+import StockDrawer from './StockDrawer.tsx';
 
 interface Props {
   stockId: string;
@@ -13,6 +16,9 @@ interface Props {
 }
 
 const StockInfoList = ({ stockId, messageApi }: Props) => {
+  const supabaseSession = useAtomValue(UserStore.supabaseSession);
+  const userId = supabaseSession?.user.id;
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState('');
 
@@ -26,6 +32,29 @@ const StockInfoList = ({ stockId, messageApi }: Props) => {
     });
     return result;
   }, [stock?.companies]);
+
+  if (!stock || !userId) {
+    return <>불러오는 중</>;
+  }
+
+  const myInfos = objectEntries(stock.companies).flatMap(([company, companyInfos]) =>
+    companyInfos.reduce((acc, companyInfo, idx) => {
+      if (companyInfo.정보.includes(userId)) {
+        acc.push({
+          company,
+          price: idx > 0 ? companyInfo.가격 - companyInfos[idx - 1].가격 : 0,
+          timeIdx: idx,
+        });
+      }
+      return acc;
+    }, [] as Array<{ company: string; timeIdx: number; price: number }>),
+  );
+
+  const stockMessages = getStockMessages({
+    companyName: selectedCompany,
+    currentTimeIdx: timeIdx ?? 0,
+    stockInfos: myInfos,
+  });
 
   const handleOpenDrawer = (company: string) => {
     setSelectedCompany(company);
@@ -49,17 +78,17 @@ const StockInfoList = ({ stockId, messageApi }: Props) => {
             >
               <Flex style={{ alignItems: 'center', columnGap: 16, flexDirection: 'row' }}>
                 <img src={getAnimalImageSource(stock.companyName)} alt={stock.companyName} width={50} />
-                <Flex>
+                <Flex style={{ gap: 10 }}>
                   <CompanyName>{stock.companyName.slice(0, 4)}</CompanyName>
                   <FlexRowStart>
                     {stock.priceChange >= 0 ? (
-                      <PriceTrendRed>
-                        {stock.priceChange.toLocaleString('ko-KR')} ({`${stock.priceChangePercentage}%`})
-                      </PriceTrendRed>
+                      <PriceTrend>
+                        {stock.currentPrice.toLocaleString('ko-KR')} <Red>({`${stock.priceChangePercentage}%`})</Red>
+                      </PriceTrend>
                     ) : (
-                      <PriceTrendBlue>
-                        {stock.priceChange.toLocaleString('ko-KR')} ({`${stock.priceChangePercentage}%`})
-                      </PriceTrendBlue>
+                      <PriceTrend>
+                        {stock.currentPrice.toLocaleString('ko-KR')} <Blue>({`${stock.priceChangePercentage}%`})</Blue>
+                      </PriceTrend>
                     )}
                   </FlexRowStart>
                 </Flex>
@@ -69,15 +98,15 @@ const StockInfoList = ({ stockId, messageApi }: Props) => {
           );
         })}
       </CardWrapper>
-      {/* <StockDrawer*/}
-      {/*  drawerOpen={drawerOpen}*/}
-      {/*  handleCloseDrawer={handleCloseDrawer}*/}
-      {/*  selectedCompany={selectedCompany}*/}
-      {/*  stockMessages={stockMessages}*/}
-      {/*  priceData={priceData}*/}
-      {/*  stockId={stockId}*/}
-      {/*  messageApi={messageApi}*/}
-      {/*/ >*/}
+      <StockDrawer
+        drawerOpen={drawerOpen}
+        handleCloseDrawer={handleCloseDrawer}
+        selectedCompany={selectedCompany}
+        stockMessages={stockMessages}
+        priceData={priceData}
+        stockId={stockId}
+        messageApi={messageApi}
+      />
     </>
   );
 };
@@ -132,23 +161,26 @@ const Quantity = styled.p`
   margin: 0;
 `;
 
-const PriceTrendRed = styled.div`
+const PriceTrend = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: center;
   font-size: 14px;
-  line-height: 22px;
   letter-spacing: 0.5px;
   font-weight: 400;
+  margin: 0;
+  padding: 0;
+  gap: 1rem;
+`;
+
+const Red = styled.p`
+  margin: 0;
+  padding: 0;
   color: #bd2c02;
 `;
 
-const PriceTrendBlue = styled.div`
-  display: flex;
-  flex-direction: column;
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.5px;
-  font-weight: 400;
+const Blue = styled.p`
+  margin: 0;
+  padding: 0;
   color: #007acc;
 `;
 
