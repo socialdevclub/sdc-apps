@@ -4,7 +4,7 @@ import { getAnimalImageSource } from '../utils/stock.ts';
 interface StockCardProps {
   companyName: string;
   stockCount: number;
-  onClick: () => void;
+  onClick?: (company: string) => void;
   totalValue: number;
   profitLoss: number;
   profitLossPercentage: number;
@@ -21,7 +21,7 @@ const StockInfoCard = ({
   const company = companyName.slice(0, companyName.length - 2);
 
   return (
-    <ButtonContainer onClick={onClick}>
+    <ButtonContainer onClick={() => onClick?.(companyName)}>
       <div>
         <Image src={getAnimalImageSource(companyName)} alt={companyName} />
       </div>
@@ -79,7 +79,7 @@ const OwnStock = styled.div`
 `;
 
 const Company = styled.div`
-  font-size: 24px;
+  font-size: 20px;
   line-height: 22px;
   font-weight: 400;
   color: white;
@@ -146,6 +146,7 @@ const Image = styled.img`
   height: 50px;
   border-radius: 6px;
   margin-right: 12px;
+  margin-left: 10px;
 `;
 
 export default StockInfoCard;
