@@ -5,7 +5,7 @@ import { ChevronLeft } from 'lucide-react';
 import Header from '../../../component-presentation/Header';
 import ProfileValidator from '../../../component/ProfileValidator';
 import { Query } from '../../../hook';
-import RemainTimeClock from '../../../component-presentation/RemainTimeClock.tsx';
+import RemainTimeClock from '../../../component-presentation/RemainTimeClock';
 import useRoundTimeRaceCheck from '../../../hook/useRoundTimeRaceCheck.tsx';
 
 const PartyHeader = () => {
@@ -14,7 +14,6 @@ const PartyHeader = () => {
   const { data: stock, refetch } = Query.Stock.useQueryStock(party?.activityName ?? '');
 
   const { remainingTime, roundTime } = useRoundTimeRaceCheck({ refetch, stock });
-
   const navigate = useNavigate();
 
   return (

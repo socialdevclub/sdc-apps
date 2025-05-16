@@ -36,12 +36,12 @@ const Phase = ({ stockId }: Props) => {
       <SwitchCase
         value={stockPhase}
         caseBy={{
-          CROWDING: isEntry ? <Waiting /> : <ProfileSetter stockId={stockId} />,
+          CROWDING: isEntry ? <Waiting stockId={stockId} /> : <ProfileSetter stockId={stockId} />,
           INTRO_INPUT: <Introduce stockId={stockId} />,
           INTRO_RESULT: <IntroduceResult stockId={stockId} />,
           PLAYING: <Stock stockId={stockId} />,
           RESULT: <Result stockId={stockId} />,
-          WAITING: <Waiting />,
+          WAITING: <Waiting stockId={stockId} />,
         }}
         defaultComponent={<Waiting />}
       />
