@@ -3,13 +3,23 @@ import { useQuery } from 'lib-react-query';
 import { UserStore } from '../../../store';
 import { serverApiUrl } from '../../../config/baseUrl';
 
-export const useRecommendedPartners = (stockId: string | undefined, options?: { enabled: boolean }) => {
+interface ReturnType {
+  isLoading: boolean;
+  partnerNicknames: string[];
+  refetch: () => void;
+}
+
+export const useRecommendedPartners = (stockId: string | undefined, options?: { enabled: boolean }): ReturnType => {
   const enabled = options?.enabled ?? false;
 
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const { data: partnerNicknames, refetch } = useQuery<string[]>({
+  const {
+    data: partnerNicknames,
+    isLoading,
+    refetch,
+  } = useQuery<string[]>({
     api: {
       hostname: serverApiUrl,
       method: 'GET',
@@ -21,5 +31,5 @@ export const useRecommendedPartners = (stockId: string | undefined, options?: { 
     },
   });
 
-  return { partnerNicknames: partnerNicknames ?? [], refetch };
+  return { isLoading, partnerNicknames: partnerNicknames ?? [], refetch };
 };
