@@ -5,8 +5,8 @@ import { useSearchParams } from 'react-router-dom';
 import { message } from 'antd';
 import Home from './Home/Home';
 import Information from './Information';
-import StockList from './StockList';
 import { Tabs, type TabsProps } from './Tabs';
+import StockInfoList from './StockInfoList.tsx';
 
 const items: TabsProps['items'] = [
   {
@@ -70,7 +70,7 @@ const Stock = ({ stockId }: Props) => {
             caseBy={{
               // 룰: <Rule stockId={stockId} />,
               정보: <Information stockId={stockId} messageApi={messageApi} />,
-              주식: <StockList stockId={stockId} messageApi={messageApi} />,
+              주식: <StockInfoList stockId={stockId} messageApi={messageApi} />,
               홈: <Home stockId={stockId} messageApi={messageApi} />,
             }}
             defaultComponent={<Home stockId={stockId} messageApi={messageApi} />}
