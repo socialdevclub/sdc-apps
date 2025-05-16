@@ -31,6 +31,7 @@ export default function RoomCreateButton({ username }: Props) {
       const createdStock = await createStockRoom(createdParty._id);
       await updatePartyRoom(createdParty._id, createdStock._id);
 
+      localStorage.setItem('last-party-id', createdParty._id);
       navigate(`/party/${createdParty._id}`);
     } catch (error) {
       setIsError(true);
