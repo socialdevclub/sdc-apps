@@ -25,7 +25,7 @@ const Home = ({ stockId, messageApi }: Props) => {
   const { stock, users, user, allUserSellPriceDesc, gameTimeInMinutes, myInfos, futureInfos, allProfitDesc, userId } =
     useStockInfo(stockId);
   const { myAllSellPrice } = Query.Stock.useMyAllSellPrice({ stockId, userId });
-  if (!user || !stock) {
+  if (!user || !stock || !userId) {
     return <div>불러오는 중..</div>;
   }
 
@@ -60,7 +60,7 @@ const Home = ({ stockId, messageApi }: Props) => {
       {/*  myInfos={myInfos}*/}
       {/*  messageApi={messageApi}*/}
       {/*/ >*/}
-      <StockHoldingsList stockId={stockId} userId={userId} />
+      <StockHoldingsList stockId={stockId} userId={userId} messageApi={messageApi} />
       <StickyBottom>
         <StartLoan stockId={stockId} money={user.money} loanCount={user.loanCount} allSellPrice={myAllSellPrice} />
       </StickyBottom>
