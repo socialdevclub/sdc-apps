@@ -36,6 +36,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
 
   const { data: stock } = Query.Stock.useQueryStock(stockId);
   const { data: userList } = Query.Stock.useUserList(stockId);
+  const { mutateAsync: mutateResetGame } = Query.Stock.useResetStock(stockId);
   const { mutateAsync: mutateInitStock } = Query.Stock.useInitStock(stockId);
   const { mutateAsync: mutateUpdateGame } = Query.Stock.useUpdateStock();
 
@@ -105,9 +106,11 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
   const startGame = async () => {
     if (!stockId) return;
 
+    await mutateResetGame({});
     await mutateInitStock({});
     await mutateUpdateGame({
       _id: stockId,
+      fluctuationsInterval: stock?.fluctuationsInterval,
       isTransaction: true,
     });
   };
