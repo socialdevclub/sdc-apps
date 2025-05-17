@@ -53,6 +53,10 @@ export type RemoveStockUser = {
   userId: string;
 };
 
+export type RemoveAllStockUser = {
+  stockId: string;
+};
+
 export type GetStockList = QueryOptions<StockSchema>;
 
 export type PostIntroduce = {

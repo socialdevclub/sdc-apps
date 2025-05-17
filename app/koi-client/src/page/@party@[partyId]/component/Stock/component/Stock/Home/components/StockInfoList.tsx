@@ -71,17 +71,21 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
       </TitleWrapper>
       <Space />
       <Container>
-        {holdings.map((stock) => (
-          <StockInfoCard
-            key={stock.companyName}
-            companyName={stock.companyName}
-            stockCount={stock.stockCount}
-            onClick={handleOpenDrawer}
-            totalValue={stock.totalValue}
-            profitLoss={stock.profitLoss}
-            profitLossPercentage={parseFloat(stock.profitLossPercentage.toFixed(1))}
-          />
-        ))}
+        {holdings.length > 0 ? (
+          holdings.map((stock) => (
+            <StockInfoCard
+              key={stock.companyName}
+              companyName={stock.companyName}
+              stockCount={stock.stockCount}
+              onClick={handleOpenDrawer}
+              totalValue={stock.totalValue}
+              profitLoss={stock.profitLoss}
+              profitLossPercentage={parseFloat(stock.profitLossPercentage.toFixed(1))}
+            />
+          ))
+        ) : (
+          <Label>보유중인 주식이 없습니다.</Label>
+        )}
       </Container>
       <StockDrawer
         drawerOpen={drawerOpen}
@@ -104,4 +108,8 @@ const Container = styled.div`
 `;
 const Space = styled.div`
   margin-block: 0.5rem;
+`;
+const Label = styled.span`
+  font-size: 15px;
+  color: gray;
 `;

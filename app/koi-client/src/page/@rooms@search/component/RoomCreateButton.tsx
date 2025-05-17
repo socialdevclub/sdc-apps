@@ -6,6 +6,7 @@ import { PartySchema } from 'shared~type-party';
 import { StockSchema } from 'shared~type-stock';
 import { UserStore } from '../../../store';
 import { Query } from '../../../hook';
+import { LOCAL_STORAGE_KEY } from '../../../config/localStorage';
 
 interface Props {
   username: string;
@@ -31,7 +32,7 @@ export default function RoomCreateButton({ username }: Props) {
       const createdStock = await createStockRoom(createdParty._id);
       await updatePartyRoom(createdParty._id, createdStock._id);
 
-      localStorage.setItem('last-party-id', createdParty._id);
+      localStorage.setItem(LOCAL_STORAGE_KEY, createdParty._id);
       navigate(`/party/${createdParty._id}`);
     } catch (error) {
       setIsError(true);

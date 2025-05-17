@@ -15,7 +15,9 @@ import {
 import { useParams } from 'react-router-dom';
 import { message, Switch, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
+import { useAtomValue } from 'jotai';
 import { Query } from '../../../../../hook';
+import { UserStore } from '../../../../../store';
 
 interface Props {
   HeaderComponent?: JSX.Element;
@@ -36,8 +38,13 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
 
   const { data: stock } = Query.Stock.useQueryStock(stockId);
   const { data: userList } = Query.Stock.useUserList(stockId);
+  const { data: party } = Query.Party.useQueryParty(partyId ?? '');
   const { mutateAsync: mutateInitStock } = Query.Stock.useInitStock(stockId);
   const { mutateAsync: mutateUpdateGame } = Query.Stock.useUpdateStock();
+  const supabaseSession = useAtomValue(UserStore.supabaseSession);
+
+  const userId = supabaseSession?.user.id;
+  const isHost = party?.authorId === userId;
 
   const menuItems: MenuProps['items'] = [
     {
@@ -100,6 +107,10 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
 
     const url = `${window.location.origin}/party/${partyId}`;
     navigator.clipboard.writeText(url);
+    messageApi.success({
+      content: '링크가 복사되었습니다. 친구에게 공유해보세요!',
+      duration: 2,
+    });
   };
 
   const startGame = async () => {
@@ -108,6 +119,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
     await mutateInitStock({});
     await mutateUpdateGame({
       _id: stockId,
+      fluctuationsInterval: stock?.fluctuationsInterval,
       isTransaction: true,
     });
   };
@@ -140,80 +152,88 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
           </InfoText>
         </RoomInfoContainer>
 
-        <GameTimeSection>
-          <Tab>
-            <Settings />
-            <TabText>게임 설정</TabText>
-          </Tab>
-          <GameOptionContainer>
-            <GameOption id="game-option-container">
-              <GameOptionTitle>게임 시간</GameOptionTitle>
-              <Dropdown
-                menu={{
-                  inlineIndent: 10,
-                  items: menuItems,
-                  onClick: changeGameTime,
-                  style: {
-                    backgroundColor: '#030711',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px',
-                    padding: '10px 12px',
-                  },
-                }}
-                trigger={['click']}
-                getPopupContainer={() => document.getElementById('game-option-container')!}
-              >
-                <GameOptionValue dark>
-                  <GameOptionText>
-                    {menuItems.find((item) => Number(item?.key) === stock?.fluctuationsInterval)?.label}
-                  </GameOptionText>
-                  {isTimeOpen ? <ChevronUp /> : <ChevronDown />}
-                </GameOptionValue>
-              </Dropdown>
-            </GameOption>
-            {isOpenGameOption && (
-              <>
-                <GameOption gap={34}>
-                  <GameOptionTitle>개인주식 보유개수제한</GameOptionTitle>
-                  <GameOptionValue>
-                    <Switch
-                      checked={gameOption.personalStockLimit}
-                      onChange={() => changeGameOption('personalStockLimit')}
-                      style={{ backgroundColor: gameOption.personalStockLimit ? '#6339E3' : '#030711' }}
-                    />
-                    <GameOptionText>{gameOption.personalStockLimit ? 'ON' : 'OFF'}</GameOptionText>
+        {isHost && (
+          <GameTimeSection>
+            <Tab>
+              <Settings />
+              <TabText>게임 설정</TabText>
+            </Tab>
+            <GameOptionContainer>
+              <GameOption id="game-option-container">
+                <GameOptionTitle>게임 시간</GameOptionTitle>
+                <Dropdown
+                  menu={{
+                    inlineIndent: 10,
+                    items: menuItems,
+                    onClick: changeGameTime,
+                    style: {
+                      backgroundColor: '#030711',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                      padding: '10px 12px',
+                    },
+                  }}
+                  trigger={['click']}
+                  getPopupContainer={() => document.getElementById('game-option-container')!}
+                >
+                  <GameOptionValue dark>
+                    <GameOptionText>
+                      {(() => {
+                        const found = menuItems.find((item) => Number(item?.key) === stock?.fluctuationsInterval);
+                        if (found && 'label' in found) {
+                          return found.label;
+                        }
+                        return null;
+                      })()}
+                    </GameOptionText>
+                    {isTimeOpen ? <ChevronUp /> : <ChevronDown />}
                   </GameOptionValue>
-                </GameOption>
-                <GameOption gap={34}>
-                  <GameOptionTitle>시장에 풀린 주식 제한</GameOptionTitle>
-                  <GameOptionValue>
-                    <Switch
-                      checked={gameOption.publicStockLimit}
-                      onChange={() => changeGameOption('publicStockLimit')}
-                      style={{ backgroundColor: gameOption.publicStockLimit ? '#6339E3' : '#030711' }}
-                    />
-                    <GameOptionText>{gameOption.publicStockLimit ? 'ON' : 'OFF'}</GameOptionText>
-                  </GameOptionValue>
-                </GameOption>
-                <GameOption gap={34}>
-                  <GameOptionTitle>정보 이어진 사람 공개</GameOptionTitle>
-                  <GameOptionValue>
-                    <Switch
-                      checked={gameOption.isOpenInfo}
-                      onChange={() => changeGameOption('isOpenInfo')}
-                      style={{ backgroundColor: gameOption.isOpenInfo ? '#6339E3' : '#030711' }}
-                    />
-                    <GameOptionText>{gameOption.isOpenInfo ? 'ON' : 'OFF'}</GameOptionText>
-                  </GameOptionValue>
-                </GameOption>
-              </>
-            )}
-          </GameOptionContainer>
-          <MoreText onClick={openMoreGameOption}>
-            <span>{isOpenGameOption ? '접기' : '더보기'}</span>
-          </MoreText>
-        </GameTimeSection>
+                </Dropdown>
+              </GameOption>
+              {isOpenGameOption && (
+                <>
+                  <GameOption gap={34}>
+                    <GameOptionTitle>개인주식 보유개수제한</GameOptionTitle>
+                    <GameOptionValue>
+                      <Switch
+                        checked={gameOption.personalStockLimit}
+                        onChange={() => changeGameOption('personalStockLimit')}
+                        style={{ backgroundColor: gameOption.personalStockLimit ? '#6339E3' : '#030711' }}
+                      />
+                      <GameOptionText>{gameOption.personalStockLimit ? 'ON' : 'OFF'}</GameOptionText>
+                    </GameOptionValue>
+                  </GameOption>
+                  <GameOption gap={34}>
+                    <GameOptionTitle>시장에 풀린 주식 제한</GameOptionTitle>
+                    <GameOptionValue>
+                      <Switch
+                        checked={gameOption.publicStockLimit}
+                        onChange={() => changeGameOption('publicStockLimit')}
+                        style={{ backgroundColor: gameOption.publicStockLimit ? '#6339E3' : '#030711' }}
+                      />
+                      <GameOptionText>{gameOption.publicStockLimit ? 'ON' : 'OFF'}</GameOptionText>
+                    </GameOptionValue>
+                  </GameOption>
+                  <GameOption gap={34}>
+                    <GameOptionTitle>정보 이어진 사람 공개</GameOptionTitle>
+                    <GameOptionValue>
+                      <Switch
+                        checked={gameOption.isOpenInfo}
+                        onChange={() => changeGameOption('isOpenInfo')}
+                        style={{ backgroundColor: gameOption.isOpenInfo ? '#6339E3' : '#030711' }}
+                      />
+                      <GameOptionText>{gameOption.isOpenInfo ? 'ON' : 'OFF'}</GameOptionText>
+                    </GameOptionValue>
+                  </GameOption>
+                </>
+              )}
+            </GameOptionContainer>
+            <MoreText onClick={openMoreGameOption}>
+              <span>{isOpenGameOption ? '접기' : '더보기'}</span>
+            </MoreText>
+          </GameTimeSection>
+        )}
 
         <PlayerSection>
           <Tab>
@@ -223,10 +243,10 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
           <PlayerList>
             {userList?.map((user) => (
               <Player key={user.userId}>
-                <AvatarContainer>
+                <AvatarContainer isHost={user.userId === party?.authorId}>
                   <UserRound />
                 </AvatarContainer>
-                <PlayerName>{user.userInfo.nickname}</PlayerName>
+                <PlayerName isHost={user.userId === party?.authorId}>{user.userInfo.nickname}</PlayerName>
               </Player>
             ))}
           </PlayerList>
@@ -234,18 +254,29 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
       </BodyContainer>
       <BottomSheet>
         <ActionButtons>
-          <ShareButton>
-            <ButtonContent>
-              <Share color="white" />
-              <ButtonText>공유하기</ButtonText>
-            </ButtonContent>
-          </ShareButton>
-          <StartButton onClick={startGame}>
-            <ButtonContent>
-              <Play color="white" />
-              <ButtonText>게임시작</ButtonText>
-            </ButtonContent>
-          </StartButton>
+          {isHost ? (
+            <>
+              <GrayButton onClick={shareParty}>
+                <ButtonContent>
+                  <Share color="white" />
+                  <ButtonText>공유하기</ButtonText>
+                </ButtonContent>
+              </GrayButton>
+              <PurpleButton onClick={startGame}>
+                <ButtonContent>
+                  <Play color="white" />
+                  <ButtonText>게임시작</ButtonText>
+                </ButtonContent>
+              </PurpleButton>
+            </>
+          ) : (
+            <PurpleButton onClick={shareParty}>
+              <ButtonContent>
+                <Share color="white" />
+                <ButtonText>공유하기</ButtonText>
+              </ButtonContent>
+            </PurpleButton>
+          )}
         </ActionButtons>
       </BottomSheet>
     </Container>
@@ -476,9 +507,11 @@ const ActionButtons = styled.div`
   display: flex;
   justify-content: center;
   gap: 14px;
+  padding: 0 16px;
 `;
 
-const ShareButton = styled.button`
+const GrayButton = styled.button`
+  width: 100%;
   background-color: #374151;
   border: none;
   border-radius: 8px;
@@ -486,7 +519,8 @@ const ShareButton = styled.button`
   cursor: pointer;
 `;
 
-const StartButton = styled.button`
+const PurpleButton = styled.button`
+  width: 100%;
   border: none;
   border-radius: 8px;
   padding: 14px 24px 14px 16px;
