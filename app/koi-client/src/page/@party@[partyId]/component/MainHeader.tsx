@@ -9,6 +9,7 @@ import { Query } from '../../../hook';
 import RemainTimeClock from '../../../component-presentation/RemainTimeClock';
 import useRoundTimeRaceCheck from '../../../hook/useRoundTimeRaceCheck.tsx';
 import { UserStore } from '../../../store';
+import { LOCAL_STORAGE_KEY } from '../../../config/localStorage';
 
 const PartyHeader = () => {
   const { partyId } = useParams();
@@ -19,6 +20,7 @@ const PartyHeader = () => {
   const { remainingTime, roundTime } = useRoundTimeRaceCheck({ refetch, stock });
   const { mutateAsync: removeStock } = Query.Stock.useRemoveStockSession(stock?._id ?? ''); // 주식게임 방 세션 삭제
   const { mutateAsync: deleteParty } = Query.Party.useDeleteParty(partyId ?? ''); // 방 삭제
+
   const navigate = useNavigate();
 
   // 방 나가기 핸들러
@@ -27,8 +29,8 @@ const PartyHeader = () => {
     if (window.confirm('정말 나가시겠습니까? 방이 삭제됩니다.')) {
       await removeStock({ stockId: stock?._id ?? '' });
       await deleteParty({ partyId: partyId ?? '' });
-      // 로컬 스토리지에서 last-party-id 삭제
-      localStorage.removeItem('last-party-id');
+      // 로컬 스토리지에서 LOCAL_STORAGE_KEY 삭제
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
       navigate('/');
     }
   }

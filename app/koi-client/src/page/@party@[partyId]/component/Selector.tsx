@@ -4,6 +4,7 @@ import { Query } from '../../../hook';
 import Poll from './Poll';
 import Feed from './Feed';
 import Stock from './Stock';
+import { LOCAL_STORAGE_KEY } from '../../../config/localStorage';
 
 const Selector = () => {
   const { partyId } = useParams();
@@ -16,7 +17,7 @@ const Selector = () => {
   } catch (error) {
     // 파티가 유효하지 않은 경우 로컬스토리지 제거, 홈으로 이동
     console.error('Error fetching party data:', error);
-    localStorage.removeItem('last-party-id');
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
     navigate('/');
   }
 

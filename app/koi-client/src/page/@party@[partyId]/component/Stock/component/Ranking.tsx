@@ -10,6 +10,7 @@ import { commaizeNumber } from '@toss/utils';
 import { css } from '@linaria/core';
 import { UserStore } from '../../../../../store';
 import { Query } from '../../../../../hook';
+import { LOCAL_STORAGE_KEY } from '../../../../../config/localStorage';
 
 interface RankingProps {
   stockId: string;
@@ -28,6 +29,7 @@ function Ranking({ stockId }: RankingProps) {
   const { mutateAsync: removeStockUser } = Query.Stock.useRemoveUser(); // 주식게임 방 세션 유저 삭제
   const { mutateAsync: deleteParty } = Query.Party.useDeleteParty(partyId ?? ''); // 방 삭제
   const isHost = party?.authorId === supabaseSession?.user.id;
+
   const navigate = useNavigate();
 
   // 방 나가기 핸들러
@@ -37,7 +39,7 @@ function Ranking({ stockId }: RankingProps) {
     if (isHost && window.confirm('정말 나가시겠습니까? 방이 삭제됩니다.')) {
       await removeStock({ stockId: stock?._id ?? '' });
       await deleteParty({ partyId: partyId ?? '' });
-      localStorage.removeItem('last-party-id');
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
       navigate('/');
     } else {
       // 방장이 아니면 유저만 삭제
@@ -45,7 +47,7 @@ function Ranking({ stockId }: RankingProps) {
         stockId: stock?._id ?? '',
         userId: supabaseSession?.user.id ?? '',
       });
-      localStorage.removeItem('last-party-id');
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
       navigate('/');
     }
   }
