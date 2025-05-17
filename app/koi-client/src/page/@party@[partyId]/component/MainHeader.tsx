@@ -22,6 +22,7 @@ const PartyHeader = () => {
   const navigate = useNavigate();
 
   // 방 나가기 핸들러
+  // @fixme: window.confirm을 컴포넌트로 대체
   async function handleExit() {
     if (window.confirm('정말 나가시겠습니까? 방이 삭제됩니다.')) {
       await removeStock({ stockId: stock?._id ?? '' });

@@ -33,6 +33,7 @@ function Ranking({ stockId }: RankingProps) {
   // 방 나가기 핸들러
   async function handleExit() {
     // 방장이면 방 삭제
+    // @fixme: window.confirm을 컴포넌트로 대체
     if (isHost && window.confirm('정말 나가시겠습니까? 방이 삭제됩니다.')) {
       await removeStock({ stockId: stock?._id ?? '' });
       await deleteParty({ partyId: partyId ?? '' });
