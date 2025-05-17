@@ -4,7 +4,7 @@ import ProfileSetter from './ProfileSetter';
 import Waiting from './Waiting';
 import AccessDenided from './AccessDenided';
 import Stock from './Stock';
-import Result from './Result';
+import Ranking from './Ranking';
 import { Query } from '../../../../../hook';
 import { UserStore } from '../../../../../store';
 import Introduce from './Introduce';
@@ -40,7 +40,7 @@ const Phase = ({ stockId }: Props) => {
           INTRO_INPUT: <Introduce stockId={stockId} />,
           INTRO_RESULT: <IntroduceResult stockId={stockId} />,
           PLAYING: <Stock stockId={stockId} />,
-          RESULT: <Result stockId={stockId} />,
+          RESULT: <Ranking stockId={stockId} />,
           WAITING: <Waiting stockId={stockId} />,
         }}
         defaultComponent={<Waiting />}

@@ -1,4 +1,5 @@
 import { useAtomValue } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../component-presentation/Header';
 import MobileLayout from '../../component-presentation/MobileLayout';
 import { UserStore } from '../../store';
@@ -8,13 +9,16 @@ import Divider from './component/Divider';
 import RoomCreateButton from './component/RoomCreateButton';
 
 export default function Party() {
+  const navigate = useNavigate();
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
 
   const { data } = Query.Supabase.useMyProfile({
     supabaseSession,
   });
 
-  const avatarUrl = data?.data?.avatar_url;
+  const avatar = Query.Supabase.useQueryAvatarUrl({ supabaseSession });
+
+  const isVisibleAvatar = !avatar.isError;
   const username = data?.data?.username;
 
   return (
@@ -22,8 +26,11 @@ export default function Party() {
       <Header
         title={username}
         avatar={{
-          isVisible: true,
-          src: avatarUrl,
+          isVisible: isVisibleAvatar,
+          onClick: () => {
+            navigate('/profile');
+          },
+          src: avatar?.data,
         }}
       />
 

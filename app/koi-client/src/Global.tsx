@@ -16,6 +16,7 @@ import BackofficeStock from './page/@backoffice@stock';
 import BackofficeScreen from './page/@backoffice@screen@[partyId]';
 import BackofficeStockDetail from './page/@backoffice@stock@[stockId]';
 import BackofficePartyDetailPage from './page/@backoffice@party@[partyId]';
+import { LOCAL_STORAGE_KEY } from './config/localStorage';
 
 const router = createBrowserRouter([
   {
@@ -24,7 +25,7 @@ const router = createBrowserRouter([
     // 히스토리가 변경되어 임시로 @rooms@search 로 진행하였습니다.
     element: <RoomsSearch />,
     loader: () => {
-      const lastPartyId = localStorage.getItem('last-party-id');
+      const lastPartyId = localStorage.getItem(LOCAL_STORAGE_KEY);
 
       if (lastPartyId) {
         return redirect(`/party/${lastPartyId}`);
