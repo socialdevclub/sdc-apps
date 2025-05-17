@@ -214,9 +214,9 @@ const StockDrawer = ({
   const maxBuyableCountWithLimit = Math.min(maxBuyableCount, remainingStock ?? 0, maxStockLimitByPlayer);
 
   // TODO :: timeIdx (현재 라운드 정보) 타입가드 엄격한 처리 필요 (임시로 땜빵 타입가드 설정함)
-  if (!timeIdx) {
-    return <div>로딩중입니다...</div>;
-  }
+  // if (!timeIdx) {
+  //   return <div>로딩중입니다...</div>;
+  // }
 
   return (
     <Drawer
@@ -268,7 +268,7 @@ const StockDrawer = ({
           value={selectedCompany ? companiesPrice[selectedCompany] : 0}
           valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
           valueColor={isBuyable ? 'white' : 'red'}
-          badge={renderStockChangesInfo(selectedCompany, stock, companiesPrice, timeIdx)}
+          badge={renderStockChangesInfo(selectedCompany, stock, companiesPrice, timeIdx ?? 0)}
           src={getAnimalImageSource(selectedCompany)}
           width={50}
         />

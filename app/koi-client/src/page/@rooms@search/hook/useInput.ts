@@ -3,6 +3,7 @@ import { useAtomValue } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Query } from '../../../hook';
 import { UserStore } from '../../../store';
+import { LOCAL_STORAGE_KEY } from '../../../config/localStorage';
 
 interface ReturnType {
   roomCode: string;
@@ -39,7 +40,7 @@ export default function useInput(): ReturnType {
 
     try {
       await joinParty({ partyId: roomCode, userId: supabaseSession.user.id });
-      localStorage.setItem('last-party-id', roomCode);
+      localStorage.setItem(LOCAL_STORAGE_KEY, roomCode);
       navigate(`/party/${roomCode}`);
     } catch (error) {
       setIsValid(false);
