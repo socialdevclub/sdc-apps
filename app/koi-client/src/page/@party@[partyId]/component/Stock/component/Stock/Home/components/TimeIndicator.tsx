@@ -1,25 +1,38 @@
 import React, { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from '@emotion/styled';
-import useRoundTimeRaceCheck from '../../../../../../../../hook/useRoundTimeRaceCheck.tsx';
-import { useQueryParty } from '../../../../../../../../hook/query/Party';
-import { useQueryStock } from '../../../../../../../../hook/query/Stock';
-import Card from '../../../../../../../../component-presentation/Card.tsx';
-import { secondsToMMSS } from '../../../../../../../../utils/stock.ts';
-import * as COLOR from '../../../../../../../../config/color.ts';
+import useRoundTimeRaceCheck from '../../../../../../../../hook/useRoundTimeRaceCheck.tsx'; // 경로 확인 필요
+import { useQueryParty } from '../../../../../../../../hook/query/Party'; // 경로 확인 필요
+import { useQueryStock } from '../../../../../../../../hook/query/Stock'; // 경로 확인 필요
+import Card from '../../../../../../../../component-presentation/Card.tsx'; // 경로 확인 필요
+import { secondsToMMSS } from '../../../../../../../../utils/stock.ts'; // 경로 확인 필요
+import * as COLOR from '../../../../../../../../config/color.ts'; // 경로 확인 필요
 
 const TimeIndicator = () => {
   const { partyId } = useParams();
   const { data: party } = useQueryParty(partyId ?? '');
-  const { data: stock, refetch } = useQueryStock(party?.activityName ?? '');
+  // activityName이 비어있거나 undefined일 경우 useQueryStock 호출 방지 또는 기본값 처리 필요
+  const { data: stock, refetch } = useQueryStock(party?.activityName ?? '', {
+    enabled: !!party?.activityName, // party.activityName이 있을 때만 쿼리 실행
+  });
 
-  const { remainingTime, roundTime, elapsedTime, round } = useRoundTimeRaceCheck({ refetch, stock });
+  const { roundTime, elapsedTime, currentRound, totalRounds, totalElapsedTime } = useRoundTimeRaceCheck({
+    refetch,
+    stock,
+  });
 
   return (
     <Card
       title="경과 시간"
-      value={secondsToMMSS(elapsedTime)}
-      rightComponent={<ProgressBar roundTime={roundTime} elapsedTime={elapsedTime} round={round} />}
+      value={secondsToMMSS(totalElapsedTime)} // 현재 라운드의 경과 시간 표시
+      rightComponent={
+        <ProgressBar
+          roundTime={roundTime}
+          totalElapsedTime={totalElapsedTime} // 전체 누적 경과 시간 사용
+          currentRound={currentRound}
+          totalRounds={totalRounds}
+        />
+      }
     />
   );
 };
@@ -28,51 +41,57 @@ export default TimeIndicator;
 
 interface ProgressBarProps {
   roundTime: number;
-  elapsedTime: number;
-  round?: number;
+  totalElapsedTime: number;
+  currentRound: number;
+  totalRounds: number;
 }
 
-function ProgressBar({ roundTime, elapsedTime, round }: ProgressBarProps) {
-  // 진행률 계산 (0-100%)
+function ProgressBar({ roundTime, totalElapsedTime, currentRound, totalRounds }: ProgressBarProps) {
   const percentage = useMemo((): number => {
-    // 전체 시간이 0이면 0% 반환
-    if (roundTime <= 0) return 0;
+    // totalRounds 또는 roundTime이 0 이하일 경우 totalTime이 0 또는 음수가 될 수 있음.
+    // useRoundTimeRaceCheck 훅에서 totalRounds를 최소 1로, roundTime도 양수로 보장한다고 가정.
+    if (totalRounds <= 0 || roundTime <= 0) return 0;
+
+    const totalTime = roundTime * totalRounds;
+    // totalTime이 0이면 0% 반환 (위 조건으로 이미 커버되지만, 명시적 방어)
+    if (totalTime <= 0) return 0;
 
     // 경과 시간이 전체 시간을 초과하지 않도록 제한
-    const clampedElapsedTime = Math.min(elapsedTime, roundTime);
+    const clampedTotalElapsedTime = Math.min(totalElapsedTime, totalTime);
 
     // 진행률 계산 및 소수점 첫째 자리까지 반올림
-    return Math.round((clampedElapsedTime / roundTime) * 100 * 10) / 10;
-  }, [roundTime, elapsedTime]);
+    return Math.round((clampedTotalElapsedTime / totalTime) * 100 * 10) / 10;
+  }, [roundTime, totalElapsedTime, totalRounds]);
 
   return (
     <ProgressBarWrapper>
-      <RoundIndicator>{round ?? 0}ROUND</RoundIndicator>
+      <RoundIndicator>{currentRound}ROUND</RoundIndicator>
       <ProgressBarContainer>
         <ProgressFill percentage={percentage} />
-        {/* 8개의 세로 구분선 (9칸으로 나누기) */}
-        {Array.from({ length: 8 }).map((_, index) => {
-          // 1/9부터 8/9까지의 위치에 구분선 배치 (시작점과 끝점 제외)
-          const position = ((index + 1) / 9) * 100;
-          return <VerticalDivider key={position} position={position} />;
+        {/* totalRounds가 1이면 구분선 없음 (length: 0) */}
+        {/* totalRounds가 0이하인 경우는 훅에서 방지*/}
+        {Array.from({ length: Math.max(0, totalRounds - 1) }).map((_, index) => {
+          // 각 라운드의 경계에 구분선 배치
+          // totalRounds가 0이나 1이면 position 계산 시 분모가 0이 될 수 있으므로 방어 코드 추가
+          const position = totalRounds > 0 ? ((index + 1) / totalRounds) * 100 : 0;
+          return <VerticalDivider key={index} position={position} />; // key를 index로 사용 (안정적)
         })}
       </ProgressBarContainer>
     </ProgressBarWrapper>
   );
 }
 
-// 세로 구분선 컴포넌트 타입 정의
+// Styled Components (VerticalDivider, ProgressBarWrapper, ProgressBarContainer, ProgressFill, RoundIndicator)는 기존 코드 유지
+// ... (이하 동일한 Styled Components 코드)
 interface VerticalDividerProps {
   position: number;
 }
 
-// 진행 바 채우기 타입 정의
 interface ProgressFillProps {
   percentage: number;
   color?: string;
 }
 
-// 세로 구분선 컴포넌트
 const VerticalDivider = styled.div<VerticalDividerProps>`
   position: absolute;
   top: -4px;
@@ -109,26 +128,24 @@ const ProgressBarWrapper = styled.div`
   justify-content: center;
   width: 75%;
   padding-left: 20px;
-  height: 44px; /* Match Card's content height (22px title + 22px value) */
+  height: 44px;
   position: relative;
   gap: 0.6rem;
 `;
 
-// 진행 바 컨테이너 스타일링
 const ProgressBarContainer = styled.div`
   width: 100%;
   height: 4px;
   background-color: #000000;
   border-radius: 5px;
-  overflow: visible; /* Changed back to visible for dividers */
+  overflow: visible;
   position: relative;
 `;
 
-// 진행 바 내부 채우기 스타일링
 const ProgressFill = styled.div<ProgressFillProps>`
   height: 100%;
   background-color: ${(props: ProgressFillProps) => props.color || COLOR.violet};
-  width: ${(props: ProgressFillProps) => Math.min(props.percentage, 100)}%; /* Ensure percentage doesn't exceed 100% */
+  width: ${(props: ProgressFillProps) => Math.min(props.percentage, 100)}%;
   border-radius: 5px;
   transition: width 0.3s ease;
   position: relative;
@@ -136,7 +153,7 @@ const ProgressFill = styled.div<ProgressFillProps>`
 `;
 
 const RoundIndicator = styled.div`
-  background-color: ${COLOR.green}33; /* 33 is 20% opacity in hex */
+  background-color: ${COLOR.green}33;
   font-weight: bold;
   padding: 3px 10px;
   border-radius: 20px;
