@@ -23,7 +23,6 @@ interface Props {
 }
 
 const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
-  const [roomNumber, setRoomNumber] = useState('123456'); // 임시 방번호
   const [isTimeOpen, setIsTimeOpen] = useState(false);
   const [isOpenGameOption, setIsOpenGameOption] = useState(false);
   const [gameOption, setGameOption] = useState({
@@ -65,7 +64,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
 
   const copyRoomNumber = async () => {
     if (navigator.clipboard) {
-      await navigator.clipboard.writeText(roomNumber);
+      await navigator.clipboard.writeText(partyId ?? '');
 
       messageApi.success({
         content: '방 번호가 복사되었습니다.',
@@ -127,7 +126,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
           <RoomInfoBox>
             <RoomNumberSection onClick={copyRoomNumber}>
               <RoomText>방 번호: </RoomText>
-              <RoomNumber>{roomNumber}</RoomNumber>
+              <RoomNumber>{partyId}</RoomNumber>
               <Copy />
             </RoomNumberSection>
           </RoomInfoBox>

@@ -39,6 +39,7 @@ export default function useInput(): ReturnType {
 
     try {
       await joinParty({ partyId: roomCode, userId: supabaseSession.user.id });
+      localStorage.setItem('last-party-id', roomCode);
       navigate(`/party/${roomCode}`);
     } catch (error) {
       setIsValid(false);
