@@ -41,7 +41,7 @@ const Header = ({ title, avatar = { isVisible: false }, CenterComponent, LeftCom
   return (
     <Container>
       <LeftSection>
-        {LeftComponent || (
+        {LeftComponent ?? (
           <Avatar
             size="large"
             style={{

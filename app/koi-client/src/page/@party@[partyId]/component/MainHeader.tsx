@@ -2,39 +2,60 @@ import { Space } from 'antd';
 import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
+import { useAtomValue } from 'jotai';
 import Header from '../../../component-presentation/Header';
 import ProfileValidator from '../../../component/ProfileValidator';
 import { Query } from '../../../hook';
 import RemainTimeClock from '../../../component-presentation/RemainTimeClock';
 import useRoundTimeRaceCheck from '../../../hook/useRoundTimeRaceCheck.tsx';
+import { UserStore } from '../../../store';
 
 const PartyHeader = () => {
   const { partyId } = useParams();
   const { data: party } = Query.Party.useQueryParty(partyId ?? '');
   const { data: stock, refetch } = Query.Stock.useQueryStock(party?.activityName ?? '');
+  const supabaseSession = useAtomValue(UserStore.supabaseSession);
 
   const { remainingTime, roundTime } = useRoundTimeRaceCheck({ refetch, stock });
+  const removeStock = Query.Stock.useRemoveStockSession(stock?._id ?? ''); // 주식게임 방 세션 삭제
+  const removeStockUsers = Query.Stock.useRemoveAllUser(stock?._id ?? ''); // 주식게임 방 세션 모든 유저 삭제
+  const deleteParty = Query.Party.useDeleteParty(partyId ?? ''); // 방 삭제
   const navigate = useNavigate();
+
+  // 방 나가기 핸들러
+  async function handleExit() {
+    if (window.confirm('정말 나가시겠습니까? 방이 삭제됩니다.')) {
+      await removeStockUsers.mutateAsync({ stockId: stock?._id ?? '' });
+      await removeStock.mutateAsync({ stockId: stock?._id ?? '' });
+      await deleteParty.mutate({ partyId: partyId ?? '' });
+      // 로컬 스토리지에서 last-party-id 삭제
+      localStorage.removeItem('last-party-id');
+      navigate('/');
+    }
+  }
+
+  const userId = supabaseSession?.user.id;
+  const isHost = party?.authorId === userId;
 
   return (
     <ProfileValidator>
       <Header
-        title={party?.title}
+        title={stock?.isTransaction ? '주식 게임' : party?.title}
         LeftComponent={
-          <ChevronLeft
-            size={32}
-            onClick={() => {
-              navigate(-1);
-            }}
-            className={css`
-              color: white;
-              flex-shrink: 0;
+          isHost && (
+            <ChevronLeft
+              size={32}
+              onClick={() => handleExit()}
+              className={css`
+                color: white;
+                flex-shrink: 0;
 
-              &:hover {
-                cursor: pointer;
-              }
-            `}
-          />
+                &:hover {
+                  cursor: pointer;
+                }
+              `}
+            />
+          )
         }
         RightComponent={
           <Space>
