@@ -28,6 +28,11 @@ type Props = {
       LeftComponent?: never;
       CenterComponent?: React.ReactNode;
     }
+  | {
+      avatar?: never;
+      LeftComponent?: React.ReactNode;
+      CenterComponent?: React.ReactNode;
+    }
 );
 
 const Header = ({ title, avatar = { isVisible: false }, CenterComponent, LeftComponent, RightComponent }: Props) => {
