@@ -38,12 +38,6 @@ const RecommendedPartners = ({ stockId }: Props) => {
             <PartnerNickname>{nickname}</PartnerNickname>
           </PartnerItem>
         ))}
-        <PartnerItem>
-          <Avatar size={40} style={{ border: '1px solid #c6c6c6' }}>
-            테
-          </Avatar>
-          <PartnerNickname>테스트</PartnerNickname>
-        </PartnerItem>
       </PartnersList>
     </Container>
   );
