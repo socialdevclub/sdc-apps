@@ -107,7 +107,10 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
 
     const url = `${window.location.origin}/party/${partyId}`;
     navigator.clipboard.writeText(url);
-    message.success('링크가 복사되었습니다. 친구에게 공유해보세요!');
+    messageApi.success({
+      content: '링크가 복사되었습니다. 친구에게 공유해보세요!',
+      duration: 2,
+    });
   };
 
   const startGame = async () => {
