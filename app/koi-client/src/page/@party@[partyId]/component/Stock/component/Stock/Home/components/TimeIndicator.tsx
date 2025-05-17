@@ -12,9 +12,7 @@ const TimeIndicator = () => {
   const { partyId } = useParams();
   const { data: party } = useQueryParty(partyId ?? '');
   // activityName이 비어있거나 undefined일 경우 useQueryStock 호출 방지 또는 기본값 처리 필요
-  const { data: stock, refetch } = useQueryStock(party?.activityName ?? '', {
-    enabled: !!party?.activityName, // party.activityName이 있을 때만 쿼리 실행
-  });
+  const { data: stock, refetch } = useQueryStock(party?.activityName ?? '');
 
   const { roundTime, elapsedTime, currentRound, totalRounds, totalElapsedTime } = useRoundTimeRaceCheck({
     refetch,
@@ -74,6 +72,7 @@ function ProgressBar({ roundTime, totalElapsedTime, currentRound, totalRounds }:
           // 각 라운드의 경계에 구분선 배치
           // totalRounds가 0이나 1이면 position 계산 시 분모가 0이 될 수 있으므로 방어 코드 추가
           const position = totalRounds > 0 ? ((index + 1) / totalRounds) * 100 : 0;
+          // eslint-disable-next-line react/no-array-index-key
           return <VerticalDivider key={index} position={position} />; // key를 index로 사용 (안정적)
         })}
       </ProgressBarContainer>
