@@ -17,17 +17,17 @@ const PartyHeader = () => {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
 
   const { remainingTime, roundTime } = useRoundTimeRaceCheck({ refetch, stock });
-  const removeStock = Query.Stock.useRemoveStockSession(stock?._id ?? ''); // 주식게임 방 세션 삭제
-  const removeStockUsers = Query.Stock.useRemoveAllUser(stock?._id ?? ''); // 주식게임 방 세션 모든 유저 삭제
-  const deleteParty = Query.Party.useDeleteParty(partyId ?? ''); // 방 삭제
+  const { mutateAsync: removeStock } = Query.Stock.useRemoveStockSession(stock?._id ?? ''); // 주식게임 방 세션 삭제
+  const { mutateAsync: removeStockUsers } = Query.Stock.useRemoveAllUser(stock?._id ?? ''); // 주식게임 방 세션 모든 유저 삭제
+  const { mutateAsync: deleteParty } = Query.Party.useDeleteParty(partyId ?? ''); // 방 삭제
   const navigate = useNavigate();
 
   // 방 나가기 핸들러
   async function handleExit() {
     if (window.confirm('정말 나가시겠습니까? 방이 삭제됩니다.')) {
-      await removeStockUsers.mutateAsync({ stockId: stock?._id ?? '' });
-      await removeStock.mutateAsync({ stockId: stock?._id ?? '' });
-      await deleteParty.mutate({ partyId: partyId ?? '' });
+      await removeStockUsers({ stockId: stock?._id ?? '' });
+      await removeStock({ stockId: stock?._id ?? '' });
+      await deleteParty({ partyId: partyId ?? '' });
       // 로컬 스토리지에서 last-party-id 삭제
       localStorage.removeItem('last-party-id');
       navigate('/');
