@@ -26,4 +26,3 @@ export { default as useAllUserSellPriceDesc } from './useAllUserSellPriceDesc';
 export { default as useMyAllSellPrice } from './useMyAllSellPrice';
 export { default as useUserCount } from './useUserCount';
 export { default as useQueryResultList } from './useQueryResultList';
-export { default as useRemoveAllUser } from './useRemoveAllUser';

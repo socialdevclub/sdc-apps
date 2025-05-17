@@ -25,7 +25,6 @@ function Ranking({ stockId }: RankingProps) {
   const { data: party } = Query.Party.useQueryParty(partyId);
 
   const { mutateAsync: removeStock } = Query.Stock.useRemoveStockSession(stock?._id ?? ''); // 주식게임 방 세션 삭제
-  const { mutateAsync: removeStockUsers } = Query.Stock.useRemoveAllUser(stock?._id ?? ''); // 주식게임 방 세션 모든 유저 삭제
   const { mutateAsync: removeStockUser } = Query.Stock.useRemoveUser(); // 주식게임 방 세션 유저 삭제
   const { mutateAsync: deleteParty } = Query.Party.useDeleteParty(partyId ?? ''); // 방 삭제
   const isHost = party?.authorId === supabaseSession?.user.id;
@@ -35,7 +34,6 @@ function Ranking({ stockId }: RankingProps) {
   async function handleExit() {
     // 방장이면 방 삭제
     if (isHost && window.confirm('정말 나가시겠습니까? 방이 삭제됩니다.')) {
-      await removeStockUsers({ stockId: stock?._id ?? '' });
       await removeStock({ stockId: stock?._id ?? '' });
       await deleteParty({ partyId: partyId ?? '' });
       localStorage.removeItem('last-party-id');
