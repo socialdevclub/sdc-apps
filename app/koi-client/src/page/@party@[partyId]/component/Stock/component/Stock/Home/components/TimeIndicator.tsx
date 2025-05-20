@@ -80,8 +80,6 @@ function ProgressBar({ roundTime, totalElapsedTime, currentRound, totalRounds }:
   );
 }
 
-// Styled Components (VerticalDivider, ProgressBarWrapper, ProgressBarContainer, ProgressFill, RoundIndicator)는 기존 코드 유지
-// ... (이하 동일한 Styled Components 코드)
 interface VerticalDividerProps {
   position: number;
 }
@@ -93,12 +91,12 @@ interface ProgressFillProps {
 
 const VerticalDivider = styled.div<VerticalDividerProps>`
   position: absolute;
-  top: -4px;
+  top: -2px;
   left: ${(props: VerticalDividerProps) => props.position}%;
   width: 2px;
-  height: 0.8rem; /* Increased height */
+  height: 0.5rem; /* Increased height */
   background-color: #000000;
-  z-index: 5;
+  z-index: 2;
 
   &::before,
   &::after {
@@ -130,6 +128,7 @@ const ProgressBarWrapper = styled.div`
   height: 44px;
   position: relative;
   gap: 0.6rem;
+  z-index: 0;
 `;
 
 const ProgressBarContainer = styled.div`
@@ -139,6 +138,7 @@ const ProgressBarContainer = styled.div`
   border-radius: 5px;
   overflow: visible;
   position: relative;
+  z-index: 0;
 `;
 
 const ProgressFill = styled.div<ProgressFillProps>`
@@ -161,4 +161,5 @@ const RoundIndicator = styled.div`
   line-height: 16px;
   color: ${COLOR.pastelGreen};
   transform: translateY(-15%);
+  z-index: 1;
 `;
