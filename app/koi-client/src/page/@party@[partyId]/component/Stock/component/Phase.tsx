@@ -4,7 +4,7 @@ import ProfileSetter from './ProfileSetter';
 import Waiting from './Waiting';
 import AccessDenided from './AccessDenided';
 import Stock from './Stock';
-import Result from './Result';
+import Ranking from './Ranking';
 import { Query } from '../../../../../hook';
 import { UserStore } from '../../../../../store';
 import Introduce from './Introduce';
@@ -36,12 +36,12 @@ const Phase = ({ stockId }: Props) => {
       <SwitchCase
         value={stockPhase}
         caseBy={{
-          CROWDING: isEntry ? <Waiting /> : <ProfileSetter stockId={stockId} />,
+          CROWDING: isEntry ? <Waiting stockId={stockId} /> : <ProfileSetter stockId={stockId} />,
           INTRO_INPUT: <Introduce stockId={stockId} />,
           INTRO_RESULT: <IntroduceResult stockId={stockId} />,
           PLAYING: <Stock stockId={stockId} />,
-          RESULT: <Result stockId={stockId} />,
-          WAITING: <Waiting />,
+          RESULT: <Ranking stockId={stockId} />,
+          WAITING: <Waiting stockId={stockId} />,
         }}
         defaultComponent={<Waiting />}
       />

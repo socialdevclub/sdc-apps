@@ -1,93 +1,71 @@
-import { Button, Space } from 'antd';
+import { Space } from 'antd';
 import { css } from '@linaria/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SwitchCase } from '@toss/react';
-import { ChevronLeft, RefreshCcw, Lightbulb } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
+import { useAtomValue } from 'jotai';
 import Header from '../../../component-presentation/Header';
 import ProfileValidator from '../../../component/ProfileValidator';
 import { Query } from '../../../hook';
-import RecommendedPartnersModal from './Stock/component/Stock/RecommendedPartnersModal';
+import RemainTimeClock from '../../../component-presentation/RemainTimeClock';
+import useRoundTimeRaceCheck from '../../../hook/useRoundTimeRaceCheck.tsx';
+import { UserStore } from '../../../store';
+import { LOCAL_STORAGE_KEY } from '../../../config/localStorage';
 
 const PartyHeader = () => {
   const { partyId } = useParams();
   const { data: party } = Query.Party.useQueryParty(partyId ?? '');
+  const { data: stock, refetch } = Query.Stock.useQueryStock(party?.activityName ?? '');
+  const supabaseSession = useAtomValue(UserStore.supabaseSession);
+
+  const { remainingTime, roundTime } = useRoundTimeRaceCheck({ refetch, stock });
+  const { mutateAsync: removeStock } = Query.Stock.useRemoveStockSession(stock?._id ?? ''); // 주식게임 방 세션 삭제
+  const { mutateAsync: deleteParty } = Query.Party.useDeleteParty(partyId ?? ''); // 방 삭제
 
   const navigate = useNavigate();
-  // const [messageApi, contextHolder] = message.useMessage();
 
-  // const supabaseSession = useAtomValue(UserStore.supabaseSession);
+  // 방 나가기 핸들러
+  // @fixme: window.confirm을 컴포넌트로 대체
+  async function handleExit() {
+    if (window.confirm('정말 나가시겠습니까? 방이 삭제됩니다.')) {
+      await removeStock({ stockId: stock?._id ?? '' });
+      await deleteParty({ partyId: partyId ?? '' });
+      // 로컬 스토리지에서 LOCAL_STORAGE_KEY 삭제
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      navigate('/');
+    }
+  }
 
-  // const { data: profile } = Query.Supabase.useMyProfile({ supabaseSession });
-  // const { mutateAsync } = Query.useSendLog(`${profile?.data?.username}님의 호스트 띵똥`);
-
-  // const items: MenuProps['items'] = [
-  //   {
-  //     key: '호스트 띵똥',
-  //     label: '호스트 띵똥',
-  //     onClick: () => {
-  //       mutateAsync({})
-  //         .then(() => {
-  //           messageApi.open({
-  //             content: '호스트 띵똥!',
-  //             duration: 2,
-  //             type: 'success',
-  //           });
-  //         })
-  //         .catch((e: Error) => {
-  //           messageApi.open({
-  //             content: `${e.message}`,
-  //             duration: 2,
-  //             type: 'error',
-  //           });
-  //         });
-  //     },
-  //   },
-  // ];
+  const userId = supabaseSession?.user.id;
+  const isHost = party?.authorId === userId;
 
   return (
     <ProfileValidator>
       <Header
-        title={party?.title}
+        title={stock?.isTransaction ? '주식 게임' : party?.title}
         LeftComponent={
-          <ChevronLeft
-            size={32}
-            onClick={() => {
-              navigate(-1);
-            }}
-            className={css`
-              color: white;
-              flex-shrink: 0;
-              &:hover {
-                cursor: pointer;
-              }
-            `}
-          />
+          isHost && (
+            <ChevronLeft
+              size={32}
+              onClick={() => handleExit()}
+              className={css`
+                color: white;
+                flex-shrink: 0;
+
+                &:hover {
+                  cursor: pointer;
+                }
+              `}
+            />
+          )
         }
         RightComponent={
           <Space>
-            {/* 대화 추천 상대 리스트 모달 버튼 */}
-            <SwitchCase
-              value={party?.activityId ?? ''}
-              caseBy={{
-                STOCK: (
-                  <RecommendedPartnersModal
-                    stockId={party?.activityName}
-                    trigger={<Button style={{ border: 'none' }} ghost icon={<Lightbulb color="white" />} />}
-                  />
-                ),
-              }}
-            />
-            {/* 페이지 새로고침 버튼 */}
-            <Button
-              ghost
-              style={{ border: 'none' }}
-              icon={<RefreshCcw color="white" />}
-              onClick={() => (window.location as { reload: (isForceReload: boolean) => void }).reload(true)}
-            />
-            {/* 하이안: 잠깐 기능 닫아놈 */}
-            {/* <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
-              <Button shape="circle" icon={<EllipsisOutlined />} />
-            </Dropdown> */}
+            {stock?.isTransaction && (
+              <RemainTimeClock
+                totalTime={roundTime} // 분 단위로 주어지기에, 60을 곱해서 초로 계산
+                remainingTime={remainingTime} // 초 단위로 주어지기에, 60을 나누어서 분으로 계산
+              />
+            )}
           </Space>
         }
       />

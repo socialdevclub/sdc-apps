@@ -2,6 +2,7 @@ import { getDateDistance } from '@toss/date';
 import { objectEntries, objectValues } from '@toss/utils';
 import dayjs from 'dayjs';
 import { COMPANY_NAMES, CompanyNames } from 'shared~config/dist/stock';
+import { GetStock } from 'shared~type-stock/Response';
 import {
   ANIMAL_NAME,
   REMAINING_STOCK_THRESHOLD,
@@ -186,6 +187,45 @@ export const renderProfitBadge = (
   };
 };
 
+export const renderStockChangesInfo = (
+  selectedCompany: string,
+  stock: GetStock,
+  companiesPrice: Record<string, number>,
+  timeIdx: number,
+): { color: string; text: string } => {
+  const currentPrice = companiesPrice[selectedCompany];
+  const previousPrice = stock.companies[selectedCompany][timeIdx - 1]?.가격 || 0;
+
+  if (previousPrice > 0) {
+    const priceChange = currentPrice - previousPrice;
+    const changePercent = Math.round((priceChange / previousPrice) * 100);
+
+    if (changePercent === 0) {
+      return {
+        color: '#94A3B8',
+        text: '0% 변동 없음',
+      };
+    }
+
+    if (changePercent > 0) {
+      return {
+        color: '#F87171',
+        text: `+${priceChange.toLocaleString()} (${changePercent}%)`,
+      };
+    }
+
+    return {
+      color: '#60a5fa',
+      text: `${priceChange.toLocaleString()} (${changePercent}%)`,
+    };
+  }
+
+  return {
+    color: '#94A3B8',
+    text: '0% 변동 없음',
+  };
+};
+
 export const getAnimalImageSource = (companyName: string): string => {
   // 입력된 회사 이름이 유효한 CompanyNames 타입인지 확인
   const isValidCompanyName = objectValues(COMPANY_NAMES).includes(companyName as CompanyNames);
@@ -196,4 +236,21 @@ export const getAnimalImageSource = (companyName: string): string => {
   }
   // 유효하지 않은 회사 이름이면 기본값으로 햄찌금융 이미지 반환
   return `/no_bg_animal/${ANIMAL_NAME['햄찌금융']}.webp`;
+};
+
+export const secondsToMMSS = (seconds: number): string => {
+  // 음수인 경우 처리
+  if (seconds < 0) {
+    return `-${secondsToMMSS(-seconds)}`;
+  }
+
+  // 분과 초 계산
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+
+  // 두 자리 숫자로 포맷팅
+  const formattedMinutes = String(minutes).padStart(2, '0');
+  const formattedSeconds = String(remainingSeconds).padStart(2, '0');
+
+  return `${formattedMinutes}:${formattedSeconds}`;
 };

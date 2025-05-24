@@ -1,25 +1,38 @@
 import React from 'react';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter, redirect } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import { QueryClientProvider } from 'lib-react-query';
 import { useAtom } from 'jotai';
-import Main from './page/@';
 import SupabaseProvider from './library/supabase/SupabaseProvider';
 import { UserStore } from './store';
 import BackofficePoll from './page/@backoffice@poll';
 import Profile from './page/@profile';
 import Party from './page/@party@[partyId]';
 import Backoffice from './page/@backoffice';
+import RoomsSearch from './page/@rooms@search';
 import BackofficeParty from './page/@backoffice@party';
 import NoSession from './component/NoSession';
 import BackofficeStock from './page/@backoffice@stock';
 import BackofficeScreen from './page/@backoffice@screen@[partyId]';
 import BackofficeStockDetail from './page/@backoffice@stock@[stockId]';
 import BackofficePartyDetailPage from './page/@backoffice@party@[partyId]';
+import { LOCAL_STORAGE_KEY } from './config/localStorage';
 
 const router = createBrowserRouter([
   {
-    element: <Main />,
+    // 원래 파티 리스트 페이지가 있었는데, 대체되었습니다.
+    // 폴더 명이 @rooms@search 로 되어있는데, @로 추후 변경 예정입니다.
+    // 히스토리가 변경되어 임시로 @rooms@search 로 진행하였습니다.
+    element: <RoomsSearch />,
+    loader: () => {
+      const lastPartyId = localStorage.getItem(LOCAL_STORAGE_KEY);
+
+      if (lastPartyId) {
+        return redirect(`/party/${lastPartyId}`);
+      }
+
+      return null;
+    },
     path: '/',
   },
   {
