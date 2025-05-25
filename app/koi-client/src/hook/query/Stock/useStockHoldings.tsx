@@ -95,33 +95,10 @@ export const useStockHoldings = ({ stockId, userId }: Props) => {
     const heldStocks = userData.stockStorages.filter((storage) => storage.stockCountCurrent > 0);
 
     for (const stock of heldStocks) {
-      const { companyName, stockAveragePrice, stockCountCurrent, stockCountHistory } = stock;
+      const { companyName, stockAveragePrice, stockCountCurrent } = stock;
 
       // 현재 가격 확인
       const currentPrice = companiesPrice[companyName] || 0;
-
-      // 구매 이력을 기반으로 평균 구매 가격 계산
-      // let totalBought = 0;
-      // let totalCost = 0;
-
-      // 각 라운드별 주식 변동 내역을 확인
-      for (let i = 0; i < stockCountHistory.length; i++) {
-        // 이전 라운드와 현재 라운드의 주식 수량 차이를 계산
-        const prevCount = i === 0 ? 0 : stockCountHistory[i - 1];
-        const currentCount = stockCountHistory[i];
-        const diff = currentCount - prevCount;
-
-        // 주식 구매 시 (수량이 증가했을 때)
-        if (diff > 0) {
-          // 해당 라운드의 가격
-          // const priceAtRound = stockData.companies[companyName][i].가격;
-          // totalCost += diff * priceAtRound;
-          // totalBought += diff;
-        }
-      }
-
-      // 평균 구매 가격 계산 (총 비용 / 총 구매 수량)
-      // const averagePrice = totalBought > 0 ? totalCost / totalBought : 0;
 
       // 평균 구매 가격
       const averagePrice = stockAveragePrice;
