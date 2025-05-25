@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { responsiveStyled } from '../../../../utils/styles';
 import { CustomTheme } from '../../../../styles/theme';
+import { applyResponsiveStyles } from '../../../../utils/styles';
 
 export const Container = styled.div`
   width: 100%;
@@ -18,49 +18,65 @@ export const TitleWrapper = styled.div`
   align-items: center;
 `;
 
-export const TitleText = responsiveStyled.span({
-  DESKTOP: `font-size: 64px`,
-  base: `
-    font-family: 'Helvetica Neue LT Pro 83 HvEx', sans-serif;
-    font-size: 28px;
-    font-weight: bold;
-    letter-spacing: -2px;
-    line-height: 135%;
-    white-space: nowrap;`,
-});
+export const TitleText = styled.span((props) =>
+  applyResponsiveStyles({
+    DESKTOP: {
+      fontSize: '64px',
+    },
+    base: {
+      fontFamily: props.theme.fonts.heading,
+      fontSize: '28px',
+      fontWeight: 'bold',
+      letterSpacing: '-2px',
+      lineHeight: '135%',
+      whiteSpace: 'nowrap',
+    },
+  }),
+);
 
-export const SubTitle = responsiveStyled.p({
-  DESKTOP: `
-    font-size: 32px;
-    margin-top: 24px;
-  `,
-  base: `
-    font-size: 18px;
-    line-height: 150%;
-    margin-top: 12px;`,
-});
+export const SubTitle = styled.p(
+  applyResponsiveStyles({
+    DESKTOP: {
+      fontSize: '32px',
+      marginTop: '24px',
+    },
+    base: {
+      fontSize: '18px',
+      lineHeight: '150%',
+      marginTop: '12px',
+    },
+  }),
+);
 
-export const GamepadImage = responsiveStyled.img({
-  DESKTOP: `
-    width: 80px;
-    margin: 0 10px;
-    top: 5px`,
-  base: `
-    width: 35.6px;
-    position: relative;`,
-});
+export const GamepadImage = styled.img(
+  applyResponsiveStyles({
+    DESKTOP: {
+      margin: '0 10px',
+      top: '5px',
+      width: '80px',
+    },
+    base: {
+      position: 'relative',
+      width: '35.6px',
+    },
+  }),
+);
 
-export const ChatImage = responsiveStyled.img({
-  DESKTOP: `
-    width: 70px;
-    margin: 0 10px;
-    bottom: 0;
-    top: 5px`,
-  base: `
-    width: 34px;
-    position: relative;
-    bottom: 5px;`,
-});
+export const ChatImage = styled.img(
+  applyResponsiveStyles({
+    DESKTOP: {
+      bottom: '0',
+      margin: '0 10px',
+      top: '5px',
+      width: '70px',
+    },
+    base: {
+      bottom: '5px',
+      position: 'relative',
+      width: '34px',
+    },
+  }),
+);
 
 export const PurpleText = styled.span<{ fontFamily?: keyof CustomTheme['fonts'] }>(({ theme, fontFamily }) => ({
   color: theme.colors.brand.lightPurple,
@@ -73,14 +89,18 @@ export const TealText = styled.span(({ theme }) => ({
   fontFamily: theme.fonts.DungGeunMo,
 }));
 
-export const DevWrapper = responsiveStyled.div({
-  DESKTOP: `font-size: 64px`,
-  base: `
-    font-size: 28px;
-    font-family: 'Helvetica Neue LT Pro 83 HvEx', sans-serif;
-    font-weight: bold;
-    margin-right: 10px;`,
-});
+export const DevWrapper = styled.div((props) =>
+  applyResponsiveStyles({
+    DESKTOP: {
+      fontSize: '64px',
+    },
+    base: {
+      fontFamily: props.theme.fonts.heading,
+      fontSize: '28px',
+      fontWeight: 'bold',
+    },
+  }),
+);
 
 export const ButtonWrapper = styled.div`
   margin-top: 24px;
