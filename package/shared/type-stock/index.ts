@@ -15,6 +15,7 @@ export type StockUserInfoSchema = {
 export type StockStorageSchema = {
   companyName: string;
   stockCountCurrent: number;
+  stockAveragePrice: number;
   stockCountHistory: number[];
 };
 
