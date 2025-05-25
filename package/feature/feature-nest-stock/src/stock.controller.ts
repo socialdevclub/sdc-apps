@@ -32,11 +32,6 @@ export class StockController {
     return this.stockService.findOneByIdAndUpdate(body);
   }
 
-  @Patch()
-  updateStock(@Body() body: Request.PatchUpdateStock): Promise<StockSchema> {
-    return this.stockService.findOneByIdAndUpdate(body);
-  }
-
   @Delete()
   async deleteStock(@Query('stockId') stockId: string): Promise<boolean> {
     return this.stockService.deleteStock(stockId);
