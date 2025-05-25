@@ -95,14 +95,14 @@ export const useStockHoldings = ({ stockId, userId }: Props) => {
     const heldStocks = userData.stockStorages.filter((storage) => storage.stockCountCurrent > 0);
 
     for (const stock of heldStocks) {
-      const { companyName, stockCountCurrent, stockCountHistory } = stock;
+      const { companyName, stockAveragePrice, stockCountCurrent, stockCountHistory } = stock;
 
       // 현재 가격 확인
       const currentPrice = companiesPrice[companyName] || 0;
 
       // 구매 이력을 기반으로 평균 구매 가격 계산
-      let totalBought = 0;
-      let totalCost = 0;
+      // let totalBought = 0;
+      // let totalCost = 0;
 
       // 각 라운드별 주식 변동 내역을 확인
       for (let i = 0; i < stockCountHistory.length; i++) {
@@ -114,19 +114,25 @@ export const useStockHoldings = ({ stockId, userId }: Props) => {
         // 주식 구매 시 (수량이 증가했을 때)
         if (diff > 0) {
           // 해당 라운드의 가격
-          const priceAtRound = stockData.companies[companyName][i].가격;
-          totalCost += diff * priceAtRound;
-          totalBought += diff;
+          // const priceAtRound = stockData.companies[companyName][i].가격;
+          // totalCost += diff * priceAtRound;
+          // totalBought += diff;
         }
       }
 
       // 평균 구매 가격 계산 (총 비용 / 총 구매 수량)
-      const averagePrice = totalBought > 0 ? totalCost / totalBought : 0;
+      // const averagePrice = totalBought > 0 ? totalCost / totalBought : 0;
 
-      // 현재 총 가치
+      // 평균 구매 가격
+      const averagePrice = stockAveragePrice;
+
+      // 보유 수량의 총 투자 비용 (평균 구매 가격 * 총 구매 수량)
+      const totalCost = averagePrice * stockCountCurrent;
+
+      // 현재 총 가치 (현재 가격 * 총 구매 수량)
       const totalValue = currentPrice * stockCountCurrent;
 
-      // 손익 계산
+      // 손익 계산 (현재 총 가치 - 총 투자 비용)
       const profitLoss = totalValue - totalCost;
 
       // 손익률 계산 (퍼센트)
