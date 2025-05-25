@@ -51,12 +51,9 @@ export const SubTitle = styled.p(
 export const GamepadImage = styled.img(
   applyResponsiveStyles({
     DESKTOP: {
-      margin: '0 10px',
-      top: '5px',
       width: '80px',
     },
     base: {
-      position: 'relative',
       width: '35.6px',
     },
   }),
@@ -65,14 +62,10 @@ export const GamepadImage = styled.img(
 export const ChatImage = styled.img(
   applyResponsiveStyles({
     DESKTOP: {
-      bottom: '0',
-      margin: '0 10px',
-      top: '5px',
       width: '70px',
     },
     base: {
       bottom: '5px',
-      position: 'relative',
       width: '34px',
     },
   }),
