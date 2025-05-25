@@ -20,6 +20,12 @@
 }
 
 
+@font-face {
+  font-family: 'Helvetica Neue LT Pro 83 HvEx';
+  src: url('https://fonts.cdnfonts.com/s/29109/HelveticaNeueLTProHvEx.woff') format('woff'); /* 수정된 부분 */
+  font-style: normal;
+}
+
 html,
 body,
 #root {
