@@ -8,21 +8,30 @@ export const Container = styled.div`
   align-items: center;
 `;
 
-export const Title = styled.p`
-  font-size: 24px;
-  font-family: ${(props) => props.theme.fonts.subHeading};
-  padding-bottom: ${(props) => props.theme.spacing.xs};
-  color: ${(props) => props.theme.colors.brand.primary};
-`;
+export const Title = styled.p((props) =>
+  applyResponsiveStyles({
+    DESKTOP: {
+      fontSize: 40,
+      marginBottom: `${props.theme.spacing.md}`,
+    },
+    base: {
+      color: props.theme.colors.brand.primary,
+      fontFamily: props.theme.fonts.subHeading,
+      fontSize: 18,
+      marginBottom: `${props.theme.spacing.xs}`,
+    },
+  }),
+);
 
 export const Description = styled(HighlightText)((props) =>
   applyResponsiveStyles({
     DESKTOP: {
-      fontSize: '24px',
+      fontSize: 32,
+      marginBottom: 72,
       whiteSpace: 'pre-line',
     },
     base: {
-      fontSize: '18px',
+      fontSize: 18,
       lineHeight: '150%',
       marginBottom: `${props.theme.spacing.xl3}`,
       padding: `0 ${props.theme.spacing.xl}`,
@@ -32,11 +41,18 @@ export const Description = styled(HighlightText)((props) =>
   }),
 );
 
-export const CardWrapper = styled.div`
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-`;
+export const CardWrapper = styled.div(() =>
+  applyResponsiveStyles({
+    DESKTOP: {
+      gap: 60,
+    },
+    base: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: 24,
+    },
+  }),
+);
 
 export const Card = styled.div`
   display: flex;
@@ -46,13 +62,28 @@ export const Card = styled.div`
   gap: 8px;
 `;
 
-export const CardText = styled(HighlightText)`
-  font-size: 16px;
-  line-height: 140%;
-  text-align: center;
-  white-space: pre-line;
-`;
+export const CardText = styled(HighlightText)((props) =>
+  applyResponsiveStyles({
+    DESKTOP: {
+      fontSize: 24,
+      lineHeight: '130%',
+    },
+    base: {
+      fontSize: 16,
+      lineHeight: '140%',
+      textAlign: 'center',
+      whiteSpace: 'pre',
+    },
+  }),
+);
 
-export const CardImage = styled.img`
-  width: 120px;
-`;
+export const CardImage = styled.img(() =>
+  applyResponsiveStyles({
+    DESKTOP: {
+      width: 200,
+    },
+    base: {
+      width: 120,
+    },
+  }),
+);
