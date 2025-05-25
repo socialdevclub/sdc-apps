@@ -78,13 +78,14 @@ export class UserRepository {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async find(filter?: Record<string, any>): Promise<StockUserSchema[]> {
+  async find(filter?: Record<string, any>, options?: { consistentRead?: boolean }): Promise<StockUserSchema[]> {
     try {
       const { stockId } = filter || {};
 
       if (stockId) {
         // stockId로 쿼리 수행 (파티션 키 사용)
         const command = new QueryCommand({
+          ConsistentRead: options?.consistentRead,
           ExpressionAttributeValues: {
             ':stockId': stockId,
           },
@@ -97,6 +98,7 @@ export class UserRepository {
       }
       // 전체 스캔이 필요한 경우
       const command = new ScanCommand({
+        ConsistentRead: options?.consistentRead,
         TableName: STOCK_USER_TABLE_NAME,
         ...this.buildFilterExpression(filter),
       });
@@ -219,18 +221,48 @@ export class UserRepository {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async updateOne(filter: Record<string, any>, update: Partial<StockUserSchema>): Promise<boolean> {
+  async updateOne(filter: { stockId: string; userId: string }, update: Partial<StockUserSchema>): Promise<boolean> {
     try {
-      const user = await this.findOne(filter);
-      if (!user) {
-        return false;
-      }
-
-      await this.findOneAndUpdate({ stockId: user.stockId, userId: user.userId }, update);
+      await this.findOneAndUpdate(filter, update);
       return true;
     } catch (error) {
       console.error('Error updating user', error);
+      throw error;
+    }
+  }
+
+  async updateOneWithAdd(
+    filter: { stockId: string; userId: string },
+    setUpdate: Partial<StockUserSchema>,
+    addUpdate: Record<string, number>,
+  ): Promise<boolean> {
+    try {
+      const { stockId, userId } = filter;
+
+      if (!stockId || !userId) {
+        throw new Error('stockId and userId must be provided for update');
+      }
+
+      const { updateExpression, expressionAttributeValues, expressionAttributeNames } = this.buildMixedUpdateExpression(
+        setUpdate,
+        addUpdate,
+      );
+
+      const command = new UpdateCommand({
+        ExpressionAttributeNames: expressionAttributeNames,
+        ExpressionAttributeValues: expressionAttributeValues,
+        Key: {
+          stockId,
+          userId,
+        },
+        TableName: STOCK_USER_TABLE_NAME,
+        UpdateExpression: updateExpression,
+      });
+
+      await this.dynamoDBClient.send(command);
+      return true;
+    } catch (error) {
+      console.error('Error updating user with ADD', error);
       throw error;
     }
   }
@@ -282,11 +314,6 @@ export class UserRepository {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async countDocuments(filter: Record<string, any>): Promise<number> {
-    return this.count(filter);
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-function-return-type
   private buildFilterExpression(filter?: Record<string, any>) {
     if (!filter || Object.keys(filter).length === 0) {
@@ -329,6 +356,52 @@ export class UserRepository {
 
       updateExpression += index > 0 ? `, ${attrName} = ${attrValue}` : `${attrName} = ${attrValue}`;
     });
+
+    return {
+      expressionAttributeNames,
+      expressionAttributeValues,
+      updateExpression,
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-function-return-type
+  private buildMixedUpdateExpression(setUpdate: Partial<StockUserSchema>, addUpdate: Record<string, number>) {
+    let updateExpression = '';
+    const expressionAttributeValues = {};
+    const expressionAttributeNames = {};
+
+    // SET 부분 처리
+    if (Object.keys(setUpdate).length > 0) {
+      updateExpression += 'SET ';
+      Object.entries(setUpdate).forEach(([key, value], index) => {
+        const attrName = `#attr${index}`;
+        const attrValue = `:val${index}`;
+
+        expressionAttributeNames[attrName] = key;
+        expressionAttributeValues[attrValue] = value;
+
+        updateExpression += index > 0 ? `, ${attrName} = ${attrValue}` : `${attrName} = ${attrValue}`;
+      });
+    }
+
+    // ADD 부분 처리
+    if (Object.keys(addUpdate).length > 0) {
+      if (updateExpression) {
+        updateExpression += ' ADD ';
+      } else {
+        updateExpression += 'ADD ';
+      }
+
+      Object.entries(addUpdate).forEach(([key, value], index) => {
+        const attrName = `#addAttr${index}`;
+        const attrValue = `:addVal${index}`;
+
+        expressionAttributeNames[attrName] = key;
+        expressionAttributeValues[attrValue] = value;
+
+        updateExpression += index > 0 ? `, ${attrName} ${attrValue}` : `${attrName} ${attrValue}`;
+      });
+    }
 
     return {
       expressionAttributeNames,
