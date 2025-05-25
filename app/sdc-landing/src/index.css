@@ -5,12 +5,27 @@
   font-style: normal;
 }
 
+
+@font-face {
+  font-family: 'Helvetica Neue LT Pro 83 HvEx';
+  src: url('https://fonts.cdnfonts.com/s/29109/HelveticaNeueLTProHvEx.woff') format('woff'); /* 수정된 부분 */
+  font-weight: 750;
+  font-style: normal;
+}
+
+/* pretendard */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/npm/pretendard@2.3.13/woff2/pretendard-regular.woff2') format('woff2'),
+    url('https://cdn.jsdelivr.net/npm/pretendard@2.3.13/woff/pretendard-regular.woff') format('woff');
+}
+
 html,
 body,
 #root {
   margin: 0;
   padding: 0;
-  font-family: 'DungGeunMo';
+  font-family: 'Pretendard';
 }
 
 html {
@@ -28,4 +43,18 @@ body {
 h1 {
   margin: 0;
   padding: 0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+
 }
