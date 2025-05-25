@@ -17,6 +17,7 @@ export interface CustomTheme {
   fonts: {
     main: string;
     heading: string;
+    subHeading: string;
     DungGeunMo: string;
   };
   spacing: {
@@ -49,6 +50,7 @@ export const theme: CustomTheme = {
     DungGeunMo: 'DungGeunMo',
     heading: "'Helvetica Neue LT Pro 83 HvEx', sans-serif",
     main: 'Pretendard, sans-serif',
+    subHeading: "'Helvetica Neue LT Pro 53 Ex', sans-serif",
   },
   spacing: {
     lg: '20px',

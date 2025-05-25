@@ -1,6 +1,6 @@
 import * as styles from './index.styles';
 
-export const StripBanner = () => {
+export const LineBanner = () => {
   return (
     <styles.Container>
       <p>
