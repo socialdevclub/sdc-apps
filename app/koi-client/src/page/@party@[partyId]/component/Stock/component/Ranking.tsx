@@ -8,6 +8,7 @@ import html2canvas from 'html2canvas';
 import saveAs from 'file-saver';
 import { commaizeNumber } from '@toss/utils';
 import { css } from '@linaria/core';
+// import { GetStockUser } from 'shared~type-stock/Response';
 import { UserStore } from '../../../../../store';
 import { Query } from '../../../../../hook';
 import { LOCAL_STORAGE_KEY } from '../../../../../config/localStorage';
@@ -19,6 +20,7 @@ interface RankingProps {
 function Ranking({ stockId }: RankingProps) {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const { getRound0Avg, getRound12Avg } = Query.Stock.useQueryResult(stockId);
+
   const { partyId } = useParams();
 
   const { data: stock } = Query.Stock.useQueryStock(stockId);
@@ -26,7 +28,7 @@ function Ranking({ stockId }: RankingProps) {
   const { data: party } = Query.Party.useQueryParty(partyId);
 
   const { mutateAsync: removeStock } = Query.Stock.useRemoveStockSession(stock?._id ?? ''); // 주식게임 방 세션 삭제
-  const { mutateAsync: removeStockUser } = Query.Stock.useRemoveUser(); // 주식게임 방 세션 유저 삭제
+  // const { mutateAsync: removeStockUser } = Query.Stock.useRemoveUser(); // 주식게임 방 세션 유저 삭제
   const { mutateAsync: deleteParty } = Query.Party.useDeleteParty(partyId ?? ''); // 방 삭제
   const isHost = party?.authorId === supabaseSession?.user.id;
 
@@ -41,13 +43,13 @@ function Ranking({ stockId }: RankingProps) {
       await deleteParty({ partyId: partyId ?? '' });
       localStorage.removeItem(LOCAL_STORAGE_KEY);
       navigate('/');
-    } else {
-      // 방장이 아니면 유저만 삭제
-      await removeStockUser({
-        stockId: stock?._id ?? '',
-        userId: supabaseSession?.user.id ?? '',
-      });
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+    } else if (!isHost) {
+      // // 방장이 아니면 유저만 삭제
+      // await removeStockUser({
+      //   stockId: stock?._id ?? '',
+      //   userId: supabaseSession?.user.id ?? '',
+      // });
+      // localStorage.removeItem(LOCAL_STORAGE_KEY);
       navigate('/');
     }
   }
@@ -68,9 +70,8 @@ function Ranking({ stockId }: RankingProps) {
     return <></>;
   }
 
-  const sortedUser = users ? [...users].sort((a, b) => getRoundAvg(b.userId) - getRoundAvg(a.userId)) : [];
-  const rank = sortedUser.findIndex((v) => v.userId === userId) + 1;
-  const user = sortedUser.find((v) => v.userId === userId);
+  const rank = users.findIndex((v) => v.userId === userId) + 1;
+  const user = users.find((v) => v.userId === userId);
   const rankPercentage = Math.floor(Math.max(((rank - 1) / users.length) * 100, 1));
 
   const animal =
@@ -140,9 +141,9 @@ function Ranking({ stockId }: RankingProps) {
   };
 
   const shareData = {
-    text: `${user?.userInfo.nickname}님의 순위는 ${rank}위! ${animalResult}입니다!`,
+    text: `${user?.userInfo.nickname}님의 순위는 ${rank}위! ${animalResult}입니다! `,
     title: '주식게임결과',
-    url: 'https://play.socialdev.club/',
+    url: 'https://play.socialdev.club?share=stock',
   };
 
   const handleShare = async () => {
@@ -157,7 +158,7 @@ function Ranking({ stockId }: RankingProps) {
   return (
     <Container>
       <CaptureArea ref={captureAreaRef}>
-        <Title>주식게임{stock.round === 0 && ' 연습게임'} 결과</Title>
+        <Title>주식게임 결과</Title>
         <Wrapper>
           <Box>
             <BoxContainer>
@@ -213,10 +214,11 @@ function Ranking({ stockId }: RankingProps) {
         <AlignLeft size={24} />
         <span>전체 순위</span>
       </SubTitle>
-      {sortedUser.map((user, index) => {
+      {users.map((user, index) => {
         const userAvg = getRoundAvg(user.userId);
         const userFluctuation = userAvg - 1000000;
         const userPercentage = userFluctuation / 10000;
+        const animalResult = getAnimalByPercentage(userPercentage);
 
         return (
           <RankCard key={user.userId} color={getRankColor(index + 1)}>
@@ -288,17 +290,31 @@ function getRankNickname(rank: number, nickname: string | undefined) {
   }
 }
 
+function getAnimalByPercentage(percentage: number) {
+  if (percentage < 0) return '당돌한 햄스터';
+  if (percentage < 100) return '순수한 토끼';
+  if (percentage < 150) return '세련된 고양이';
+  if (percentage < 200) return '활발한 강아지';
+  if (percentage < 250) return '카리스마 늑대';
+  if (percentage < 300) return '타고난 호랑이';
+  return '전설적인 드래곤';
+}
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  width: 100% !important;
   height: 100%;
   gap: 20px;
   padding: 0 16px;
   box-sizing: border-box;
   margin-bottom: 100px;
+
+  @media (max-width: 405px) {
+    max-width: 375px;
+  }
 `;
 
 const SubTitle = styled.div`
@@ -341,6 +357,9 @@ const Rank = styled.span`
 
 const Nickname = styled.span`
   font-size: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const AnimalName = styled.span`
@@ -368,6 +387,8 @@ const BottomSection = styled.div`
   padding: 16px;
   box-sizing: border-box;
   border-top: 1px solid #1d283a;
+  background-color: #1d283a;
+  border-radius: 8px 8px 0 0;
   gap: 16px;
 `;
 
