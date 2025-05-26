@@ -76,8 +76,7 @@ export class UserRepository {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async find(filter?: Record<string, any>, options?: { consistentRead?: boolean }): Promise<StockUserSchema[]> {
+  async find(filter?: Partial<StockUserSchema>, options?: { consistentRead?: boolean }): Promise<StockUserSchema[]> {
     try {
       const { stockId } = filter || {};
 
