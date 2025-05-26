@@ -10,6 +10,9 @@ interface Props {
 }
 
 const Splash = ({ onAuthDetail }: Props) => {
+  const share = new URLSearchParams(window.location.search).get('share');
+  const isSharedByStock = share === 'stock';
+
   return (
     <Layout>
       <Content>
@@ -17,16 +20,23 @@ const Splash = ({ onAuthDetail }: Props) => {
         <Title>소셜데브클럽</Title>
         <Description>{`사람과 사람을 연결시켜주는\n소셜 게임을 함께 만들고 즐겨요`}</Description>
       </Content>
-      <Footer>
+      <Footer isShared={isSharedByStock}>
+        {isSharedByStock && (
+          <ShareGuide>
+            이곳은 소셜데브클럽 통합 로그인 페이지입니다.
+            <br />
+            간단 가입 후 주식 게임을 바로 즐길 수 있어요!
+          </ShareGuide>
+        )}
         <Auth
           supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
+          appearance={{ style: { container: { margin: '0' } }, theme: ThemeSupa }}
           providers={['discord']}
           localization={authLocalization}
           redirectTo={window.location.origin}
           onlyThirdPartyProviders
         />
-        <Button type="text" onClick={() => onAuthDetail()}>
+        <Button style={{ marginTop: '25px' }} type="text" onClick={() => onAuthDetail()}>
           <Text>다른 방법으로 로그인</Text>
         </Button>
       </Footer>
@@ -71,11 +81,24 @@ const Description = styled.span`
   margin-top: 43px;
 `;
 
-const Footer = styled.div`
+const Footer = styled.div<{ isShared: boolean }>`
   width: 100%;
-  margin-top: 172px;
+  margin-top: ${({ isShared }) => (isShared ? '99px' : '172px')};
   text-align: center;
   font-size: 14px;
+`;
+
+const ShareGuide = styled.span`
+  display: inline-block;
+  width: 100%;
+  padding: 4px 0;
+  margin-bottom: 25px;
+  border-radius: 8px;
+  background-color: #5965f233;
+  font-size: 14px;
+  color: #5965f2;
+  line-height: 135%;
+  text-align: center;
 `;
 
 const Text = styled.u`
