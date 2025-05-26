@@ -29,6 +29,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
   const [isOpenGameOption, setIsOpenGameOption] = useState(false);
   const [gameOption, setGameOption] = useState({
     isOpenInfo: false,
+    isTransaction: true,
     personalStockLimit: false,
     publicStockLimit: false,
   });
@@ -124,7 +125,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
     await mutateUpdateGame({
       _id: stockId,
       fluctuationsInterval: stock?.fluctuationsInterval,
-      isTransaction: true,
+      isTransaction: gameOption.isTransaction,
     });
   };
 
@@ -198,6 +199,17 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
               {isOpenGameOption && (
                 <>
                   <GameOption gap={34}>
+                    <GameOptionTitle>주식거래 바로시작</GameOptionTitle>
+                    <GameOptionValue>
+                      <Switch
+                        checked={gameOption.isTransaction}
+                        onChange={() => changeGameOption('isTransaction')}
+                        style={{ backgroundColor: gameOption.isTransaction ? '#6339E3' : '#030711' }}
+                      />
+                      <GameOptionText>{gameOption.isTransaction ? 'ON' : 'OFF'}</GameOptionText>
+                    </GameOptionValue>
+                  </GameOption>
+                  {/* <GameOption gap={34}>
                     <GameOptionTitle>개인주식 보유개수제한</GameOptionTitle>
                     <GameOptionValue>
                       <Switch
@@ -229,7 +241,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                       />
                       <GameOptionText>{gameOption.isOpenInfo ? 'ON' : 'OFF'}</GameOptionText>
                     </GameOptionValue>
-                  </GameOption>
+                  </GameOption> */}
                 </>
               )}
             </GameOptionContainer>
