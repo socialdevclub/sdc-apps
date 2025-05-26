@@ -2,7 +2,7 @@ import { useMutation } from 'lib-react-query';
 import { Response } from 'shared~type-stock';
 import { serverApiUrl } from '../../../config/baseUrl';
 
-const useUpdateGame = (stockId: string | undefined) => {
+const useInitStock = (stockId: string | undefined) => {
   return useMutation<object, Response.Stock>({
     api: {
       hostname: serverApiUrl,
@@ -12,4 +12,4 @@ const useUpdateGame = (stockId: string | undefined) => {
   });
 };
 
-export default useUpdateGame;
+export default useInitStock;
