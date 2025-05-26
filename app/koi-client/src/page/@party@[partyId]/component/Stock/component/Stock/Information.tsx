@@ -12,7 +12,6 @@ import { UserStore } from '../../../../../../store';
 import { getAnimalImageSource, getFormattedGameTime, getStockMessages } from '../../../../../../utils/stock';
 import DrawStockInfo from './DrawInfo';
 import StockDrawer from './StockDrawer';
-import RecommendedPartners from './RecommendedPartners';
 
 interface Props {
   stockId: string;
@@ -258,9 +257,9 @@ const InformationItems = ({ stockId, onClick, myInfos }: InformationItemsProps) 
       })}
       {pastInfos.length === 0 && <Empty>현재 시각 이전의 정보가 없습니다</Empty>}
 
-      <Divider />
+      {/* <Divider />
 
-      <RecommendedPartners stockId={stockId} />
+      <RecommendedPartners stockId={stockId} /> */}
 
       <StickyBottom>
         <DrawStockInfo stockId={stockId} />
