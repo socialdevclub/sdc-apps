@@ -43,8 +43,7 @@ export class UserRepository {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async count(filter: Record<string, any>): Promise<number> {
+  async count(filter: Partial<StockUserSchema>): Promise<number> {
     try {
       const { stockId } = filter;
 
