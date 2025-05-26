@@ -92,6 +92,9 @@ export class UserRepository {
         });
 
         const { Items } = await this.dynamoDBClient.send(command);
+
+        Items.sort((a, b) => a.index - b.index);
+
         return (Items || []) as StockUserSchema[];
       }
       // 전체 스캔이 필요한 경우
