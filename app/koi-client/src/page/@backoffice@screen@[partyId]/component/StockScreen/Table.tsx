@@ -1,5 +1,5 @@
 import { StockConfig } from 'shared~config';
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { commaizeNumber } from '@toss/utils';
 import { css } from '@emotion/react';
@@ -11,6 +11,22 @@ interface Props {
 
 const Table = ({ stockId }: Props) => {
   const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId, { keepPreviousData: false });
+
+  const [isShowRemainingStock, setIsShowRemainingStock] = useState(false);
+
+  useEffect(() => {
+    const toggleRemainingStock = (event: KeyboardEvent) => {
+      if (event.key === 'r') {
+        setIsShowRemainingStock((prev) => !prev);
+      }
+    };
+
+    document.addEventListener('keydown', toggleRemainingStock);
+
+    return () => {
+      document.removeEventListener('keydown', toggleRemainingStock);
+    };
+  }, []);
 
   if (!stock?.companies || timeIdx === undefined) {
     return <></>;
@@ -25,13 +41,13 @@ const Table = ({ stockId }: Props) => {
         <RowHeaderItem>주식이름</RowHeaderItem>
         <RowHeaderItem>현재 가격</RowHeaderItem>
         <RowHeaderItem>변동 정보</RowHeaderItem>
-        <RowHeaderItem>남은 수량</RowHeaderItem>
+        {isShowRemainingStock && <RowHeaderItem>남은 수량</RowHeaderItem>}
       </Row>
       <Row>
         <RowHeaderItem>주식이름</RowHeaderItem>
         <RowHeaderItem>현재 가격</RowHeaderItem>
         <RowHeaderItem>변동 정보</RowHeaderItem>
-        <RowHeaderItem>남은 수량</RowHeaderItem>
+        {isShowRemainingStock && <RowHeaderItem>남은 수량</RowHeaderItem>}
       </Row>
       {companyNames.map((company) => {
         if (timeIdx > 9) {
@@ -49,13 +65,15 @@ const Table = ({ stockId }: Props) => {
             <RowItem>{company}</RowItem>
             <RowItem>{commaizeNumber(companies[company][timeIdx].가격)}</RowItem>
             <RowItem color={color}>{등락}</RowItem>
-            <RowItem
-              style={{
-                width: '10px',
-              }}
-            >
-              {remainingStock}
-            </RowItem>
+            {isShowRemainingStock && (
+              <RowItem
+                style={{
+                  width: '10px',
+                }}
+              >
+                {remainingStock}
+              </RowItem>
+            )}
           </Row>
         );
       })}
