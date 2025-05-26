@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { BigBanner, LineBanner, OurGoalSection } from './components';
+import { BigBanner, LineBanner, OurGoalSection, SignatureGameSection } from './components';
 
 const Home = () => {
   return (
@@ -9,6 +9,7 @@ const Home = () => {
         <LineBanner />
       </div>
       <OurGoalSection />
+      <SignatureGameSection />
     </Container>
   );
 };

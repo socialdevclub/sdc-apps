@@ -34,7 +34,6 @@ export const Description = styled(HighlightText)((props) =>
       fontSize: 18,
       lineHeight: '150%',
       marginBottom: `${props.theme.spacing.xl3}`,
-      padding: `0 ${props.theme.spacing.xl}`,
       textAlign: 'center',
       wordBreak: 'keep-all',
     },
@@ -62,7 +61,7 @@ export const Card = styled.div`
   gap: 8px;
 `;
 
-export const CardText = styled(HighlightText)((props) =>
+export const CardText = styled(HighlightText)(() =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: 24,

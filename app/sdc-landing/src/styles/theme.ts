@@ -30,6 +30,8 @@ export interface CustomTheme {
     xl2: string;
     xl3: string;
   };
+
+  dropShadow: string;
 }
 
 export const theme: CustomTheme = {
@@ -41,11 +43,12 @@ export const theme: CustomTheme = {
     },
     font: {
       1: '#6B7280',
-      2: '#111827',
+      2: '#454545',
       3: '#F3F4F6',
       4: '#0EA5E9',
     },
   },
+  dropShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
   fonts: {
     DungGeunMo: 'DungGeunMo',
     heading: "'Helvetica Neue LT Pro 83 HvEx', sans-serif",
