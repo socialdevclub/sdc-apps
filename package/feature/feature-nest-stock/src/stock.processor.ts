@@ -21,9 +21,12 @@ export class StockProcessor {
 
     try {
       // 필요한 데이터 조회
-      const stock = await this.stockRepository.findOneById(stockId);
-      const user = await this.userRepository.findOne({ stockId, userId });
-      const playerCount = await this.userRepository.countDocuments({ stockId });
+      const [stock, users] = await Promise.all([
+        this.stockRepository.findOneById(stockId, { consistentRead: true }),
+        this.userRepository.find({ stockId }, { consistentRead: true }),
+      ]);
+      const user = users.find((v) => v.userId === userId);
+      const playerCount = users.length;
 
       if (!stock) {
         throw new Error('스톡 정보를 불러올 수 없습니다');
@@ -41,8 +44,7 @@ export class StockProcessor {
         throw new Error('유저 정보를 불러올 수 없습니다');
       }
 
-      const { companies } = stock;
-      const remainingStocks = stock.remainingStocks as unknown as Record<string, number>;
+      const { companies, remainingStocks } = stock;
 
       const companyInfo = companies[company];
       if (!companyInfo) {
@@ -103,25 +105,29 @@ export class StockProcessor {
         storage.companyName === company ? updatedStockStorage : storage,
       );
 
-      await this.userRepository.updateOne(
-        { stockId, userId },
-        {
-          lastActivityTime: dayjs().toISOString(),
-          money: user.money - totalPrice,
-          stockStorages: updatedStockStorages,
-        },
-      );
-
       // 남은 주식 업데이트
       const updatedRemainingStocks = { ...remainingStocks };
       updatedRemainingStocks[company] = remainingStocks[company] - amount;
 
-      await this.stockRepository.updateOne(
-        { _id: stockId },
-        {
-          remainingStocks: updatedRemainingStocks,
-        },
-      );
+      await Promise.all([
+        this.userRepository.updateOneWithAdd(
+          { stockId, userId },
+          {
+            lastActivityTime: dayjs().toISOString(),
+            stockStorages: updatedStockStorages,
+          },
+          {
+            money: -totalPrice,
+          },
+        ),
+        this.stockRepository.updateOneWithAdd(
+          stockId,
+          {},
+          {
+            [`remainingStocks.${company}`]: -amount,
+          },
+        ),
+      ]);
 
       // 로그 상태 업데이트
       await this.logService.updateOne({ queueId: attributes?.queueMessageId }, { date: new Date(), status: 'SUCCESS' });
@@ -146,8 +152,10 @@ export class StockProcessor {
 
     try {
       // 필요한 데이터 조회
-      const stock = await this.stockRepository.findOneById(stockId);
-      const user = await this.userRepository.findOne({ stockId, userId });
+      const [stock, user] = await Promise.all([
+        this.stockRepository.findOneById(stockId),
+        this.userRepository.findOne({ stockId, userId }),
+      ]);
 
       if (!stock) {
         throw new Error('스톡 정보를 불러올 수 없습니다');
@@ -220,25 +228,29 @@ export class StockProcessor {
         storage.companyName === company ? updatedStockStorage : storage,
       );
 
-      await this.userRepository.updateOne(
-        { stockId, userId },
-        {
-          lastActivityTime: dayjs().toISOString(),
-          money: user.money + totalPrice,
-          stockStorages: updatedStockStorages,
-        },
-      );
-
       // 남은 주식 업데이트
       const updatedRemainingStocks = { ...remainingStocks };
       updatedRemainingStocks[company] = remainingCompanyStock + amount;
 
-      await this.stockRepository.updateOne(
-        { _id: stockId },
-        {
-          remainingStocks: updatedRemainingStocks,
-        },
-      );
+      await Promise.all([
+        this.userRepository.updateOneWithAdd(
+          { stockId, userId },
+          {
+            lastActivityTime: dayjs().toISOString(),
+            stockStorages: updatedStockStorages,
+          },
+          {
+            money: totalPrice,
+          },
+        ),
+        this.stockRepository.updateOneWithAdd(
+          stockId,
+          {},
+          {
+            [`remainingStocks.${company}`]: amount,
+          },
+        ),
+      ]);
 
       // 로그 상태 업데이트
       await this.logService.updateOne({ queueId: attributes?.queueMessageId }, { date: new Date(), status: 'SUCCESS' });

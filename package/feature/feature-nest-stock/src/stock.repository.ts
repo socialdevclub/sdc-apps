@@ -36,9 +36,10 @@ export class StockRepository {
     }
   }
 
-  async findOneById(stockId: string): Promise<StockSchemaWithId | null> {
+  async findOneById(stockId: string, options?: { consistentRead?: boolean }): Promise<StockSchemaWithId | null> {
     try {
       const command = new GetCommand({
+        ConsistentRead: options?.consistentRead,
         Key: { _id: stockId },
         TableName: STOCK_TABLE_NAME,
       });
@@ -97,21 +98,39 @@ export class StockRepository {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async updateOne(filter: Record<string, any>, update: Partial<Stock>): Promise<boolean> {
+  async updateOne(stockId: string, update: Partial<Stock>): Promise<boolean> {
     try {
-      // DynamoDB는 filter 기반 업데이트를 직접 지원하지 않습니다.
-      // 먼저 항목을 찾고 업데이트해야 합니다.
-      const stocks = await this.find(filter);
-      if (stocks.length === 0) {
-        return false;
-      }
-
-      const stockId = stocks[0]._id;
       await this.findOneAndUpdate(stockId, update);
       return true;
     } catch (error) {
       console.error('Error updating stock', error);
+      throw error;
+    }
+  }
+
+  async updateOneWithAdd(
+    stockId: string,
+    setUpdate: Partial<Stock>,
+    addUpdate: Record<string, number>,
+  ): Promise<boolean> {
+    try {
+      const { updateExpression, expressionAttributeValues, expressionAttributeNames } = this.buildMixedUpdateExpression(
+        setUpdate,
+        addUpdate,
+      );
+
+      const command = new UpdateCommand({
+        ExpressionAttributeNames: expressionAttributeNames,
+        ExpressionAttributeValues: expressionAttributeValues,
+        Key: { _id: stockId },
+        TableName: STOCK_TABLE_NAME,
+        UpdateExpression: updateExpression,
+      });
+
+      await this.dynamoDBClient.send(command);
+      return true;
+    } catch (error) {
+      console.error('Error updating stock with ADD', error);
       throw error;
     }
   }
@@ -178,6 +197,52 @@ export class StockRepository {
 
       updateExpression += index > 0 ? `, ${attrName} = ${attrValue}` : `${attrName} = ${attrValue}`;
     });
+
+    return {
+      expressionAttributeNames,
+      expressionAttributeValues,
+      updateExpression,
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  private buildMixedUpdateExpression(setUpdate: Partial<Stock>, addUpdate: Record<string, number>) {
+    let updateExpression = '';
+    const expressionAttributeValues = {};
+    const expressionAttributeNames = {};
+
+    // SET 부분 처리
+    if (Object.keys(setUpdate).length > 0) {
+      updateExpression += 'SET ';
+      Object.entries(setUpdate).forEach(([key, value], index) => {
+        const attrName = `#attr${index}`;
+        const attrValue = `:val${index}`;
+
+        expressionAttributeNames[attrName] = key;
+        expressionAttributeValues[attrValue] = value;
+
+        updateExpression += index > 0 ? `, ${attrName} = ${attrValue}` : `${attrName} = ${attrValue}`;
+      });
+    }
+
+    // ADD 부분 처리
+    if (Object.keys(addUpdate).length > 0) {
+      if (updateExpression) {
+        updateExpression += ' ADD ';
+      } else {
+        updateExpression += 'ADD ';
+      }
+
+      Object.entries(addUpdate).forEach(([key, value], index) => {
+        const attrName = `#addAttr${index}`;
+        const attrValue = `:addVal${index}`;
+
+        expressionAttributeNames[attrName] = key;
+        expressionAttributeValues[attrValue] = value;
+
+        updateExpression += index > 0 ? `, ${attrName} ${attrValue}` : `${attrName} ${attrValue}`;
+      });
+    }
 
     return {
       expressionAttributeNames,
