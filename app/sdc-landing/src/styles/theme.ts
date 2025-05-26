@@ -51,9 +51,9 @@ export const theme: CustomTheme = {
   dropShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
   fonts: {
     DungGeunMo: 'DungGeunMo',
-    heading: "'Helvetica Neue LT Pro 83 HvEx', sans-serif",
-    main: 'Pretendard, sans-serif',
-    subHeading: "'Helvetica Neue LT Pro 53 Ex', sans-serif",
+    heading: "'Montserrat', sans-serif",
+    main: "'Pretendard', sans-serif",
+    subHeading: "'Montserrat', sans-serif",
   },
   spacing: {
     lg: '20px',

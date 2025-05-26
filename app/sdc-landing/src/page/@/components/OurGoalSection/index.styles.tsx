@@ -18,6 +18,7 @@ export const Title = styled.p((props) =>
       color: props.theme.colors.brand.primary,
       fontFamily: props.theme.fonts.subHeading,
       fontSize: 18,
+      fontWeight: 500,
       marginBottom: `${props.theme.spacing.xs}`,
     },
   }),
@@ -40,7 +41,7 @@ export const Description = styled(HighlightText)((props) =>
   }),
 );
 
-export const CardWrapper = styled.div(() =>
+export const CardWrapper = styled.div((props) =>
   applyResponsiveStyles({
     DESKTOP: {
       gap: 60,
@@ -49,6 +50,7 @@ export const CardWrapper = styled.div(() =>
       display: 'flex',
       flexWrap: 'wrap',
       gap: 24,
+      padding: props.theme.spacing.md,
     },
   }),
 );

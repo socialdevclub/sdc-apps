@@ -5,22 +5,13 @@
   font-style: normal;
 }
 
-
 @font-face {
-  font-family: 'Helvetica Neue LT Pro 83 HvEx';
-  src: url('https://fonts.cdnfonts.com/s/29109/HelveticaNeueLTProHvEx.woff') format('woff');
-  font-weight: 750;
+  font-family: 'Montserrat';
+  src: url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
   font-style: normal;
+  font-weight: 400;
 }
 
-@font-face {
-  font-family: 'Helvetica Neue LT Pro 53 Ex';
-  src: url('https://fonts.cdnfonts.com/s/29109/HelveticaNeueLTProEx.woff') format('woff');
-  font-weight: 750;
-  font-style: normal;
-}
-
-/* pretendard */
 @font-face {
   font-family: 'Pretendard';
   src: url('https://cdn.jsdelivr.net/npm/pretendard@2.3.13/woff2/pretendard-regular.woff2') format('woff2'),
@@ -63,5 +54,4 @@ button {
   border: none;
   cursor: pointer;
   outline: none;
-
 }

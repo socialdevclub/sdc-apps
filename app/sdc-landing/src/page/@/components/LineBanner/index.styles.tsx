@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import { applyResponsiveStyles } from '../../../../utils/styles';
+import HighlightText from '../../../../component/HighlightTex';
 
-export const Container = styled.div((props) =>
+export const Container = styled(HighlightText)((props) =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: '24px',
@@ -17,7 +18,3 @@ export const Container = styled.div((props) =>
     },
   }),
 );
-
-export const ColorText = styled.span`
-  color: ${(props) => props.theme.colors.brand.primary};
-`;

@@ -19,6 +19,7 @@ export const Title = styled.p((props) =>
       color: props.theme.colors.brand.primary,
       fontFamily: props.theme.fonts.subHeading,
       fontSize: 24,
+      fontWeight: 500,
       letterSpacing: -1,
       marginBottom: `${props.theme.spacing.xs}`,
     },

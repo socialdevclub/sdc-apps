@@ -19,9 +19,10 @@ export const BigBanner = () => {
         <styles.ChatImage src="/asset/img/chat.png" alt="chat" />
         <styles.TitleText>mmunity</styles.TitleText>
       </styles.TitleWrapper>
-      <styles.SubTitle>
-        소데클에서 같이 <styles.PurpleText>네트워킹 게임</styles.PurpleText> 만들래?
-      </styles.SubTitle>
+      <styles.SubTitle
+        text="소데클에서 같이 네트워킹 게임 만들래?"
+        highlights={[{ color: '#AE94FF', text: '네트워킹 게임' }]}
+      />
       <styles.ButtonWrapper>
         <styles.Button>합류하기</styles.Button>
       </styles.ButtonWrapper>

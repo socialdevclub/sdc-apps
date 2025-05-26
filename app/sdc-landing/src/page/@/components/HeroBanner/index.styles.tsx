@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { CustomTheme } from '../../../../styles/theme';
 import { applyResponsiveStyles } from '../../../../utils/styles';
+import HighlightText from '../../../../component/HighlightTex';
 
 export const Container = styled.div`
   width: 100%;
@@ -21,29 +22,27 @@ export const TitleWrapper = styled.div`
 export const TitleText = styled.span((props) =>
   applyResponsiveStyles({
     DESKTOP: {
-      fontSize: '64px',
+      fontSize: '120px',
     },
     base: {
       fontFamily: props.theme.fonts.heading,
-      fontSize: '28px',
+      fontSize: '32px',
       fontWeight: 'bold',
-      letterSpacing: '-2px',
-      lineHeight: '135%',
       whiteSpace: 'nowrap',
     },
   }),
 );
 
-export const SubTitle = styled.p(
+export const SubTitle = styled(HighlightText)(() =>
   applyResponsiveStyles({
     DESKTOP: {
-      fontSize: '32px',
-      marginTop: '24px',
+      fontSize: 36,
+      marginTop: 36,
     },
     base: {
-      fontSize: '18px',
+      fontSize: 18,
       lineHeight: '150%',
-      marginTop: '12px',
+      marginTop: 18,
     },
   }),
 );
@@ -51,10 +50,10 @@ export const SubTitle = styled.p(
 export const GamepadImage = styled.img(
   applyResponsiveStyles({
     DESKTOP: {
-      width: '80px',
+      width: '134px',
     },
     base: {
-      width: '35.6px',
+      width: '36px',
     },
   }),
 );
@@ -62,20 +61,28 @@ export const GamepadImage = styled.img(
 export const ChatImage = styled.img(
   applyResponsiveStyles({
     DESKTOP: {
-      width: '70px',
+      width: '118px',
     },
     base: {
       bottom: '5px',
-      width: '34px',
+      width: '32px',
     },
   }),
 );
 
-export const PurpleText = styled.span<{ fontFamily?: keyof CustomTheme['fonts'] }>(({ theme, fontFamily }) => ({
-  color: theme.colors.brand.lightPurple,
-  fontFamily: theme.fonts[fontFamily || 'main'],
-  fontWeight: 'bold',
-}));
+export const PurpleText = styled.span<{ fontFamily?: keyof CustomTheme['fonts'] }>(({ theme, fontFamily }) =>
+  applyResponsiveStyles({
+    DESKTOP: {
+      fontSize: 112,
+    },
+    base: {
+      color: theme.colors.brand.lightPurple,
+      fontFamily: theme.fonts[fontFamily || 'main'],
+      fontSize: 36,
+      fontWeight: 'bold',
+    },
+  }),
+);
 
 export const TealText = styled.span(({ theme }) => ({
   color: theme.colors.brand.primary,
@@ -85,25 +92,42 @@ export const TealText = styled.span(({ theme }) => ({
 export const DevWrapper = styled.div((props) =>
   applyResponsiveStyles({
     DESKTOP: {
-      fontSize: '64px',
+      fontSize: '112px',
+      paddingRight: props.theme.spacing.sm,
     },
     base: {
       fontFamily: props.theme.fonts.heading,
-      fontSize: '28px',
+      fontSize: '30px',
       fontWeight: 'bold',
     },
   }),
 );
 
-export const ButtonWrapper = styled.div`
-  margin-top: 24px;
-`;
+export const ButtonWrapper = styled.div((props) =>
+  applyResponsiveStyles({
+    DESKTOP: {
+      marginTop: 64,
+    },
+    base: {
+      marginTop: props.theme.spacing.xl,
+    },
+  }),
+);
 
-export const Button = styled.button`
-  background-color: ${(props) => props.theme.colors.brand.primary};
-  color: black;
-  border-radius: 4px;
-  padding: ${(props) => props.theme.spacing.xs} ${(props) => props.theme.spacing.xl};
-  font-weight: bold;
-  font-size: 16px;
-`;
+export const Button = styled.button((props) =>
+  applyResponsiveStyles({
+    DESKTOP: {
+      fontSize: 30,
+      padding: `${props.theme.spacing.md} 64px`,
+    },
+    base: {
+      backgroundColor: props.theme.colors.brand.primary,
+      border: `1px solid ${props.theme.colors.brand.primary}`,
+      borderRadius: 12,
+      color: 'black',
+      fontSize: 16,
+      fontWeight: 'bold',
+      padding: `${props.theme.spacing.xs} ${props.theme.spacing.xl}`,
+    },
+  }),
+);
