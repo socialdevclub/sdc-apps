@@ -1,15 +1,17 @@
+import dayjs from 'dayjs';
+import { StockConfig } from 'shared~config';
 import {
+  StockStorageSchema,
   StockUserForm,
+  StockUserInfoSchema,
   StockUserRequired,
   StockUserSchema,
-  StockUserInfoSchema,
-  StockStorageSchema,
 } from 'shared~type-stock';
-import { StockConfig } from 'shared~config';
-import dayjs from 'dayjs';
 
 export class StockUserStorage implements StockStorageSchema {
   companyName: string;
+
+  stockAveragePrice: number;
 
   stockCountCurrent: number;
 
@@ -57,6 +59,7 @@ export class StockUser implements StockUserSchema {
     const stockStorages = companies.map((company) => {
       return {
         companyName: company,
+        stockAveragePrice: 0,
         stockCountCurrent: 0,
         stockCountHistory: new Array(StockConfig.MAX_STOCK_IDX + 1).fill(0),
       } as StockStorageSchema;

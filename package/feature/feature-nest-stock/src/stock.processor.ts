@@ -92,9 +92,15 @@ export class StockProcessor {
       //   default:
       // }
 
+      // 평균 단가 업데이트 (기존 금액 * 기존 수량 + 현재 금액 * 구매 수량) / (기존 수량 + 구매 수량)
+      const stockAveragePrice =
+        (stockStorage.stockAveragePrice * stockStorage.stockCountCurrent + companyPrice * amount) /
+        (stockStorage.stockCountCurrent + amount);
+
       // 주식 및 보유량 업데이트
       const updatedStockStorage = {
         ...stockStorage,
+        stockAveragePrice,
         stockCountCurrent: companyCount + amount,
         stockCountHistory: [...stockStorage.stockCountHistory],
       };
@@ -215,9 +221,13 @@ export class StockProcessor {
       //   default:
       // }
 
+      // 평균 단가 업데이트 - 판매 후 보유 수량이 0이 되면 0으로 초기화, 보유 시 평균 단가 유지
+      const stockAveragePrice = companyCount <= amount ? 0 : stockStorage.stockAveragePrice;
+
       // 주식 및 보유량 업데이트
       const updatedStockStorage = {
         ...stockStorage,
+        stockAveragePrice,
         stockCountCurrent: companyCount - amount,
         stockCountHistory: [...stockStorage.stockCountHistory],
       };

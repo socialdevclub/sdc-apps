@@ -289,6 +289,7 @@ export class UserRepository {
       const stockStorages = companies.map((company) => {
         return {
           companyName: company,
+          stockAveragePrice: 0,
           stockCountCurrent: 0,
           stockCountHistory: new Array(StockConfig.MAX_STOCK_IDX + 1).fill(0),
         } as StockStorageSchema;
