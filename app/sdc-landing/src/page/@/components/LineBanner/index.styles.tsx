@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import { applyResponsiveStyles } from '../../../../utils/styles';
-import HighlightTextt from '../../../../component/HighlightText';
+import HighlightText from '../../../../common/HighlightText';
 
-export const Container = styled(HighlightTextt)((props) =>
+export const Container = styled(HighlightText)((props) =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: '24px',

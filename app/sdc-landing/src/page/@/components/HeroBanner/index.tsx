@@ -5,7 +5,7 @@ export const BigBanner = () => {
     <styles.Container>
       <styles.TitleWrapper>
         <styles.TitleText>Experiential ga</styles.TitleText>
-        <styles.GamepadImage src="/asset/img/gamepad.png" alt="gamepad" />
+        <styles.GamepadImage src="src/assets/img/Gamepad.png" alt="gamepad" />
         <styles.TitleText>e</styles.TitleText>
       </styles.TitleWrapper>
       <styles.TitleWrapper>
@@ -16,7 +16,7 @@ export const BigBanner = () => {
           <styles.PurpleText fontFamily="DungGeunMo">&gt;</styles.PurpleText>
         </styles.DevWrapper>
         <styles.TitleText>C</styles.TitleText>
-        <styles.ChatImage src="/asset/img/chat.png" alt="chat" />
+        <styles.ChatImage src="src/assets/img/Chat.png" alt="chat" />
         <styles.TitleText>mmunity</styles.TitleText>
       </styles.TitleWrapper>
       <styles.SubTitle

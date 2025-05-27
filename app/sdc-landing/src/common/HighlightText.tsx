@@ -10,7 +10,7 @@ interface HighlightMultipleProps {
   HighlightComponent?: React.ElementType;
 }
 
-export const HighlightTextt = ({
+export const HighlightText = ({
   text,
   highlights,
   HighlightComponent = 'strong',
@@ -57,4 +57,4 @@ export const HighlightTextt = ({
   );
 };
 
-export default HighlightTextt;
+export default HighlightText;

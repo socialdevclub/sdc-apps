@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { CustomTheme } from '../../../../styles/theme';
 import { applyResponsiveStyles } from '../../../../utils/styles';
-import HighlightTextt from '../../../../component/HighlightText';
+import HighlightText from '../../../../common/HighlightText';
 
 export const Container = styled.div`
   width: 100%;
@@ -33,7 +33,7 @@ export const TitleText = styled.span((props) =>
   }),
 );
 
-export const SubTitle = styled(HighlightTextt)(() =>
+export const SubTitle = styled(HighlightText)(() =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: 36,

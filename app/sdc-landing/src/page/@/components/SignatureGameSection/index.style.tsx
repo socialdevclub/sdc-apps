@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { CSSProperties } from 'react';
 import { applyResponsiveStyles } from '../../../../utils/styles';
-import HighlightTextt from '../../../../component/HighlightText';
+import HighlightText from '../../../../common/HighlightText';
 
 export const Container = styled.div`
   display: flex;
@@ -26,7 +26,7 @@ export const Title = styled.p((props) =>
   }),
 );
 
-export const Description = styled(HighlightTextt)((props) =>
+export const Description = styled(HighlightText)((props) =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: 32,

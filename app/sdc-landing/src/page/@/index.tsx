@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 import { BigBanner, LineBanner, OurGoalSection, SignatureGameSection } from './components';
+import HowWePlaySection from './components/HowWePlaySection';
+import SocialDevClubSection from './components/SocialDevClubSection';
 
 const Home = () => {
   return (
@@ -9,6 +11,8 @@ const Home = () => {
         <LineBanner />
       </div>
       <OurGoalSection />
+      <SocialDevClubSection />
+      <HowWePlaySection />
       <SignatureGameSection />
     </Container>
   );
