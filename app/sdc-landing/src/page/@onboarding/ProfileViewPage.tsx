@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import OtherProfileContainer from './component/OtherProfileContainer';
 import MyProfileContainer from './component/MyProfileContainer';
-import RequiredAuth from '../../component/RequiredAuth';
+import RequiredAuth from '../../common/RequiredAuth';
 
 // 프로필 컴포넌트
 const ProfileViewPage: React.FC = () => {

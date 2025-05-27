@@ -19,10 +19,10 @@ const Subtitle = styled.div`
   font-size: 1.125rem;
   font-weight: 300;
   line-height: 150%;
-  margin-top: 1rem;
-
+  margin-top: 0.5rem;
   @media ${MEDIA_QUERY.DESKTOP} {
     font-size: 2rem;
+    margin-top: 1rem;
   }
 `;
 
@@ -75,13 +75,13 @@ const SlideTrack = styled.div`
 `;
 
 const SlideImage = styled.img`
-  width: 100px;
+  width: 150px;
   height: auto;
   margin: 0 5px;
   flex-shrink: 0;
 
   @media ${MEDIA_QUERY.DESKTOP} {
-    width: 200px;
+    width: 250px;
     height: auto;
   }
 `;

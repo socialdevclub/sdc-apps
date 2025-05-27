@@ -26,9 +26,10 @@ const Title = styled.div`
 const Subtitle = styled.div`
   font-size: 1.125rem
   line-height: 150%;
-  margin-top: 1.5rem;
+  margin-top:  0.5rem;
   font-weight: 300;
   @media ${MEDIA_QUERY.DESKTOP} {
+    margin-top: 1.5rem;
     font-size: 3.25rem;
   }
 `;
