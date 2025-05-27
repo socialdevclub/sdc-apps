@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import backgroundImage from '../../../../assets/img/SocialDevClubBackgroundImage.png';
+import { MEDIA_QUERY } from '../../../../config/common';
 
 const Container = styled.div`
   text-align: center;
@@ -15,20 +16,31 @@ const BackgroundImage = styled.div`
 
 const Title = styled.div`
   color: #ae94ff;
-  font-size: 24px;
-  font-family: 'Helvetica Neue LT Pro 83 HvEx';
+  font-size: 1.5rem;
+  font-family: Montserrat;
+  @media ${MEDIA_QUERY.DESKTOP} {
+    font-size: 2.5rem;
+  }
 `;
 
 const Subtitle = styled.div`
-  font-size: 18px;
+  font-size: 1.125rem
   line-height: 150%;
-  margin-top: 15px;
+  margin-top: 1.5rem;
+  font-weight: 300;
+  @media ${MEDIA_QUERY.DESKTOP} {
+    font-size: 3.25rem;
+  }
 `;
 
 const Highlight = styled.div`
-  font-size: 18px;
+  font-size: 1.125rem
   font-weight: 500;
   line-height: 150%;
+  font-weight: 700;
+  @media ${MEDIA_QUERY.DESKTOP} {
+    font-size: 3.25rem;
+  }
 `;
 
 const HighlightSpan = styled.span`
@@ -40,7 +52,7 @@ const Image = styled.img`
   height: auto;
   margin-bottom: 20px;
   margin-top: 30px;
-  max-width: 350px;
+  max-width: 800px;
 `;
 
 export const Style = {

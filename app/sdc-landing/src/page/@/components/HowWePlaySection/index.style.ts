@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { MEDIA_QUERY } from '../../../../config/common';
 
 const Container = styled.div`
   text-align: center;
@@ -6,20 +7,33 @@ const Container = styled.div`
 
 const Title = styled.div`
   color: #ae94ff;
-  font-size: 24px;
-  font-family: 'Helvetica Neue LT Pro 83 HvEx';
+  font-size: 1.5rem;
+  font-family: Montserrat;
+
+  @media ${MEDIA_QUERY.DESKTOP} {
+    font-size: 2.5rem;
+  }
 `;
 
 const Subtitle = styled.div`
-  font-size: 1rem;
+  font-size: 1.125rem;
+  font-weight: 300;
   line-height: 150%;
-  margin-top: 15px;
+  margin-top: 1rem;
+
+  @media ${MEDIA_QUERY.DESKTOP} {
+    font-size: 2rem;
+  }
 `;
 
 const Highlight = styled.div`
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 500;
   line-height: 150%;
+
+  @media ${MEDIA_QUERY.DESKTOP} {
+    font-size: 2rem;
+  }
 `;
 
 const HighlightSpan = styled.span`
@@ -65,6 +79,11 @@ const SlideImage = styled.img`
   height: auto;
   margin: 0 5px;
   flex-shrink: 0;
+
+  @media ${MEDIA_QUERY.DESKTOP} {
+    width: 200px;
+    height: auto;
+  }
 `;
 
 const MaskOverlay = styled.div`

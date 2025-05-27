@@ -19,10 +19,10 @@
   font-style: normal;
 }
 
-
 @font-face {
-  font-family: 'Helvetica Neue LT Pro 83 HvEx';
-  src: url('https://fonts.cdnfonts.com/s/29109/HelveticaNeueLTProHvEx.woff') format('woff'); /* 수정된 부분 */
+  font-family: 'Montserrat';
+  src: url('https://fonts.gstatic.com/s/montserrat/v26/JTURjIg1_i6t8kCHKm45_epG3gnD-w.woff2') format('woff2');
+  font-weight: 600;
   font-style: normal;
 }
 
