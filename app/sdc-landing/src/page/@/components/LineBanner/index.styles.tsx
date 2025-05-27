@@ -1,11 +1,12 @@
 import styled from '@emotion/styled';
 import { applyResponsiveStyles } from '../../../../utils/styles';
-import HighlightText from '../../../../component/HighlightTex';
+import HighlightTextt from '../../../../component/HighlightText';
 
-export const Container = styled(HighlightText)((props) =>
+export const Container = styled(HighlightTextt)((props) =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: '24px',
+      padding: `${props.theme.spacing.xl3} ${props.theme.spacing.xs}`,
     },
     base: {
       alignItems: 'center',

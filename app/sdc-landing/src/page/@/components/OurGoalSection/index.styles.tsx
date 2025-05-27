@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { applyResponsiveStyles } from '../../../../utils/styles';
-import HighlightText from '../../../../component/HighlightTex';
+import HighlightTextt from '../../../../component/HighlightText';
 
 export const Container = styled.div`
   display: flex;
@@ -24,7 +24,7 @@ export const Title = styled.p((props) =>
   }),
 );
 
-export const Description = styled(HighlightText)((props) =>
+export const Description = styled(HighlightTextt)((props) =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: 32,
@@ -63,7 +63,7 @@ export const Card = styled.div`
   gap: 8px;
 `;
 
-export const CardText = styled(HighlightText)(() =>
+export const CardText = styled(HighlightTextt)(() =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: 24,
