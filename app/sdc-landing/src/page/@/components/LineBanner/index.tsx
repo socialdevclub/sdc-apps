@@ -7,7 +7,7 @@ export const LineBanner = () => {
       highlights={[
         {
           color: '#06DEDD',
-          text: '소셜데브클럽',
+          text: ' 소셜데브클럽',
         },
       ]}
     />

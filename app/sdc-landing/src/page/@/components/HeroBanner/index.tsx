@@ -1,6 +1,10 @@
+import { useMediaQuery } from 'react-responsive';
+import { MEDIA_QUERY } from '../../../../config/common';
 import * as styles from './index.styles';
 
-export const BigBanner = () => {
+export const HeroBanner = () => {
+  const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });
+
   return (
     <styles.Container>
       <styles.TitleWrapper>
@@ -20,7 +24,11 @@ export const BigBanner = () => {
         <styles.TitleText>mmunity</styles.TitleText>
       </styles.TitleWrapper>
       <styles.SubTitle
-        text="소데클에서 같이 네트워킹 게임 만들래?"
+        text={
+          isDesktop
+            ? '일상의 지루함이 느껴진다면, 소데클에서 같이 네트워킹 게임 만들래?'
+            : '소데클에서 같이 네트워킹 게임 만들래?'
+        }
         highlights={[{ color: '#AE94FF', text: '네트워킹 게임' }]}
       />
       <styles.ButtonWrapper>

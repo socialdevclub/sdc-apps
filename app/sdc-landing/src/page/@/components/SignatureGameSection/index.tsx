@@ -1,4 +1,6 @@
+import { useMediaQuery } from 'react-responsive';
 import * as styles from './index.style';
+import { MEDIA_QUERY } from '../../../../config/common';
 
 export type ProjectStatus = 'OPEN' | 'COMING_SOON' | 'IN_DEVELOPMENT';
 
@@ -56,11 +58,17 @@ const cards: { name: string; description: string; status: ProjectStatus; url: st
 ];
 
 export const SignatureGameSection = () => {
+  const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });
+
   return (
     <styles.Container>
       <styles.Title>Signature Game</styles.Title>
       <styles.Description
-        text={`소셜데브클럽의 시그니처 게임!\n커뮤니티에 기여하고 함께 성장해요`}
+        text={
+          isDesktop
+            ? '소셜데브클럽에서 만들고 있는 시그니처 게임!\n커뮤니티에 기여하고 함께 성장해요'
+            : '소셜데브클럽의 시그니처 게임!\n커뮤니티에 기여하고 함께 성장해요'
+        }
         highlights={[
           {
             color: '#06DEDD',
