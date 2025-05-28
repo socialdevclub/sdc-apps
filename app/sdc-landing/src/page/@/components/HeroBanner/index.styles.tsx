@@ -12,6 +12,7 @@ export const Container = styled.div`
   padding: 60px 16px;
   background-color: #000000;
   color: white;
+  flex: 1 1 0;
 `;
 
 export const TitleWrapper = styled.div`
@@ -19,13 +20,28 @@ export const TitleWrapper = styled.div`
   align-items: center;
 `;
 
+export const TitleHighlightText = styled(HighlightText)((props) =>
+  applyResponsiveStyles({
+    DESKTOP: {
+      fontSize: '110px',
+      paddingBottom: 0,
+    },
+    base: {
+      fontFamily: (props as { theme: CustomTheme }).theme.fonts.heading,
+      fontSize: '30px',
+      fontWeight: 'bold',
+      paddingBottom: props.theme.spacing.xs2,
+      whiteSpace: 'nowrap',
+    },
+  }),
+);
 export const TitleText = styled.span((props) =>
   applyResponsiveStyles({
     DESKTOP: {
-      fontSize: '120px',
+      fontSize: '116px',
     },
     base: {
-      fontFamily: props.theme.fonts.heading,
+      fontFamily: (props as { theme: CustomTheme }).theme.fonts.heading,
       fontSize: '32px',
       fontWeight: 'bold',
       whiteSpace: 'nowrap',
@@ -61,10 +77,10 @@ export const GamepadImage = styled.img(
 export const ChatImage = styled.img(
   applyResponsiveStyles({
     DESKTOP: {
+      transform: 'translateY(15px)',
       width: '118px',
     },
     base: {
-      bottom: '5px',
       width: '32px',
     },
   }),
@@ -93,7 +109,7 @@ export const DevWrapper = styled.div((props) =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: '112px',
-      paddingRight: props.theme.spacing.sm,
+      padding: `0 ${props.theme.spacing.sm}`,
     },
     base: {
       fontFamily: props.theme.fonts.heading,

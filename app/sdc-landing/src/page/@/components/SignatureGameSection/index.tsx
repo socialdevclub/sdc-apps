@@ -96,7 +96,7 @@ export const SignatureGameSection = () => {
           </styles.Card>
         ))}
       </styles.CardContainer>
-      <styles.MoreButton>더보기</styles.MoreButton>
+      {/* <styles.MoreButton>더보기</styles.MoreButton> */}
     </styles.Container>
   );
 };

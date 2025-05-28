@@ -6,22 +6,30 @@ import SocialDevClubSection from './components/SocialDevClubSection';
 const Home = () => {
   return (
     <Container>
-      <div>
+      <BannerWrapper>
         <HeroBanner />
         <LineBanner />
-      </div>
-      <OurGoalSection />
+      </BannerWrapper>
       <SocialDevClubSection />
+      <OurGoalSection />
       <HowWePlaySection />
       <SignatureGameSection />
     </Container>
   );
 };
 
+const BannerWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: -100px;
+  min-height: calc(100svh - 72px);
+`;
+
 const Container = styled.div`
   background-color: #000000;
   min-height: 100dvh;
-  gap: 100px;
+  gap: 400px;
   display: flex;
   flex-direction: column;
 `;
