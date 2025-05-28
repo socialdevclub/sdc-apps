@@ -3,7 +3,7 @@ import { useMutation } from 'lib-react-query';
 import { serverApiUrl } from '../../../config/baseUrl';
 
 const useSellStock = () => {
-  return useMutation<Request.PostSellStock, Response.Stock>({
+  return useMutation<Request.PostSellStock, Response.Common>({
     api: {
       hostname: serverApiUrl,
       method: 'POST',
