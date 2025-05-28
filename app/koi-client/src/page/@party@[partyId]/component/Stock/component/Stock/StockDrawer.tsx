@@ -60,7 +60,6 @@ const StockDrawer = ({
 
   const { isBuyLoading, isSellLoading, onClickBuy, onClickSell } = useTradeStock({
     messageApi,
-    stockStorages: user?.stockStorages ?? [],
   });
 
   const 보유주식 = useMemo(() => {

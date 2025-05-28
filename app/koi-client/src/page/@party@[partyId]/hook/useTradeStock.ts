@@ -1,10 +1,7 @@
-import { useEffect, useRef } from 'react';
 import { MessageInstance } from 'antd/es/message/interface';
-import { StockStorageSchema } from 'shared~type-stock';
 import { Query } from '../../../hook';
 
 interface Props {
-  stockStorages: StockStorageSchema[];
   messageApi: MessageInstance;
 }
 
@@ -41,9 +38,7 @@ interface SellStockProps {
  * @param stockStorages 현재 내가 가진 주식들에 대한 정보
  * @param messageApi 메시지 API
  */
-export const useTradeStock = ({ stockStorages, messageApi }: Props): ReturnType => {
-  const prevStockStorages = useRef<StockStorageSchema[]>(stockStorages);
-
+export const useTradeStock = ({ messageApi }: Props): ReturnType => {
   const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
   const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
 
@@ -56,8 +51,21 @@ export const useTradeStock = ({ stockStorages, messageApi }: Props): ReturnType 
     userId,
     callback,
   }: BuyStockProps): Promise<void> => {
-    await buyStock({ amount, company, round, stockId, unitPrice, userId });
-    callback?.();
+    const { status, message } = await buyStock({ amount, company, round, stockId, unitPrice, userId });
+
+    const isSuccess = status === 200;
+    const isFailed = status === 400;
+
+    if (isSuccess) {
+      messageApi.destroy();
+      messageApi.open({ content: message, duration: 2, type: 'success' });
+      callback?.();
+    }
+
+    if (isFailed) {
+      messageApi.destroy();
+      messageApi.open({ content: message, duration: 2, type: 'error' });
+    }
   };
 
   const onClickSell = async ({
@@ -69,39 +77,22 @@ export const useTradeStock = ({ stockStorages, messageApi }: Props): ReturnType 
     userId,
     callback,
   }: SellStockProps): Promise<void> => {
-    await sellStock({ amount, company, round, stockId, unitPrice, userId });
-    callback?.();
-  };
+    const { status, message } = await sellStock({ amount, company, round, stockId, unitPrice, userId });
 
-  //   비동기 메시지 큐(SQS)로 인한 구매/판매 성공에 대한 메시지 표시 기능
-  useEffect(() => {
-    if (stockStorages.length > 0 && prevStockStorages.current.length > 0) {
-      const currentTotalStocks = stockStorages.reduce((total, storage) => total + (storage.stockCountCurrent || 0), 0);
+    const isSuccess = status === 200;
+    const isFailed = status === 400;
 
-      const prevTotalStocks = prevStockStorages.current.reduce(
-        (total, storage) => total + (storage.stockCountCurrent || 0),
-        0,
-      );
-
-      if (currentTotalStocks > prevTotalStocks) {
-        messageApi.destroy();
-        messageApi.open({
-          content: `주식을 ${currentTotalStocks - prevTotalStocks}주 구매하였습니다.`,
-          duration: 2,
-          type: 'success',
-        });
-      } else if (currentTotalStocks < prevTotalStocks) {
-        messageApi.destroy();
-        messageApi.open({
-          content: `주식을 ${prevTotalStocks - currentTotalStocks}주 판매하였습니다.`,
-          duration: 2,
-          type: 'success',
-        });
-      }
-
-      prevStockStorages.current = stockStorages;
+    if (isSuccess) {
+      messageApi.destroy();
+      messageApi.open({ content: message, duration: 2, type: 'success' });
+      callback?.();
     }
-  }, [messageApi, stockStorages]);
+
+    if (isFailed) {
+      messageApi.destroy();
+      messageApi.open({ content: message, duration: 2, type: 'error' });
+    }
+  };
 
   return { isBuyLoading, isSellLoading, onClickBuy, onClickSell };
 };
