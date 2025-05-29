@@ -17,8 +17,8 @@ const Logo = styled.img`
 `;
 
 const JoinButton = styled.img`
-  width: 150px;
-  height: 70px;
+  width: 130px;
+  height: 46px;
   object-fit: cover;
 `;
 
