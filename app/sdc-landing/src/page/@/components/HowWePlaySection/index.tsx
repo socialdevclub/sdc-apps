@@ -13,7 +13,7 @@ const HowWePlaySection = () => {
         <Style.SliderContainer>
           <Style.SlideTrack>
             {images.map((src, idx) => (
-              <Style.SlideImage key={src} src={src} alt={`slide-${idx}`} />
+              <Style.SlideImage key={`${src}-${idx + 1}`} src={src} alt={`slide-${idx}`} />
             ))}
           </Style.SlideTrack>
           <Style.MaskOverlay />

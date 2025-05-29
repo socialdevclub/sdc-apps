@@ -11,7 +11,7 @@ const DesktopHeader = () => {
           <Style.Logo src={SocialDevClubLogo} />
         </Style.HeaderLeft>
         <Style.HeaderCenter>
-          {MENU_LIST.map((item, index) => {
+          {MENU_LIST.map((item) => {
             return <Style.HeaderItem key={item}>{item}</Style.HeaderItem>;
           })}
         </Style.HeaderCenter>
