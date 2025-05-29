@@ -215,7 +215,7 @@ function Ranking({ stockId }: RankingProps) {
         <AlignLeft size={24} />
         <span>전체 순위</span>
       </SubTitle>
-      {users.map((user, index) => {
+      {sortedUser.map((user, index) => {
         const userAvg = getRoundAvg(user.userId);
         const userFluctuation = userAvg - 1000000;
         const userPercentage = userFluctuation / 10000;
