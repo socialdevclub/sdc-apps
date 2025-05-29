@@ -8,7 +8,7 @@ const Container = styled.div`
   top: 0;
   z-index: 1000;
   background-color: #000;
-  align-items:center;
+  align-items: center;
 `;
 
 const Logo = styled.img`
@@ -18,7 +18,7 @@ const Logo = styled.img`
 
 const JoinButton = styled.img`
   width: 100px;
-  height:50px;
+  height: 50px;
   margin-right: 10px;
 `;
 
@@ -45,7 +45,7 @@ const SideMenu = styled.div`
   top: 0;
   right: 0;
   width: 70%;
-  max-width:500px;
+  max-width: 500px;
   height: 100vh;
   background-color: black;
   color: white;
@@ -127,8 +127,6 @@ const MenuItem = styled.li`
   border-bottom: 1px solid #333;
   padding-bottom: 8px;
   cursor: pointer;
-
- 
 `;
 
 const LoginText = styled.span`

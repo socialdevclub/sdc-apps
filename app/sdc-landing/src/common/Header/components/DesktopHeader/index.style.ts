@@ -2,13 +2,13 @@ import styled from '@emotion/styled';
 
 const Container = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   padding: 13px 24px;
   position: sticky;
   top: 0;
   z-index: 1000;
   background-color: #000;
-  align-items:center;
+  align-items: center;
 `;
 
 const Logo = styled.img`
@@ -18,19 +18,15 @@ const Logo = styled.img`
 
 const JoinButton = styled.img`
   width: 150px;
-  height:70px;
-  object-fit:cover;
+  height: 70px;
+  object-fit: cover;
 `;
-
-
-
 
 const HeaderLeft = styled.div``;
 
 const HeaderCenter = styled.div`
   display: flex;
-  gap:53px
-  
+  gap: 53px;
 `;
 
 const HeaderRight = styled.div`
@@ -40,20 +36,20 @@ const HeaderRight = styled.div`
 `;
 
 const HeaderItem = styled.span`
-font-weight:500;
-`
+  font-weight: 500;
+`;
 const LoginText = styled.div`
-font-weight:500;
-margin-right:20px;
-`
+  font-weight: 500;
+  margin-right: 20px;
+`;
 
 export const Style = {
   Container,
+  HeaderCenter,
+  HeaderItem,
   HeaderLeft,
   HeaderRight,
   JoinButton,
+  LoginText,
   Logo,
-  HeaderCenter,
-  HeaderItem,
-  LoginText
 };

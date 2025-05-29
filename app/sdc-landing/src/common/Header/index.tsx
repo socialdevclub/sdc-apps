@@ -1,10 +1,12 @@
 import React from 'react';
-import MobileHeader from './components/MobileHeader';
+import { useMediaQuery } from 'react-responsive';
 import DesktopHeader from './components/DesktopHeader';
-const Header = () => {
-  return (
-   <DesktopHeader/>
-  );
-}
-export default Header;
+import { MEDIA_QUERY } from '../../config/common';
+import MobileHeader from './components/MobileHeader';
 
+const Header = () => {
+  const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });
+
+  return isDesktop ? <DesktopHeader /> : <MobileHeader />;
+};
+export default Header;

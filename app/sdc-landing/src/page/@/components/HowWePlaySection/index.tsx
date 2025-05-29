@@ -3,7 +3,7 @@ import SampleImage from '../../../../assets/img/SampleImage.png';
 
 const HowWePlaySection = () => {
   const image = [SampleImage, SampleImage, SampleImage, SampleImage, SampleImage, SampleImage, SampleImage];
-  const images = [...image, ...image,...image,...image];
+  const images = [...image, ...image, ...image, ...image];
   return (
     <Style.Container>
       <Style.Title>How We Play</Style.Title>

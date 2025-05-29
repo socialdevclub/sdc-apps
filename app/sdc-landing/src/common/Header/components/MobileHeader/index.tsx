@@ -5,6 +5,7 @@ import MenuButton from '../../../../assets/img/MenuButton.png';
 import SocialDevJoinButton from '../../../../assets/img/JoinButton.png';
 import ProfileTempImage from '../../../../assets/img/ProfileTempImage.png';
 import { MENU_LIST } from '../../../../config/common';
+
 const MobileHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
@@ -34,7 +35,7 @@ const MobileHeader = () => {
           <Style.MenuButton
             src={MenuButton}
             onClick={() => {
-              setIsOpen((prev:boolean) => !prev);
+              setIsOpen((prev: boolean) => !prev);
             }}
           />
         </Style.HeaderRight>
