@@ -154,7 +154,7 @@ export class StockProcessor {
 
       return {
         message: `${error instanceof Error ? error.message : `${error}`}`,
-        status: 400,
+        status: 500,
       };
     } finally {
       this.logService.deleteOldStatusLogs().catch(console.error);
@@ -289,7 +289,7 @@ export class StockProcessor {
       );
       return {
         message: `${error instanceof Error ? error.message : `${error}`}`,
-        status: 400,
+        status: 500,
       };
     } finally {
       this.logService.deleteOldStatusLogs().catch(console.error);

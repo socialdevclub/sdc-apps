@@ -54,7 +54,7 @@ export const useTradeStock = ({ messageApi }: Props): ReturnType => {
     const { status, message } = await buyStock({ amount, company, round, stockId, unitPrice, userId });
 
     const isSuccess = status === 200;
-    const isFailed = status === 400;
+    const isFailed = status >= 400;
 
     if (isSuccess) {
       messageApi.destroy();
@@ -80,7 +80,7 @@ export const useTradeStock = ({ messageApi }: Props): ReturnType => {
     const { status, message } = await sellStock({ amount, company, round, stockId, unitPrice, userId });
 
     const isSuccess = status === 200;
-    const isFailed = status === 400;
+    const isFailed = status >= 400;
 
     if (isSuccess) {
       messageApi.destroy();
