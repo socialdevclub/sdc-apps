@@ -210,7 +210,7 @@ export const renderStockChangesInfo = (
     if (changePercent > 0) {
       return {
         color: '#F87171',
-        text: `+${priceChange.toLocaleString()} (${changePercent}%)`,
+        text: `+${priceChange.toLocaleString()} (+${changePercent}%)`,
       };
     }
 

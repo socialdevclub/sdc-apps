@@ -112,9 +112,7 @@ const StartLoan = ({ stockId, loanCount, money, allSellPrice }: Props) => {
   return (
     <>
       {contextHolder}
-      <LoanButton onClick={() => setOpen(true)} disabled={isDisabled}>
-        대출하기
-      </LoanButton>
+      <LoanButton onClick={() => setOpen(true)}>대출하기</LoanButton>
       <div
         css={{
           position: 'absolute',
@@ -130,8 +128,9 @@ const StartLoan = ({ stockId, loanCount, money, allSellPrice }: Props) => {
           getContainer={false}
           cancelButtonProps={{ style: { backgroundColor: '#252836', color: 'white' } }}
           okButtonProps={{
+            disabled: isDisabled,
             loading: isLoading,
-            style: { backgroundColor: COLOR.violetLight },
+            style: { backgroundColor: COLOR.violetLight, opacity: isDisabled ? 0.5 : 1 },
           }}
           onOk={onClickStartLoan}
         >

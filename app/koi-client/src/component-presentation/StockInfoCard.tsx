@@ -35,7 +35,7 @@ const StockInfoCard = ({
           <FlexRowCenter>
             {profitLoss >= 0 ? (
               <PriceTrendRed>
-                {profitLoss.toLocaleString('ko-KR')} ({`${profitLossPercentage}%`})
+                {`+${profitLoss.toLocaleString('ko-KR')}`} ({`+${profitLossPercentage}%`})
               </PriceTrendRed>
             ) : (
               <PriceTrendBlue>

@@ -67,7 +67,7 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
   return (
     <>
       <TitleWrapper>
-        <H3> 보유중인 주식</H3>
+        <H3> 보유 중인 주식</H3>
       </TitleWrapper>
       <Space />
       <Container>
@@ -84,7 +84,7 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
             />
           ))
         ) : (
-          <Label>보유중인 주식이 없습니다.</Label>
+          <Label>보유 중인 주식이 없습니다.</Label>
         )}
       </Container>
       <StockDrawer

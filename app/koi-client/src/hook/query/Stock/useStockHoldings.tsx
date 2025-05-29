@@ -104,7 +104,7 @@ export const useStockHoldings = ({ stockId, userId }: Props) => {
       const averagePrice = stockAveragePrice;
 
       // 보유 수량의 총 투자 비용 (평균 구매 가격 * 총 구매 수량)
-      const totalCost = averagePrice * stockCountCurrent;
+      const totalCost = Math.round(averagePrice * stockCountCurrent);
 
       // 현재 총 가치 (현재 가격 * 총 구매 수량)
       const totalValue = currentPrice * stockCountCurrent;
@@ -113,7 +113,7 @@ export const useStockHoldings = ({ stockId, userId }: Props) => {
       const profitLoss = totalValue - totalCost;
 
       // 손익률 계산 (퍼센트)
-      const profitLossPercentage = totalCost > 0 ? (profitLoss / totalCost) * 100 : 0;
+      const profitLossPercentage = totalCost > 0 ? Math.round((profitLoss / totalCost) * 100 * 10) / 10 : 0;
 
       result.push({
         averagePrice,
