@@ -2,6 +2,8 @@ import { useMediaQuery } from 'react-responsive';
 import { MEDIA_QUERY } from '../../../../config/common';
 import * as styles from './index.styles';
 
+const DISCORD_INVITE_LINK = 'https://discord.gg/H8sq77NabR';
+
 export const HeroBanner = () => {
   const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });
 
@@ -61,7 +63,7 @@ export const HeroBanner = () => {
         ]}
       />
       <styles.ButtonWrapper>
-        <styles.Button>합류하기</styles.Button>
+        <styles.Button onClick={() => window.open(DISCORD_INVITE_LINK, '_blank')}>합류하기</styles.Button>
       </styles.ButtonWrapper>
     </styles.Container>
   );
