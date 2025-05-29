@@ -69,6 +69,7 @@ function Ranking({ stockId }: RankingProps) {
   if (!users) {
     return <></>;
   }
+
   const sortedUser = users ? [...users].sort((a, b) => getRoundAvg(b.userId) - getRoundAvg(a.userId)) : [];
   const rank = sortedUser.findIndex((v) => v.userId === userId) + 1;
   const user = sortedUser.find((v) => v.userId === userId);
@@ -214,7 +215,7 @@ function Ranking({ stockId }: RankingProps) {
         <AlignLeft size={24} />
         <span>전체 순위</span>
       </SubTitle>
-      {sortedUser.map((user, index) => {
+      {users.map((user, index) => {
         const userAvg = getRoundAvg(user.userId);
         const userFluctuation = userAvg - 1000000;
         const userPercentage = userFluctuation / 10000;

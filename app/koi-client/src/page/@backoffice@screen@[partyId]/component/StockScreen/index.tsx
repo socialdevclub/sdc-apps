@@ -27,9 +27,62 @@ export default function StockScreen({ party }: Props) {
     keepPreviousData: false,
     refetchInterval: 500,
   });
+  const { mutateAsync: mutateUpdateStock } = Query.Stock.useUpdateStock();
 
   const startedTime = useMemo(() => dayjs(stock?.startedTime).toDate(), [stock?.startedTime]);
   const isTransaction = stock?.isTransaction ?? false;
+
+  useEffect(() => {
+    const resetTime = (event: KeyboardEvent) => {
+      if (event.key !== 'y') {
+        return;
+      }
+
+      if (!stock?._id) {
+        return;
+      }
+
+      const isConfirm = window.confirm('시작 시간을 초기화하시겠습니까?');
+      if (!isConfirm) {
+        return;
+      }
+
+      mutateUpdateStock({
+        _id: stock._id,
+        startedTime: dayjs(new Date()).toISOString(),
+      });
+    };
+
+    document.addEventListener('keydown', resetTime);
+
+    return () => {
+      document.removeEventListener('keydown', resetTime);
+    };
+  }, [mutateUpdateStock, stock?._id]);
+
+  useEffect(() => {
+    const toggleTransaction = (event: KeyboardEvent) => {
+      if (event.key !== 't') {
+        return;
+      }
+
+      if (!stock?._id) {
+        return;
+      }
+
+      mutateUpdateStock({
+        _id: stock._id,
+        isTransaction: !isTransaction,
+      });
+    };
+
+    document.addEventListener('keydown', toggleTransaction);
+
+    return () => {
+      document.removeEventListener('keydown', toggleTransaction);
+    };
+  }, [isTransaction, mutateUpdateStock, startedTime, stock?._id]);
+
   const [time, setTime] = useState(() => {
     return getTimeDistanceWithCurrent(startedTime);
   });

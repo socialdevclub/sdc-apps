@@ -57,8 +57,9 @@ export class UserController {
   }
 
   @Post('/align-index')
-  async alignIndex(@Query('stockId') stockId: string): Promise<void> {
-    return this.userService.alignIndex(stockId);
+  async alignIndex(@Query('stockId') stockId: string): Promise<{ result: boolean }> {
+    await this.userService.alignIndex(stockId);
+    return { result: true };
   }
 
   @Post('/introduce')

@@ -43,8 +43,7 @@ export class UserRepository {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async count(filter: Record<string, any>): Promise<number> {
+  async count(filter: Partial<StockUserSchema>): Promise<number> {
     try {
       const { stockId } = filter;
 
@@ -77,8 +76,7 @@ export class UserRepository {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async find(filter?: Record<string, any>, options?: { consistentRead?: boolean }): Promise<StockUserSchema[]> {
+  async find(filter?: Partial<StockUserSchema>, options?: { consistentRead?: boolean }): Promise<StockUserSchema[]> {
     try {
       const { stockId } = filter || {};
 
@@ -94,6 +92,9 @@ export class UserRepository {
         });
 
         const { Items } = await this.dynamoDBClient.send(command);
+
+        Items.sort((a, b) => a.index - b.index);
+
         return (Items || []) as StockUserSchema[];
       }
       // 전체 스캔이 필요한 경우
@@ -104,6 +105,9 @@ export class UserRepository {
       });
 
       const { Items } = await this.dynamoDBClient.send(command);
+
+      Items.sort((a, b) => a.index - b.index);
+
       return (Items || []) as StockUserSchema[];
     } catch (error) {
       console.error('Error finding users', error);

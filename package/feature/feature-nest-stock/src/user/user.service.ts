@@ -70,7 +70,7 @@ export class UserService {
 
   async alignIndex(stockId: string): Promise<void> {
     // 해당 주식방의 모든 사용자 목록을 가져옵니다
-    const allUsers = await this.getUserList(stockId);
+    const allUsers = await this.userRepository.find({ stockId });
 
     // 성별로 사용자 분류
     const maleUsers = allUsers.filter((user) => user.userInfo.gender === 'M');
