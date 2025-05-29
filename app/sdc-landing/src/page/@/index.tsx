@@ -28,7 +28,6 @@ const BannerWrapper = styled.div(
     base: {
       display: 'flex',
       flexDirection: 'column',
-      gap: '100px',
       height: '100%',
       justifyContent: 'space-between',
       marginBottom: 0,
