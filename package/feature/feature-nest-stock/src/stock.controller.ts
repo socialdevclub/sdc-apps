@@ -70,7 +70,7 @@ export class StockController {
   }
 
   @Post('/buy')
-  async buyStock(@Body() body: Request.PostBuyStock): Promise<{ messageId: string }> {
+  async buyStock(@Body() body: Request.PostBuyStock): Promise<Response.Common> {
     const queueUniqueId = randomUUID();
 
     // SQS 관련 로직 (지금은 안씀)
@@ -102,8 +102,8 @@ export class StockController {
         });
     }
 
-    await this.stockProcessor.buyStock(body.stockId, body, { queueMessageId: queueUniqueId });
-    return { messageId: 'direct' };
+    const response = await this.stockProcessor.buyStock(body.stockId, body, { queueMessageId: queueUniqueId });
+    return response;
   }
 
   @Post('/draw-info')
@@ -112,7 +112,7 @@ export class StockController {
   }
 
   @Post('/sell')
-  async sellStock(@Body() body: Request.PostSellStock): Promise<{ messageId: string }> {
+  async sellStock(@Body() body: Request.PostSellStock): Promise<Response.Common> {
     const queueUniqueId = randomUUID();
 
     // SQS 관련 로직 (지금은 안씀)
@@ -144,8 +144,8 @@ export class StockController {
         });
     }
 
-    await this.stockProcessor.sellStock(body.stockId, body, { queueMessageId: queueUniqueId });
-    return { messageId: 'direct' };
+    const response = await this.stockProcessor.sellStock(body.stockId, body, { queueMessageId: queueUniqueId });
+    return response;
   }
 
   @Post('/finish')
