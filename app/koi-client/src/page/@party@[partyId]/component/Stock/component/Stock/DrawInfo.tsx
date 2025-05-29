@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { objectEntries } from '@toss/utils';
 import { Modal, message } from 'antd';
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
@@ -22,6 +23,22 @@ const DrawStockInfo = ({ stockId }: Props) => {
   const modalRef = useRef<HTMLUListElement>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const { data: stock, timeIdx } = Query.Stock.useQueryStock(stockId);
+
+  // 내 예측 정보 계산
+  const myInfos = stock
+    ? objectEntries(stock.companies).reduce((myInfos, [company, companyInfos]) => {
+        companyInfos.forEach((companyInfo, idx) => {
+          if (companyInfo.정보.some((name) => name === userId)) {
+            myInfos.push({
+              company,
+              price: idx > 0 ? companyInfo.가격 - companyInfos[idx - 1].가격 : 0,
+              timeIdx: idx,
+            });
+          }
+        });
+        return myInfos;
+      }, [] as Array<{ company: string; timeIdx: number; price: number }>)
+    : [];
 
   const onClickDrawStockInfo = () => {
     if (!userId) return;
@@ -59,14 +76,13 @@ const DrawStockInfo = ({ stockId }: Props) => {
   }
 
   const allPrice = myAllSellPrice + (user?.money ?? 0);
-  const isDisabled = timeIdx === undefined || timeIdx >= 7 || !stock.isTransaction || allPrice < 1000000;
+  const isDisabled =
+    timeIdx === undefined || timeIdx >= 7 || !stock.isTransaction || allPrice < 1000000 || myInfos.length === 10;
 
   return (
     <>
       {contextHolder}
-      <InfoExtractButton onClick={() => setOpen(true)} disabled={isDisabled}>
-        정보 뽑기
-      </InfoExtractButton>
+      <InfoExtractButton onClick={() => setOpen(true)}>정보 뽑기</InfoExtractButton>
       <div
         css={{
           position: 'absolute',
@@ -80,7 +96,11 @@ const DrawStockInfo = ({ stockId }: Props) => {
           okText="뽑기"
           cancelText="닫기"
           getContainer={false}
-          okButtonProps={{ loading: isLoading, style: { backgroundColor: COLOR.green } }}
+          okButtonProps={{
+            disabled: isDisabled,
+            loading: isLoading,
+            style: { backgroundColor: COLOR.green, opacity: isDisabled ? 0.5 : 1 },
+          }}
           cancelButtonProps={{ style: { backgroundColor: '#252836', color: 'white' } }}
           onOk={onClickDrawStockInfo}
         >
@@ -95,6 +115,9 @@ const DrawStockInfo = ({ stockId }: Props) => {
               <h3>2. 정보 뽑기 조건</h3>
               <p>
                 <HighlightedText>수익률 0% 이상</HighlightedText>일 때만 뽑기를 할 수 있어요.
+              </p>
+              <p style={{ wordBreak: 'keep-all' }}>
+                내가 가진 <HighlightedText>정보가 10개 미만</HighlightedText>일 때 뽑을 수 있어요.
               </p>
             </li>
           </InfoExtractionRulesList>
