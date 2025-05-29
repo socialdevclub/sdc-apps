@@ -92,7 +92,7 @@ const StockLineChart = (props: StockLineChartProps) => {
               distance: [0, 1], // 라벨 위치 조정
               fontFamily: 'DungGeunMo',
               fontSize: 12,
-              formatter: `평균 구매가: ${memoizedAveragePrice.toLocaleString()}원`, // 라벨 텍스트
+              formatter: `평균 구매가: ${Math.round(memoizedAveragePrice).toLocaleString()}원`, // 라벨 텍스트
               padding: [2, 4],
               position: 'insideEndTop', // 라벨 위치
             },
