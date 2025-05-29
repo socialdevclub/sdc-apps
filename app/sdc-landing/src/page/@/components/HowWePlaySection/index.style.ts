@@ -63,7 +63,7 @@ const Wrapper = styled.div`
 const SlideTrack = styled.div`
   display: flex;
   width: fit-content;
-  animation: scroll 60s linear infinite;
+  animation: scroll 180s linear infinite;
   @keyframes scroll {
     0% {
       transform: translateX(0%);
@@ -75,14 +75,14 @@ const SlideTrack = styled.div`
 `;
 
 const SlideImage = styled.img`
-  width: 150px;
+  width: 160px;
   height: auto;
   margin: 0 5px;
   flex-shrink: 0;
 
   @media ${MEDIA_QUERY.DESKTOP} {
-    width: 250px;
-    height: auto;
+    width: 300px;
+    
   }
 `;
 
@@ -98,8 +98,11 @@ const MaskOverlay = styled.div`
 `;
 
 const SliderContainer = styled.div`
+display: flex;
+  justify-content: center; // 추가
   position: relative;
-  z-index: 0;
+  overflow: hidden;
+  width: 100%;
 `;
 
 export const Style = {
