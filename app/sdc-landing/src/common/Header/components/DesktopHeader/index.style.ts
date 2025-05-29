@@ -9,6 +9,7 @@ const Container = styled.div`
   background-color: #000;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
+  min-width: 1100px; // ✅ 최소 너비 지정
 `;
 
 const Logo = styled.img`
