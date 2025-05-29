@@ -75,7 +75,7 @@ export const MyLevel = ({ moneyRatio, initialMoney = 1000000 }: Props) => {
     <Container>
       <LeftSection>
         <AnimalImage src={`/animal/${levelInfo.animal}.jpg`} />
-        <LevelIndicator>Lv.{levelInfo.index + 1}</LevelIndicator>
+        <LevelIndicator>Lv.{levelInfo.index}</LevelIndicator>
       </LeftSection>
       <RightSection>
         <TopSection>
