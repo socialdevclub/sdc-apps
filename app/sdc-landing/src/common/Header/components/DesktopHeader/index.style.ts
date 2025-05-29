@@ -43,7 +43,7 @@ const HeaderItem = styled.span`
 `;
 const LoginText = styled.div`
   font-weight: 500;
-  margin-right: 20px;
+  margin-right: 32px;
 `;
 
 export const Style = {
