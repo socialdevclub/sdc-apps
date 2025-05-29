@@ -70,9 +70,10 @@ function Ranking({ stockId }: RankingProps) {
     return <></>;
   }
 
-  const rank = users.findIndex((v) => v.userId === userId) + 1;
-  const user = users.find((v) => v.userId === userId);
-  const rankPercentage = Math.floor(Math.max(((rank - 1) / users.length) * 100, 1));
+  const sortedUser = users ? [...users].sort((a, b) => getRoundAvg(b.userId) - getRoundAvg(a.userId)) : [];
+  const rank = sortedUser.findIndex((v) => v.userId === userId) + 1;
+  const user = sortedUser.find((v) => v.userId === userId);
+  const rankPercentage = Math.floor(Math.max(((rank - 1) / sortedUser.length) * 100, 1));
 
   const animal =
     percentage < 0
@@ -214,7 +215,7 @@ function Ranking({ stockId }: RankingProps) {
         <AlignLeft size={24} />
         <span>전체 순위</span>
       </SubTitle>
-      {users.map((user, index) => {
+      {sortedUser.map((user, index) => {
         const userAvg = getRoundAvg(user.userId);
         const userFluctuation = userAvg - 1000000;
         const userPercentage = userFluctuation / 10000;
@@ -413,6 +414,7 @@ const Label = styled.span`
   font-size: 23px;
   color: white;
   font-family: 'DungGeunMo';
+  white-space: nowrap;
 `;
 
 const CaptureArea = styled.div`

@@ -1,5 +1,5 @@
 import { Drawer } from 'antd';
-import React, { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useAtomValue } from 'jotai';
 import { isStockOverLimit } from 'shared~config/dist/stock';
@@ -14,6 +14,7 @@ import ButtonGroup from '../../../../../../component-presentation/ButtonGroup';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
 import StockBuyingNotification from './StockBuyingNotification';
+import { useTradeStock } from '../../../../hook/useTradeStock';
 
 interface Props {
   drawerOpen: boolean;
@@ -57,34 +58,9 @@ const StockDrawer = ({
   });
   const { data: userCount } = Query.Stock.useUserCount({ stockId });
 
-  const stockCountCurrent = getStockStorage(selectedCompany)?.stockCountCurrent;
-  const prevStockCountCurrent = useRef<number | undefined>(stockCountCurrent);
-
-  if (prevStockCountCurrent.current !== stockCountCurrent && typeof stockCountCurrent === 'number') {
-    if (typeof prevStockCountCurrent.current !== 'number') {
-      prevStockCountCurrent.current = stockCountCurrent;
-    } else {
-      if (stockCountCurrent > prevStockCountCurrent.current) {
-        messageApi.destroy();
-        messageApi.open({
-          content: `주식을 ${stockCountCurrent - prevStockCountCurrent.current}주 구매하였습니다.`,
-          duration: 2,
-          type: 'success',
-        });
-      } else if (stockCountCurrent < prevStockCountCurrent.current) {
-        messageApi.destroy();
-        messageApi.open({
-          content: `주식을 ${prevStockCountCurrent.current - stockCountCurrent}주 판매하였습니다.`,
-          duration: 2,
-          type: 'success',
-        });
-      }
-      prevStockCountCurrent.current = stockCountCurrent;
-    }
-  }
-
-  const { mutateAsync: buyStock, isLoading: isBuyLoading } = Query.Stock.useBuyStock();
-  const { mutateAsync: sellStock, isLoading: isSellLoading } = Query.Stock.useSellStock();
+  const { isBuyLoading, isSellLoading, onClickBuy, onClickSell } = useTradeStock({
+    messageApi,
+  });
 
   const 보유주식 = useMemo(() => {
     return (
@@ -123,48 +99,6 @@ const StockDrawer = ({
   if (!stock || !userId || !user) {
     return <>불러오는 중</>;
   }
-
-  const onClickBuy = async (company: string) => {
-    await buyStock({ amount: 1, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId });
-    await refetchUser();
-    // .then(() => {
-    //   messageApi.destroy();
-    //   messageApi.open({
-    //     content: '주식을 구매하였습니다.',
-    //     duration: 2,
-    //     type: 'success',
-    //   });
-    // })
-    // .catch((reason: Error) => {
-    //   messageApi.destroy();
-    //   messageApi.open({
-    //     content: `${reason.message}`,
-    //     duration: 2,
-    //     type: 'error',
-    //   });
-    // });
-  };
-
-  const onClickSell = async (company: string, amount = 1) => {
-    await sellStock({ amount, company, round: stock.round, stockId, unitPrice: companiesPrice[company], userId });
-    await refetchUser();
-    // .then(() => {
-    //   messageApi.destroy();
-    //   messageApi.open({
-    //     content: `주식을 ${amount > 1 ? `${amount}주 ` : ''}판매하였습니다.`,
-    //     duration: 2,
-    //     type: 'success',
-    //   });
-    // })
-    // .catch((reason: Error) => {
-    //   messageApi.destroy();
-    //   messageApi.open({
-    //     content: `${reason.message}`,
-    //     duration: 2,
-    //     type: 'error',
-    //   });
-    // });
-  };
 
   const isLoading = isBuyLoading || isFreezed || isSellLoading;
   const isDisabled = timeIdx === undefined || timeIdx >= StockConfig.MAX_STOCK_IDX || !stock.isTransaction || isLoading;
@@ -271,14 +205,32 @@ const StockDrawer = ({
                 1,
               ),
             flex: 1,
-            onClick: () => onClickBuy(selectedCompany),
+            onClick: () =>
+              onClickBuy({
+                amount: 1,
+                callback: () => refetchUser(),
+                company: selectedCompany,
+                round: stock.round,
+                stockId,
+                unitPrice: companiesPrice[selectedCompany],
+                userId,
+              }),
             text: '사기',
           },
           {
             backgroundColor: '#f63c6b',
             disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
             flex: 1,
-            onClick: () => onClickSell(selectedCompany),
+            onClick: () =>
+              onClickSell({
+                amount: 1,
+                callback: () => refetchUser(),
+                company: selectedCompany,
+                round: stock.round,
+                stockId,
+                unitPrice: companiesPrice[selectedCompany],
+                userId,
+              }),
             text: '팔기',
           },
         ]}
@@ -291,7 +243,15 @@ const StockDrawer = ({
             backgroundColor: '#374151',
             disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
             onClick: () =>
-              onClickSell(selectedCompany, 보유주식.find(({ company }) => company === selectedCompany)?.count),
+              onClickSell({
+                amount: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
+                callback: () => refetchUser(),
+                company: selectedCompany,
+                round: stock.round,
+                stockId,
+                unitPrice: companiesPrice[selectedCompany],
+                userId,
+              }),
             text: '모두 팔기',
           },
         ]}

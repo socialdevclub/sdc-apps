@@ -53,13 +53,10 @@ const Stock = ({ stockId }: Props) => {
   useEffect(() => {
     function handleEndGame() {
       mutateFinishStock({ stockId }); // 주식 종료 및 정산
-      // 거래 비활성화
-      mutateUpdateGame({
-        _id: stockId,
-        isTransaction: !stock?.isTransaction,
-      });
-      // 결과 페이지로 이동
-      mutateSetPhase({ phase: 'RESULT', stockId });
+      if (false) {
+        // 결과 페이지로 이동
+        mutateSetPhase({ phase: 'RESULT', stockId });
+      }
       messageApi.open({
         content: '게임이 종료되었습니다.',
         duration: 2,

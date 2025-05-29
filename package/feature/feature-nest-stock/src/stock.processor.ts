@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
-import type { Request } from 'shared~type-stock';
+import type { Request, Response } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
 import { isStockOverLimit } from 'shared~config/dist/stock';
 import dayjs from 'dayjs';
@@ -16,7 +16,11 @@ export class StockProcessor {
     private readonly logService: LogService,
   ) {}
 
-  async buyStock(stockId: string, body: Request.PostBuyStock, attributes?: { queueMessageId?: string }): Promise<void> {
+  async buyStock(
+    stockId: string,
+    body: Request.PostBuyStock,
+    attributes?: { queueMessageId?: string },
+  ): Promise<Response.Common> {
     const { userId, company, amount, unitPrice } = body;
 
     try {
@@ -105,7 +109,6 @@ export class StockProcessor {
         stockCountHistory: [...stockStorage.stockCountHistory],
       };
       updatedStockStorage.stockCountHistory[idx] += amount;
-
       // 사용자 정보 업데이트
       const updatedStockStorages = user.stockStorages.map((storage) =>
         storage.companyName === company ? updatedStockStorage : storage,
@@ -137,13 +140,22 @@ export class StockProcessor {
 
       // 로그 상태 업데이트
       await this.logService.updateOne({ queueId: attributes?.queueMessageId }, { date: new Date(), status: 'SUCCESS' });
+
+      return {
+        message: `주식을 ${amount}주 구매하였습니다.`,
+        status: 200,
+      };
     } catch (error) {
       console.error(error);
       await this.logService.updateOne(
         { queueId: attributes?.queueMessageId },
         { failedReason: error instanceof Error ? error.message : `${error}`, status: 'FAILED' },
       );
-      throw error;
+
+      return {
+        message: `${error instanceof Error ? error.message : `${error}`}`,
+        status: 400,
+      };
     } finally {
       this.logService.deleteOldStatusLogs().catch(console.error);
     }
@@ -153,7 +165,7 @@ export class StockProcessor {
     stockId: string,
     body: Request.PostSellStock,
     attributes?: { queueMessageId?: string },
-  ): Promise<void> {
+  ): Promise<Response.Common> {
     const { userId, company, amount, unitPrice } = body;
 
     try {
@@ -264,13 +276,21 @@ export class StockProcessor {
 
       // 로그 상태 업데이트
       await this.logService.updateOne({ queueId: attributes?.queueMessageId }, { date: new Date(), status: 'SUCCESS' });
+
+      return {
+        message: `주식을 ${amount}주 판매하였습니다.`,
+        status: 200,
+      };
     } catch (error) {
       console.error(error);
       await this.logService.updateOne(
         { queueId: attributes?.queueMessageId },
         { failedReason: error instanceof Error ? error.message : `${error}`, status: 'FAILED' },
       );
-      return;
+      return {
+        message: `${error instanceof Error ? error.message : `${error}`}`,
+        status: 400,
+      };
     } finally {
       this.logService.deleteOldStatusLogs().catch(console.error);
     }
