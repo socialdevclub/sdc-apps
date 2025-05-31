@@ -7,6 +7,7 @@ import { Query } from '../../hook';
 import RoomCodeInput from './component/RoomCodeInput';
 import Divider from './component/Divider';
 import RoomCreateButton from './component/RoomCreateButton';
+import ProfileValidator from '../../component/ProfileValidator';
 
 export default function Party() {
   const navigate = useNavigate();
@@ -23,20 +24,22 @@ export default function Party() {
 
   return (
     <MobileLayout padding="0px">
-      <Header
-        title={username}
-        avatar={{
-          isVisible: isVisibleAvatar,
-          onClick: () => {
-            navigate('/profile');
-          },
-          src: avatar?.data,
-        }}
-      />
+      <ProfileValidator>
+        <Header
+          title={username}
+          avatar={{
+            isVisible: isVisibleAvatar,
+            onClick: () => {
+              navigate('/profile');
+            },
+            src: avatar?.data,
+          }}
+        />
 
-      <RoomCodeInput />
-      <Divider />
-      <RoomCreateButton username={username} />
+        <RoomCodeInput />
+        <Divider />
+        <RoomCreateButton username={username} />
+      </ProfileValidator>
     </MobileLayout>
   );
 }

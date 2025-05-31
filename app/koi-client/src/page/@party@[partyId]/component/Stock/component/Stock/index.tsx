@@ -52,8 +52,8 @@ const Stock = ({ stockId }: Props) => {
   // 주식 게임 자동 종료 및 정산
   useEffect(() => {
     function handleEndGame() {
-      mutateFinishStock({ stockId }); // 주식 종료 및 정산
       if (false) {
+        mutateFinishStock({ stockId }); // 주식 종료 및 정산
         // 결과 페이지로 이동
         mutateSetPhase({ phase: 'RESULT', stockId });
       }
