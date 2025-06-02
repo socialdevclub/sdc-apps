@@ -38,6 +38,7 @@ export const Description = styled(HighlightText)((props) =>
       lineHeight: '150%',
       marginBottom: `${props.theme.spacing.xl3}`,
       textAlign: 'center',
+      whiteSpace: 'pre-line',
       wordBreak: 'keep-all',
     },
   }),

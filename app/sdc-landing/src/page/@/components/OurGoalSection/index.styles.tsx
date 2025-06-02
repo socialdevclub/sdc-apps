@@ -17,7 +17,7 @@ export const Title = styled.p((props) =>
     base: {
       color: props.theme.colors.brand.primary,
       fontFamily: props.theme.fonts.subHeading,
-      fontSize: 18,
+      fontSize: 24,
       fontWeight: 500,
       marginBottom: `${props.theme.spacing.xs}`,
     },
@@ -32,11 +32,11 @@ export const Description = styled(HighlightText)((props) =>
       whiteSpace: 'pre-line',
     },
     base: {
-      fontSize: 18,
+      fontSize: 16,
       lineHeight: '150%',
       marginBottom: `${props.theme.spacing.xl3}`,
       textAlign: 'center',
-      wordBreak: 'keep-all',
+      whiteSpace: 'pre-line',
     },
   }),
 );
@@ -49,7 +49,7 @@ export const CardWrapper = styled.div((props) =>
     base: {
       display: 'flex',
       flexWrap: 'wrap',
-      gap: 24,
+      gap: 29,
       padding: props.theme.spacing.md,
     },
   }),
