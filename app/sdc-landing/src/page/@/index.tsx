@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { HeroBanner, LineBanner, OurGoalSection, SignatureGameSection } from './components';
+import { HeroBanner, OurGoalSection, SignatureGameSection } from './components';
 import HowWePlaySection from './components/HowWePlaySection';
 import SocialDevClubSection from './components/SocialDevClubSection';
 import { applyResponsiveStyles } from '../../utils/styles';
@@ -9,7 +9,6 @@ const Home = () => {
     <Container>
       <BannerWrapper>
         <HeroBanner />
-        <LineBanner />
       </BannerWrapper>
       <SocialDevClubSection />
       <OurGoalSection />
