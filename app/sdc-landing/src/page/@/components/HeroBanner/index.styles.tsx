@@ -134,7 +134,7 @@ export const Button = styled.button((props) =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: 30,
-      padding: `${props.theme.spacing.md} 64px`,
+      padding: `${props.theme.spacing.md} 73px`,
     },
     base: {
       backgroundColor: props.theme.colors.brand.primary,
