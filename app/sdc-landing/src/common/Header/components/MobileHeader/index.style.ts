@@ -3,23 +3,24 @@ import styled from '@emotion/styled';
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 13px 16px;
+  padding: 12px 16px;
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: #000;
+  background-color: rgb(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
   align-items: center;
 `;
 
 const Logo = styled.img`
-  width: 43px;
+  width: 41px;
   height: 35px;
 `;
 
 const JoinButton = styled.img`
   width: 97px;
-  height: 37px;
-  margin-right: 10px;
+  height: 33px;
+  margin-right: 16px;
 `;
 
 const JoinText = styled.span`
@@ -28,8 +29,8 @@ const JoinText = styled.span`
 `;
 
 const MenuButton = styled.img`
-  width: 25px;
-  height: 25px;
+  width: 22px;
+  height: 22px;
 `;
 
 const HeaderLeft = styled.div``;

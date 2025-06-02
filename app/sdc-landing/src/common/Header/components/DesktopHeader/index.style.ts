@@ -6,7 +6,9 @@ const Container = styled.div`
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: #000;
+  background-color: rgb(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   min-width: 1100px; // ✅ 최소 너비 지정
