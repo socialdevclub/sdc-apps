@@ -24,14 +24,7 @@ const BannerWrapper = styled.div(
       marginBottom: '-100px',
       minHeight: 'calc(100svh - 96px)',
     },
-    base: {
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      justifyContent: 'space-between',
-      marginBottom: 0,
-      minHeight: 'calc(100svh - 76px)',
-    },
+    base: {},
   }),
 );
 
