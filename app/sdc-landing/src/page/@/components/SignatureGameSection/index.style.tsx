@@ -74,7 +74,6 @@ const CardWrapper = styled.div((props) =>
       borderRadius: 12,
       boxShadow: props.theme.dropShadow,
       display: 'flex',
-      flex: '1 1 100%',
       flexDirection: 'column',
       overflow: 'hidden',
     },
@@ -121,6 +120,7 @@ const CardTextBox = styled.div((props) =>
       gap: props.theme.spacing.xs,
       padding: props.theme.spacing.md,
       position: 'relative',
+      width: '100%',
     },
   }),
 );
