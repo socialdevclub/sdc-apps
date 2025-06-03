@@ -22,7 +22,6 @@ const BannerWrapper = styled.div(
   applyResponsiveStyles({
     DESKTOP: {
       marginBottom: '-100px',
-      minHeight: 'calc(100svh - 96px)',
     },
     base: {},
   }),
