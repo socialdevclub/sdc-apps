@@ -60,7 +60,7 @@ export const SubTitle = styled(HighlightText)(() =>
     base: {
       fontSize: 18,
       lineHeight: '150%',
-      marginTop: 17,
+      marginTop: 24,
     },
   }),
 );

@@ -146,6 +146,7 @@ const CardText = styled.p((props) =>
       lineHeight: '150%',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
+      whiteSpace: 'pre-line',
     },
   }),
 );

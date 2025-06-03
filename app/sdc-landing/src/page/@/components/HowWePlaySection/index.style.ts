@@ -57,7 +57,7 @@ const Wrapper = styled.div`
   position: relative;
   overflow: hidden;
   width: 100%;
-  padding: 40px 0;
+  padding: 32px 0;
 `;
 
 const SlideTrack = styled.div`
@@ -82,7 +82,6 @@ const SlideImage = styled.img`
 
   @media ${MEDIA_QUERY.DESKTOP} {
     width: 300px;
-    
   }
 `;
 
@@ -98,7 +97,7 @@ const MaskOverlay = styled.div`
 `;
 
 const SliderContainer = styled.div`
-display: flex;
+  display: flex;
   justify-content: center; // 추가
   position: relative;
   overflow: hidden;
