@@ -1,8 +1,6 @@
 import { useMediaQuery } from 'react-responsive';
-import { MEDIA_QUERY } from '../../../../config/common';
+import { DISCORD_INVITE_LINK, MEDIA_QUERY } from '../../../../config/common';
 import * as styles from './index.styles';
-
-const DISCORD_INVITE_LINK = 'https://discord.gg/H8sq77NabR';
 
 export const HeroBanner = () => {
   const isDesktop = useMediaQuery({ query: MEDIA_QUERY.DESKTOP });

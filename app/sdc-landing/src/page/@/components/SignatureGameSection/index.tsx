@@ -24,8 +24,7 @@ const cards: { name: string; description: string; status: ProjectStatus; url: st
     url: 'src/assets/img/GameImageStock.png',
   },
   {
-    description:
-      '한 번의 터치로 순식간에 퍼지는 좀비 바이러스!\n끝없이 번지는 바이러스 속에서 마지막까지\n 인간성을 지켜낼 사람은 과연 누구?!',
+    description: `한 번의 터치로 순식간에 퍼지는 좀비 바이러스!\n끝없이 번지는 바이러스 속에서 마지막까지\n 인간성을 지켜낼 사람은 과연 누구?!`,
     name: '좀비게임',
     status: 'COMING_SOON',
     url: 'src/assets/img/GameImageZombies.png',
@@ -34,7 +33,7 @@ const cards: { name: string; description: string; status: ProjectStatus; url: st
     description: '소셜데브클럽의 시그니처 게임!\n커뮤니티에 기여하고 함께 성장해요',
     name: '마피아시즈',
     status: 'IN_DEVELOPMENT',
-    url: 'src/assets/img/GameImageZombies.png',
+    url: 'src/assets/img/GameImageMafia.png',
   },
   {
     description: '추리하고, 의심해라!\n치밀한 판단력과 심리전으로 사건의 진실을\n쟁탈하는 미스터리 게임',
@@ -97,7 +96,7 @@ export const SignatureGameSection = () => {
           </styles.Card>
         ))}
       </styles.CardContainer>
-      {/* <styles.MoreButton>더보기</styles.MoreButton> */}
+      <styles.MoreButton>더보기</styles.MoreButton>
     </styles.Container>
   );
 };

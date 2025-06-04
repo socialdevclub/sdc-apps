@@ -22,7 +22,7 @@ const Subtitle = styled.div`
   margin-top: 0.5rem;
   @media ${MEDIA_QUERY.DESKTOP} {
     font-size: 2rem;
-    margin-top: 1rem;
+    margin-top: 24px;
   }
 `;
 
@@ -57,19 +57,23 @@ const Wrapper = styled.div`
   position: relative;
   overflow: hidden;
   width: 100%;
-  padding: 32px 0;
+  padding-top: 32px;
+  @media ${MEDIA_QUERY.DESKTOP} {
+    padding-top: 64px;
+  }
 `;
 
 const SlideTrack = styled.div`
   display: flex;
-  width: fit-content;
-  animation: scroll 180s linear infinite;
+  width: max-content;
+  animation: scroll 80s linear infinite;
+
   @keyframes scroll {
     0% {
       transform: translateX(0%);
     }
     100% {
-      transform: translateX(-50%);
+      transform: translateX(-33.333%);
     }
   }
 `;
@@ -77,8 +81,9 @@ const SlideTrack = styled.div`
 const SlideImage = styled.img`
   width: 160px;
   height: auto;
-  margin: 0 5px;
+  margin: 0 10px;
   flex-shrink: 0;
+  border-radius: 24px;
 
   @media ${MEDIA_QUERY.DESKTOP} {
     width: 300px;

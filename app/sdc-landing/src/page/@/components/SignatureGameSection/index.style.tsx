@@ -88,7 +88,7 @@ const CardContent = styled.div`
 `;
 
 const CardImage = styled.img`
-  width: 100%;
+  width: 105%;
   aspect-ratio: 4/3;
   object-fit: cover;
 `;
@@ -139,13 +139,10 @@ const CardText = styled.p((props) =>
   applyResponsiveStyles({
     base: {
       WebkitBoxOrient: 'vertical',
-      WebkitLineClamp: 3,
       color: props.theme.colors.font['2'],
       display: '-webkit-box',
       fontSize: 16,
       lineHeight: '150%',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
       whiteSpace: 'pre-line',
     },
   }),
@@ -164,6 +161,7 @@ export const MoreButton = styled.button((props) =>
   applyResponsiveStyles({
     DESKTOP: {
       fontSize: 24,
+      marginBottom: 240,
     },
     base: {
       alignItems: 'center',
@@ -174,6 +172,7 @@ export const MoreButton = styled.button((props) =>
       fontSize: 16,
       fontWeight: 'bold',
       justifyContent: 'center',
+      marginBottom: 100,
       maxWidth: 178,
       padding: props.theme.spacing.sm,
       width: '100%',
