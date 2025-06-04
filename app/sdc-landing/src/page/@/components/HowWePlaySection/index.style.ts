@@ -81,12 +81,14 @@ const SlideTrack = styled.div`
 const SlideImage = styled.img`
   width: 160px;
   height: auto;
-  margin: 0 10px;
   flex-shrink: 0;
-  border-radius: 24px;
+  border-radius: 12px;
+  margin: 0 4px;
 
   @media ${MEDIA_QUERY.DESKTOP} {
     width: 300px;
+    border-radius: 24px;
+    margin: 0 8px;
   }
 `;
 
