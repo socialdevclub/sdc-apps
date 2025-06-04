@@ -4,6 +4,7 @@ export const MEDIA_QUERY = {
 } as const;
 export const MENU_LIST = ['게임', 'EVENT', '소셜 활동', '크루원 소개', '팀 블로그', '협업문의'];
 export const DISCORD_INVITE_LINK = 'https://discord.gg/H8sq77NabR';
-export const openDisCodeHandler = (): void => {
-  window.open(DISCORD_INVITE_LINK, '_blank');
+export const INSTAAGRAM_LINK = 'https://www.instagram.com/socialdev.club/';
+export const openWindowHandler = (url = DISCORD_INVITE_LINK): void => {
+  window.open(url, '_blank');
 };

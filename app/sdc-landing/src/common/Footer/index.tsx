@@ -1,6 +1,7 @@
 import { Style } from './index.style';
 import Logo from '../../assets/img/SocialDevClubLogo.png';
 import InstaLogo from '../../assets/img/InstaLogo.png';
+import { openWindowHandler, INSTAAGRAM_LINK } from '../../config/common';
 
 const Footer = () => {
   return (
@@ -15,7 +16,7 @@ const Footer = () => {
           <Style.Copylight>{`© 2025 SOCIAL <Dev/> CLUB. all rights reserved.`}</Style.Copylight>
         </Style.LeftContainer>
         <Style.RightContainer>
-          <Style.InstaLogo src={InstaLogo} />
+          <Style.InstaLogo onClick={() => openWindowHandler(INSTAAGRAM_LINK)} src={InstaLogo} />
         </Style.RightContainer>
       </Style.Container>
     </Style.Wrapper>

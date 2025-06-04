@@ -88,7 +88,7 @@ const CardContent = styled.div`
 `;
 
 const CardImage = styled.img`
-  width: 105%;
+  width: 100%;
   aspect-ratio: 4/3;
   object-fit: cover;
 `;

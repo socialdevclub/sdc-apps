@@ -1,7 +1,7 @@
 import { Style } from './index.style';
 import SocialDevClubLogo from '../../../../assets/img/SocialDevClubLogo.png';
 import SocialDevJoinButton from '../../../../assets/img/JoinButton.png';
-import { MENU_LIST, openDisCodeHandler } from '../../../../config/common';
+import { MENU_LIST, openWindowHandler } from '../../../../config/common';
 
 const DesktopHeader = () => {
   return (
@@ -17,7 +17,7 @@ const DesktopHeader = () => {
         </Style.HeaderCenter>
         <Style.HeaderRight>
           <Style.LoginText>로그인</Style.LoginText>
-          <Style.JoinButton onClick={openDisCodeHandler} src={SocialDevJoinButton} />
+          <Style.JoinButton onClick={() => openWindowHandler()} src={SocialDevJoinButton} />
         </Style.HeaderRight>
       </Style.Container>
     </>
