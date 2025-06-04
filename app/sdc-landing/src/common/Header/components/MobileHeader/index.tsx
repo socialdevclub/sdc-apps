@@ -4,7 +4,7 @@ import SocialDevClubLogo from '../../../../assets/img/SocialDevClubLogo.png';
 import MenuButton from '../../../../assets/img/MenuButton.png';
 import SocialDevJoinButton from '../../../../assets/img/JoinButton.png';
 import ProfileTempImage from '../../../../assets/img/ProfileTempImage.png';
-import { MENU_LIST } from '../../../../config/common';
+import { MENU_LIST, openDisCodeHandler } from '../../../../config/common';
 
 const MobileHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +31,7 @@ const MobileHeader = () => {
           <Style.Logo src={SocialDevClubLogo} />
         </Style.HeaderLeft>
         <Style.HeaderRight>
-          <Style.JoinButton src={SocialDevJoinButton} />
+          <Style.JoinButton onClick={openDisCodeHandler} src={SocialDevJoinButton} />
           <Style.MenuButton
             src={MenuButton}
             onClick={() => {
