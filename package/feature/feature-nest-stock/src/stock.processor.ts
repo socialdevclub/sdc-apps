@@ -129,13 +129,15 @@ export class StockProcessor {
             money: -totalPrice,
           },
         ),
-        this.stockRepository.updateOneWithAdd(
-          stockId,
-          {},
-          {
-            [`remainingStocks.${company}`]: -amount,
-          },
-        ),
+        // FIXME: 아래 코드 버그 있음
+        // this.stockRepository.updateOneWithAdd(
+        //   stockId,
+        //   {},
+        //   {
+        //     [`remainingStocks.${company}`]: -amount,
+        //   },
+        // ),
+        this.stockRepository.updateOne(stockId, { remainingStocks: updatedRemainingStocks }),
       ]);
 
       // 로그 상태 업데이트
