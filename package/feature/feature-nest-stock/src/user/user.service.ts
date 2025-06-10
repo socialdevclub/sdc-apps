@@ -258,7 +258,7 @@ ${JSON.stringify(userData)}`;
     }
 
     // 대출 실행
-    await this.userRepository.updateMany(
+    await this.userRepository.updateOne(
       { stockId, userId },
       {
         loanCount: user.loanCount + 1,
@@ -278,7 +278,7 @@ ${JSON.stringify(userData)}`;
     const loanAmount = user.loanCount * 2_000_000;
     const finalMoney = user.money - loanAmount;
 
-    await this.userRepository.updateMany(
+    await this.userRepository.updateOne(
       { stockId, userId },
       {
         loanCount: 0,

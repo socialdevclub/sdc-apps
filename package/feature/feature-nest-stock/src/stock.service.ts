@@ -265,7 +265,7 @@ export class StockService {
 
       const idx = Math.min(
         Math.floor(getDateDistance(dayjs(stock.startedTime).toDate(), new Date()).minutes / stock.fluctuationsInterval),
-        9,
+        StockConfig.MAX_STOCK_IDX,
       );
 
       // 각 사용자의 주식 판매 처리

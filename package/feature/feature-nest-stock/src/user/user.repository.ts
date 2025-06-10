@@ -76,7 +76,10 @@ export class UserRepository {
     }
   }
 
-  async find(filter?: Partial<StockUserSchema>, options?: { consistentRead?: boolean }): Promise<StockUserSchema[]> {
+  async find(
+    filter?: Pick<StockUserSchema, 'stockId'>,
+    options?: { consistentRead?: boolean },
+  ): Promise<StockUserSchema[]> {
     try {
       const { stockId } = filter || {};
 
@@ -115,27 +118,25 @@ export class UserRepository {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async findOne(filter: Record<string, any>): Promise<StockUserSchema | null> {
+  async findOne(filter: Pick<StockUserSchema, 'stockId' | 'userId'>): Promise<StockUserSchema | null> {
     try {
       const { stockId, userId } = filter;
 
-      if (stockId && userId) {
-        // 기본 키(stockId, userId)로 조회
-        const command = new GetCommand({
-          Key: {
-            stockId,
-            userId,
-          },
-          TableName: STOCK_USER_TABLE_NAME,
-        });
-
-        const { Item } = await this.dynamoDBClient.send(command);
-        return Item as StockUserSchema;
+      if (!stockId || !userId) {
+        throw new Error('stockId and userId must be provided for findOne');
       }
-      // 다른 속성으로 조회
-      const items = await this.find(filter);
-      return items.length > 0 ? items[0] : null;
+
+      // 기본 키(stockId, userId)로 조회
+      const command = new GetCommand({
+        Key: {
+          stockId,
+          userId,
+        },
+        TableName: STOCK_USER_TABLE_NAME,
+      });
+
+      const { Item } = await this.dynamoDBClient.send(command);
+      return Item as StockUserSchema;
     } catch (error) {
       console.error('Error finding user', error);
       throw error;
@@ -202,8 +203,7 @@ export class UserRepository {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async deleteMany(filter: Record<string, any>): Promise<boolean> {
+  async deleteMany(filter: Pick<StockUserSchema, 'stockId'>): Promise<boolean> {
     try {
       const users = await this.find(filter);
       const deletionPromises = users.map((user) => {
@@ -268,22 +268,6 @@ export class UserRepository {
       return true;
     } catch (error) {
       console.error('Error updating user with ADD', error);
-      throw error;
-    }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async updateMany(filter: Record<string, any>, update: Partial<StockUserSchema>): Promise<boolean> {
-    try {
-      const users = await this.find(filter);
-      const updatePromises = users.map((user) => {
-        return this.findOneAndUpdate({ stockId: user.stockId, userId: user.userId }, update);
-      });
-
-      await Promise.all(updatePromises);
-      return true;
-    } catch (error) {
-      console.error('Error updating multiple users', error);
       throw error;
     }
   }
