@@ -235,6 +235,7 @@ export class UserRepository {
     }
   }
 
+  // FIXME: 문제 있음. 테스트 코드 만들어야함
   async updateOneWithAdd(
     filter: { stockId: string; userId: string },
     setUpdate: Partial<StockUserSchema>,
