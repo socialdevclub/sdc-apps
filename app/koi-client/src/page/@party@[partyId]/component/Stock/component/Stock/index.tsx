@@ -52,8 +52,9 @@ const Stock = ({ stockId }: Props) => {
   // 주식 게임 자동 종료 및 정산
   useEffect(() => {
     function handleEndGame() {
+      mutateFinishStock({ stockId }); // 주식 종료 및 정산
+      // FIXME: 큰 스크린 모드에서는 결과 페이지로 이동하지 않는다.
       if (false) {
-        mutateFinishStock({ stockId }); // 주식 종료 및 정산
         // 결과 페이지로 이동
         mutateSetPhase({ phase: 'RESULT', stockId });
       }
