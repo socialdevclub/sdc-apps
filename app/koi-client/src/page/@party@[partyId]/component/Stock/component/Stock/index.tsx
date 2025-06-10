@@ -54,10 +54,8 @@ const Stock = ({ stockId }: Props) => {
     function handleEndGame() {
       mutateFinishStock({ stockId }); // 주식 종료 및 정산
       // FIXME: 큰 스크린 모드에서는 결과 페이지로 이동하지 않는다.
-      if (false) {
-        // 결과 페이지로 이동
-        mutateSetPhase({ phase: 'RESULT', stockId });
-      }
+      // 결과 페이지로 이동
+      mutateSetPhase({ phase: 'RESULT', stockId });
       messageApi.open({
         content: '게임이 종료되었습니다.',
         duration: 2,
