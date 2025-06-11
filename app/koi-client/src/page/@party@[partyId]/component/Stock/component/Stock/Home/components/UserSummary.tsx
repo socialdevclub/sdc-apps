@@ -27,7 +27,7 @@ const UserSummary = ({
 
   return (
     <>
-      <MyLevel moneyRatio={moneyRatio} initialMoney={1000000} />
+      <MyLevel moneyRatio={moneyRatio} initialMoney={stock.initialMoney} />
       <Flex gap={12} css={{ width: '100%' }}>
         <Card
           title="잔액"

@@ -22,7 +22,7 @@ const Home = ({ stockId, messageApi }: Props) => {
   }
 
   // 내 수익률 계산
-  const getProfitRatio = (v: number) => ((v / 1000000) * 100 - 100).toFixed(2);
+  const getProfitRatio = (v: number) => ((v / stock.initialMoney) * 100 - 100).toFixed(2);
   const moneyRatio = getProfitRatio(user.money + myAllSellPrice);
 
   return (

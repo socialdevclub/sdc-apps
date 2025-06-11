@@ -68,6 +68,7 @@ export type StockSchema = {
    * 2라운드 - 본선게임
    */
   round: number;
+  initialMoney: number;
 };
 export type StockSchemaWithId = StockSchema;
 

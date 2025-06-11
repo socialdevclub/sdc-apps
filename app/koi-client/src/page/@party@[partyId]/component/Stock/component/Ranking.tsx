@@ -63,8 +63,8 @@ function Ranking({ stockId }: RankingProps) {
   const userId = supabaseSession.user.id;
   const getRoundAvg = stock.round === 0 ? getRound0Avg : getRound12Avg;
   const roundAvg = getRoundAvg(userId);
-  const fluctuation = roundAvg - 1000000;
-  const percentage = fluctuation / 10000;
+  const fluctuation = roundAvg - stock.initialMoney;
+  const percentage = fluctuation / (stock.initialMoney * 100);
 
   if (!users) {
     return <></>;
@@ -217,8 +217,8 @@ function Ranking({ stockId }: RankingProps) {
       </SubTitle>
       {sortedUser.map((user, index) => {
         const userAvg = getRoundAvg(user.userId);
-        const userFluctuation = userAvg - 1000000;
-        const userPercentage = userFluctuation / 10000;
+        const userFluctuation = userAvg - stock.initialMoney;
+        const userPercentage = userFluctuation / (stock.initialMoney * 100);
         const animalResult = getAnimalByPercentage(userPercentage);
 
         return (

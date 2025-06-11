@@ -23,6 +23,8 @@ export class Stock implements StockSchema {
 
   round: number;
 
+  initialMoney: number;
+
   constructor() {
     this._id = randomUUID();
     this.stockPhase = 'CROWDING';
@@ -34,5 +36,6 @@ export class Stock implements StockSchema {
     this.transactionInterval = 0;
     this.fluctuationsInterval = 5;
     this.round = 0;
+    this.initialMoney = 1000000;
   }
 }

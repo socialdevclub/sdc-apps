@@ -9,7 +9,7 @@ import {
   ScanCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { StockConfig } from 'shared~config';
-import { StockStorageSchema, StockUserSchema } from 'shared~type-stock';
+import { StockSchema, StockStorageSchema, StockUserSchema } from 'shared~type-stock';
 import dayjs from 'dayjs';
 import { StockUser } from './user.schema';
 
@@ -272,7 +272,7 @@ export class UserRepository {
     }
   }
 
-  async initializeUsers(stockId: string): Promise<boolean> {
+  async initializeUsers(stock: StockSchema): Promise<boolean> {
     try {
       const companies = StockConfig.getRandomCompanyNames();
       const stockStorages = companies.map((company) => {
@@ -284,13 +284,13 @@ export class UserRepository {
         } as StockStorageSchema;
       });
 
-      const users = await this.find({ stockId });
+      const users = await this.find({ stockId: stock._id });
       const updatePromises = users.map((user) => {
         return this.findOneAndUpdate(
           { stockId: user.stockId, userId: user.userId },
           {
             lastActivityTime: dayjs().toISOString(),
-            money: StockConfig.INIT_USER_MONEY,
+            money: stock.initialMoney,
             resultByRound: [...(user.resultByRound ?? [])],
             stockStorages,
           },

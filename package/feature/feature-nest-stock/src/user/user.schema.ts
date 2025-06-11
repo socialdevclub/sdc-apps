@@ -8,6 +8,8 @@ import {
   StockUserSchema,
 } from 'shared~type-stock';
 
+const INIT_USER_MONEY = 1_000_000;
+
 export class StockUserStorage implements StockStorageSchema {
   companyName: string;
 
@@ -51,7 +53,7 @@ export class StockUser implements StockUserSchema {
     this.userInfo = required.userInfo;
 
     this.index = partial.index ?? 0;
-    this.money = partial.money ?? StockConfig.INIT_USER_MONEY;
+    this.money = partial.money ?? INIT_USER_MONEY;
     this.lastActivityTime = dayjs().toISOString();
     this.loanCount = partial.loanCount ?? 0;
 

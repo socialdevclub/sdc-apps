@@ -41,7 +41,6 @@ export const isStockOverLimit = (
 };
 
 export const INIT_STOCK_PRICE = 100000;
-export const INIT_USER_MONEY = 1_000_000;
 
 export const LOAN_PRICE = 1_000_000;
 export const BOUNDARY_LOAN_PRICE = 1_000_000;

@@ -50,8 +50,8 @@ const Result = ({ stockId }: Props) => {
   const userId = supabaseSession.user.id;
   const getRoundAvg = stock.round === 0 ? getRound0Avg : getRound12Avg;
   const roundAvg = getRoundAvg(userId);
-  const fluctuation = roundAvg - 1000000;
-  const percentage = fluctuation / 10000;
+  const fluctuation = roundAvg - stock.initialMoney;
+  const percentage = fluctuation / (stock.initialMoney * 100);
 
   const animal =
     percentage < 0
