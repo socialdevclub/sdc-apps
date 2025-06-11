@@ -60,6 +60,8 @@ const Wrapper = styled.div`
   padding-top: 32px;
   @media ${MEDIA_QUERY.DESKTOP} {
     padding-top: 64px;
+    max-width: 1920px;
+    margin: 0 auto;
   }
 `;
 
