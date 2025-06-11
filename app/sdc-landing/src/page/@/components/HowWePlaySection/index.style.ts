@@ -91,6 +91,8 @@ const SlideImage = styled.img`
     width: 300px;
     border-radius: 24px;
     margin: 0 8px;
+    user-select: none;
+    -webkit-user-drag: none;
   }
 `;
 
