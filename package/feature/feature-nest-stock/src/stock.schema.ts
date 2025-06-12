@@ -40,7 +40,7 @@ export class Stock implements StockSchema {
     this.round = 0;
     this.initialMoney = 1000000;
     this.roomOptions = {
-      loan: true,
+      hasLoan: true,
       // maxMarketStockCount: 200,
       // maxPersonalStockCount: 30,
       // maxStockHint: 6,

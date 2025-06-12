@@ -47,7 +47,7 @@ export type CompanyInfo = {
 };
 
 export type RoomOptions = {
-  loan: boolean;
+  hasLoan: boolean;
   // maxStockHint: number;
   // maxPersonalStockCount: number;
   // maxMarketStockCount: number;
