@@ -64,15 +64,6 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
     setIsOpenGameOption(!isOpenGameOption);
   };
 
-  const changeGameTime = ({ key }: { key: string }) => {
-    if (!stockId) return;
-
-    mutateUpdateGame({
-      _id: stockId,
-      fluctuationsInterval: Number(key),
-    });
-  };
-
   const changeGameOption = (key: keyof typeof gameOption) => {
     // TODO: 옵션 변경 요청
     setGameOption((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -105,6 +96,8 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
       isTransaction: gameOption.isTransaction,
     });
   };
+
+  if (!stockId) return <></>;
 
   return (
     <Container>
@@ -147,14 +140,8 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                   menu={{
                     inlineIndent: 10,
                     items: fluctuationMenuItems,
-                    onClick: changeGameTime,
-                    style: {
-                      backgroundColor: '#030711',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '10px',
-                      padding: '10px 12px',
-                    },
+                    onClick: ({ key }) => mutateUpdateGame({ _id: stockId, fluctuationsInterval: Number(key) }),
+                    style: gameOptionDropdownStyle,
                   }}
                   trigger={['click']}
                   getPopupContainer={() => document.getElementById('game-option-fluctuation-container')!}
@@ -194,14 +181,8 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                       menu={{
                         inlineIndent: 10,
                         items: initialMoneyMenuItems,
-                        // onClick: changeInitialMoney,
-                        style: {
-                          backgroundColor: '#030711',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '10px',
-                          padding: '10px 12px',
-                        },
+                        onClick: ({ key }) => mutateUpdateGame({ _id: stockId, initialMoney: Number(key) }),
+                        style: gameOptionDropdownStyle,
                       }}
                       trigger={['click']}
                       getPopupContainer={() => document.getElementById('game-option-fluctuation-container')!}
@@ -209,8 +190,8 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                       <GameOptionValue dark>
                         <GameOptionText>
                           {(() => {
-                            const found = fluctuationMenuItems?.find(
-                              (item) => Number(item?.key) === stock?.fluctuationsInterval,
+                            const found = initialMoneyMenuItems?.find(
+                              (item) => Number(item?.key) === stock?.initialMoney,
                             );
                             if (found && 'label' in found) {
                               return found.label;
@@ -310,6 +291,14 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
       </BottomSheet>
     </Container>
   );
+};
+
+const gameOptionDropdownStyle: React.CSSProperties = {
+  backgroundColor: '#030711',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '10px',
+  padding: '10px 12px',
 };
 
 const Container = styled.div`

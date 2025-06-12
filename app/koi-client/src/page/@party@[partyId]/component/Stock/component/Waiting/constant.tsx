@@ -32,15 +32,15 @@ export const fluctuationMenuItems: MenuProps['items'] = [
 
 export const initialMoneyMenuItems: MenuProps['items'] = [
   {
-    key: '1_000_000',
+    key: 1_000_000,
     label: <DropdownItem>100만원</DropdownItem>,
   },
   {
-    key: '10_000_000',
+    key: 10_000_000,
     label: <DropdownItem>1000만원</DropdownItem>,
   },
   {
-    key: '100_000_000',
+    key: 100_000_000,
     label: <DropdownItem>1억원</DropdownItem>,
   },
 ];
