@@ -16,8 +16,8 @@ import { useParams } from 'react-router-dom';
 import { message, Switch, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { useAtomValue } from 'jotai';
-import { Query } from '../../../../../hook';
-import { UserStore } from '../../../../../store';
+import { Query } from '../../../../../../hook';
+import { UserStore } from '../../../../../../store';
 
 interface Props {
   HeaderComponent?: JSX.Element;
