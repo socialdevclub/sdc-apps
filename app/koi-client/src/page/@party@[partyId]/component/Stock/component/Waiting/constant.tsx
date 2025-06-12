@@ -29,3 +29,18 @@ export const fluctuationMenuItems: MenuProps['items'] = [
     label: <DropdownItem>총 45분, 5분 마다 주식 변동</DropdownItem>,
   },
 ];
+
+export const initialMoneyMenuItems: MenuProps['items'] = [
+  {
+    key: '1_000_000',
+    label: <DropdownItem>100만원</DropdownItem>,
+  },
+  {
+    key: '10_000_000',
+    label: <DropdownItem>1000만원</DropdownItem>,
+  },
+  {
+    key: '100_000_000',
+    label: <DropdownItem>1억원</DropdownItem>,
+  },
+];

@@ -17,7 +17,7 @@ import { message, Switch, Dropdown } from 'antd';
 import { useAtomValue } from 'jotai';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
-import { fluctuationMenuItems } from './constant';
+import { fluctuationMenuItems, initialMoneyMenuItems } from './constant';
 
 interface Props {
   HeaderComponent?: JSX.Element;
@@ -141,7 +141,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
               <TabText>게임 설정</TabText>
             </Tab>
             <GameOptionContainer>
-              <GameOption id="game-option-container">
+              <GameOption id="game-option-fluctuation-container">
                 <GameOptionTitle>게임 시간</GameOptionTitle>
                 <Dropdown
                   menu={{
@@ -157,7 +157,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                     },
                   }}
                   trigger={['click']}
-                  getPopupContainer={() => document.getElementById('game-option-container')!}
+                  getPopupContainer={() => document.getElementById('game-option-fluctuation-container')!}
                 >
                   <GameOptionValue dark>
                     <GameOptionText>
@@ -187,6 +187,40 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                       />
                       <GameOptionText>{gameOption.isTransaction ? 'ON' : 'OFF'}</GameOptionText>
                     </GameOptionValue>
+                  </GameOption>
+                  <GameOption gap={34} id="game-option-fluctuation-container">
+                    <GameOptionTitle>초기 자금</GameOptionTitle>
+                    <Dropdown
+                      menu={{
+                        inlineIndent: 10,
+                        items: initialMoneyMenuItems,
+                        // onClick: changeInitialMoney,
+                        style: {
+                          backgroundColor: '#030711',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '10px',
+                          padding: '10px 12px',
+                        },
+                      }}
+                      trigger={['click']}
+                      getPopupContainer={() => document.getElementById('game-option-fluctuation-container')!}
+                    >
+                      <GameOptionValue dark>
+                        <GameOptionText>
+                          {(() => {
+                            const found = fluctuationMenuItems?.find(
+                              (item) => Number(item?.key) === stock?.fluctuationsInterval,
+                            );
+                            if (found && 'label' in found) {
+                              return found.label;
+                            }
+                            return null;
+                          })()}
+                        </GameOptionText>
+                        {isTimeOpen ? <ChevronUp /> : <ChevronDown />}
+                      </GameOptionValue>
+                    </Dropdown>
                   </GameOption>
                   {/* <GameOption gap={34}>
                     <GameOptionTitle>개인주식 보유개수제한</GameOptionTitle>
