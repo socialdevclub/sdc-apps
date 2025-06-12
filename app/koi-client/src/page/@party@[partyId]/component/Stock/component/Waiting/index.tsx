@@ -410,12 +410,6 @@ const GameOptionValue = styled.div<{ dark?: boolean }>`
   flex-grow: 1;
 `;
 
-const DropdownItem = styled.div`
-  width: 100%;
-  border-radius: 8px;
-  color: white;
-`;
-
 const GameOptionText = styled.div`
   font-size: 14px;
 `;
