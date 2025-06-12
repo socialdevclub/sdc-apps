@@ -14,10 +14,10 @@ import {
 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { message, Switch, Dropdown } from 'antd';
-import type { MenuProps } from 'antd';
 import { useAtomValue } from 'jotai';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
+import { fluctuationMenuItems } from './constant';
 
 interface Props {
   HeaderComponent?: JSX.Element;
@@ -48,29 +48,6 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
 
   const userId = supabaseSession?.user.id;
   const isHost = party?.authorId === userId;
-
-  const menuItems: MenuProps['items'] = [
-    {
-      key: '1',
-      label: <DropdownItem>총 9분, 1분 마다 주식 변동</DropdownItem>,
-    },
-    {
-      key: '2',
-      label: <DropdownItem>총 18분, 2분 마다 주식 변동</DropdownItem>,
-    },
-    {
-      key: '3',
-      label: <DropdownItem>총 27분, 3분 마다 주식 변동</DropdownItem>,
-    },
-    {
-      key: '4',
-      label: <DropdownItem>총 36분, 4분 마다 주식 변동</DropdownItem>,
-    },
-    {
-      key: '5',
-      label: <DropdownItem>총 45분, 5분 마다 주식 변동</DropdownItem>,
-    },
-  ];
 
   const copyRoomNumber = async () => {
     if (navigator.clipboard) {
@@ -169,7 +146,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                 <Dropdown
                   menu={{
                     inlineIndent: 10,
-                    items: menuItems,
+                    items: fluctuationMenuItems,
                     onClick: changeGameTime,
                     style: {
                       backgroundColor: '#030711',
@@ -185,7 +162,9 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                   <GameOptionValue dark>
                     <GameOptionText>
                       {(() => {
-                        const found = menuItems.find((item) => Number(item?.key) === stock?.fluctuationsInterval);
+                        const found = fluctuationMenuItems?.find(
+                          (item) => Number(item?.key) === stock?.fluctuationsInterval,
+                        );
                         if (found && 'label' in found) {
                           return found.label;
                         }
