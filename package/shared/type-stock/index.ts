@@ -46,13 +46,6 @@ export type CompanyInfo = {
   정보: string[];
 };
 
-export type RoomOptions = {
-  hasLoan: boolean;
-  // maxStockHint: number;
-  // maxPersonalStockCount: number;
-  // maxMarketStockCount: number;
-};
-
 export type StockSchema = {
   _id: string;
   stockPhase: StockPhase;
@@ -76,7 +69,10 @@ export type StockSchema = {
    */
   round: number;
   initialMoney: number;
-  roomOptions: RoomOptions;
+  hasLoan: boolean;
+  maxStockHint: number;
+  maxPersonalStockCount: number;
+  maxMarketStockCount: number;
 };
 export type StockSchemaWithId = StockSchema;
 

@@ -28,6 +28,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
   const [isTimeOpen, setIsTimeOpen] = useState(false);
   const [isOpenGameOption, setIsOpenGameOption] = useState(false);
   const [gameOption, setGameOption] = useState({
+    hasLoan: true,
     isOpenInfo: false,
     isTransaction: true,
     personalStockLimit: false,
@@ -93,6 +94,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
     await mutateUpdateGame({
       _id: stockId,
       fluctuationsInterval: stock?.fluctuationsInterval,
+      hasLoan: gameOption.hasLoan,
       isTransaction: gameOption.isTransaction,
     });
   };
@@ -164,18 +166,31 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
               </GameOption>
               {isOpenGameOption && (
                 <>
-                  <GameOption gap={34}>
+                  <GameOption>
                     <GameOptionTitle>주식거래 바로시작</GameOptionTitle>
-                    <GameOptionValue>
+                    <GameOptionValue style={{ justifyContent: 'flex-end', paddingRight: '10px' }}>
                       <Switch
                         checked={gameOption.isTransaction}
                         onChange={() => changeGameOption('isTransaction')}
                         style={{ backgroundColor: gameOption.isTransaction ? '#6339E3' : '#030711' }}
                       />
-                      <GameOptionText>{gameOption.isTransaction ? 'ON' : 'OFF'}</GameOptionText>
+                      <GameOptionText style={{ minWidth: '24px' }}>
+                        {gameOption.isTransaction ? 'ON' : 'OFF'}
+                      </GameOptionText>
                     </GameOptionValue>
                   </GameOption>
-                  <GameOption gap={34} id="game-option-fluctuation-container">
+                  <GameOption>
+                    <GameOptionTitle>대출 기능 활성화</GameOptionTitle>
+                    <GameOptionValue style={{ justifyContent: 'flex-end', paddingRight: '10px' }}>
+                      <Switch
+                        checked={gameOption.hasLoan}
+                        onChange={() => changeGameOption('hasLoan')}
+                        style={{ backgroundColor: gameOption.hasLoan ? '#6339E3' : '#030711' }}
+                      />
+                      <GameOptionText style={{ minWidth: '24px' }}>{gameOption.hasLoan ? 'ON' : 'OFF'}</GameOptionText>
+                    </GameOptionValue>
+                  </GameOption>
+                  <GameOption id="game-option-fluctuation-container">
                     <GameOptionTitle>초기 자금</GameOptionTitle>
                     <Dropdown
                       menu={{
@@ -408,6 +423,7 @@ const GameOptionContainer = styled.div`
 const GameOption = styled.div<{ gap?: number }>`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
   gap: ${(props) => (props.gap ? props.gap : 10)}px;
 
@@ -418,11 +434,14 @@ const GameOption = styled.div<{ gap?: number }>`
 
 const GameOptionTitle = styled.h2`
   font-size: 18px;
+  line-height: 21.6px;
+  word-break: keep-all;
 `;
 
 const GameOptionValue = styled.div<{ dark?: boolean }>`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 15px;
   padding-right: 2px;
   background-color: ${(props) => (props.dark ? '#030711' : undefined)};
@@ -435,6 +454,8 @@ const GameOptionValue = styled.div<{ dark?: boolean }>`
 
 const GameOptionText = styled.div`
   font-size: 14px;
+  line-height: 16.8px;
+  word-break: keep-all;
 `;
 
 const MoreText = styled.div`

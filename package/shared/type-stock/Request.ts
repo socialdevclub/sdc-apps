@@ -70,15 +70,20 @@ export type PostSetStockPhase = {
   phase: StockPhase;
 };
 
-export type PostStockInit =
-  | {
-      isCustomInfo: true;
-      companies: Record<string, CompanyInfo[]>;
-    }
-  | {
-      isCustomInfo?: false;
-      companies?: Record<string, Omit<CompanyInfo, '정보'>[]>;
-    };
+export type PostStockInit = Pick<StockSchema, 'maxStockHint'> &
+  (
+    | {
+        isCustomCompanies?: true;
+        companies: Record<string, Pick<CompanyInfo, '가격'>[]>;
+        stockNames?: undefined;
+      }
+    | {
+        isCustomCompanies?: false;
+        companies?: undefined;
+        // 주식 10개 이름 정의
+        stockNames: [string, string, string, string, string, string, string, string, string, string];
+      }
+  );
 
 export type PostCreateUser = Pick<StockUserSchema, StockUserRequired> &
   Omit<Partial<StockUserSchema>, StockUserRequired>;
