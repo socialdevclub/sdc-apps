@@ -56,7 +56,16 @@ const MobileHeader = () => {
                 <Style.LoginText>로그인</Style.LoginText>
               </Style.ProfileContainer>
               {MENU_LIST.map((menu) => {
-                return <Style.MenuItem key={menu}>{menu}</Style.MenuItem>;
+                return (
+                  <Style.MenuItem
+                    onClick={() => {
+                      window.alert('아직 준비중인 기능 입니다.');
+                    }}
+                    key={menu}
+                  >
+                    {menu}
+                  </Style.MenuItem>
+                );
               })}
             </Style.MenuList>
           </Style.SideMenu>

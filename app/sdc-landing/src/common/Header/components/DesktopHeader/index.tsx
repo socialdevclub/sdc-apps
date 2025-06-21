@@ -12,7 +12,16 @@ const DesktopHeader = () => {
         </Style.HeaderLeft>
         <Style.HeaderCenter>
           {MENU_LIST.map((item) => {
-            return <Style.HeaderItem key={item}>{item}</Style.HeaderItem>;
+            return (
+              <Style.HeaderItem
+                onClick={() => {
+                  window.alert('아직 준비중인 기능 입니다.');
+                }}
+                key={item}
+              >
+                {item}
+              </Style.HeaderItem>
+            );
           })}
         </Style.HeaderCenter>
         <Style.HeaderRight>

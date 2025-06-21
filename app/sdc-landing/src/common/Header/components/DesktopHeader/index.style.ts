@@ -43,6 +43,7 @@ const HeaderRight = styled.div`
 
 const HeaderItem = styled.span`
   font-weight: 500;
+  cursor: pointer;
 `;
 const LoginText = styled.div`
   font-weight: 500;
