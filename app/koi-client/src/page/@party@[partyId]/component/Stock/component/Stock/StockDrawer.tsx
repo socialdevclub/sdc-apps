@@ -2,7 +2,6 @@ import { Drawer } from 'antd';
 import { useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useAtomValue } from 'jotai';
-import { isStockOverLimit } from 'shared~config/dist/stock';
 import { MessageInstance } from 'antd/es/message/interface';
 import { StockConfig } from 'shared~config';
 import { MEDIA_QUERY } from '../../../../../../config/common';
@@ -56,8 +55,6 @@ const StockDrawer = ({
   } = Query.Stock.useQueryStock(stockId, {
     refetchInterval: Number.POSITIVE_INFINITY,
   });
-  const { data: userCount } = Query.Stock.useUserCount({ stockId });
-
   const { isBuyLoading, isSellLoading, onClickBuy, onClickSell } = useTradeStock({
     messageApi,
   });
@@ -113,11 +110,13 @@ const StockDrawer = ({
 
   // 주식 구매 한도 계산
   const currentStockCount = getStockStorage(selectedCompany)?.stockCountCurrent ?? 0; // 내가 보유한 해당 주식의 개수
-  const playerCount = userCount?.count ?? 0; // 플레이어의 수
-  const maxStockLimitByPlayer = Math.max(0, playerCount - currentStockCount); // 플레이어 수 제한에 따른 최대 구매 가능 개수
+  const maxStockLimitByPlayer = Math.max(0, stock.maxPersonalStockCount - currentStockCount); // 플레이어 수 제한에 따른 최대 구매 가능 개수
 
   // 최종 구매 가능 개수 계산 (돈, 남은 주식, 플레이어 수 제한 고려)
   const maxBuyableCountWithLimit = Math.min(maxBuyableCount, remainingStock ?? 0, maxStockLimitByPlayer);
+  console.log('🚀 ~ remainingStock:', remainingStock);
+  console.log('🚀 ~ maxStockLimitByPlayer:', maxStockLimitByPlayer);
+  console.log('🚀 ~ maxBuyableCount:', maxBuyableCount);
 
   // TODO :: timeIdx (현재 라운드 정보) 타입가드 엄격한 처리 필요 (임시로 땜빵 타입가드 설정함)
   // if (!timeIdx) {
@@ -160,17 +159,9 @@ const StockDrawer = ({
     >
       {selectedCompany && (
         <InfoHeader
-          title={selectedCompany.slice(0, 4)}
+          title={selectedCompany}
           subtitle={`보유 주식: ${currentStockCount}`}
-          subTitleColor={
-            isStockOverLimit(
-              userCount?.count ?? Number.NEGATIVE_INFINITY,
-              보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-              1,
-            ) || !isRemainingStock
-              ? 'red'
-              : '#d1d5db'
-          }
+          subTitleColor="#d1d5db"
           value={selectedCompany ? companiesPrice[selectedCompany] : 0}
           valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
           valueColor={isBuyable ? 'white' : 'red'}
@@ -196,14 +187,7 @@ const StockDrawer = ({
         buttons={[
           {
             backgroundColor: '#007aff',
-            disabled:
-              isDisabled ||
-              !isCanBuy ||
-              isStockOverLimit(
-                userCount?.count ?? Number.NEGATIVE_INFINITY,
-                보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-                1,
-              ),
+            disabled: isDisabled || !isCanBuy || maxBuyableCountWithLimit === 0,
             flex: 1,
             onClick: () =>
               onClickBuy({

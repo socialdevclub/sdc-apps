@@ -70,7 +70,7 @@ export type PostSetStockPhase = {
   phase: StockPhase;
 };
 
-export type PostStockInit = Pick<StockSchema, 'maxStockHint'> &
+export type PostStockInit = Pick<StockSchema, 'maxStockHintCount' | 'maxMarketStockCount'> &
   (
     | {
         isCustomCompanies?: true;
@@ -86,4 +86,6 @@ export type PostStockInit = Pick<StockSchema, 'maxStockHint'> &
   );
 
 export type PostCreateUser = Pick<StockUserSchema, StockUserRequired> &
-  Omit<Partial<StockUserSchema>, StockUserRequired>;
+  Omit<Partial<StockUserSchema>, StockUserRequired> & {
+    companyNames: string[];
+  };

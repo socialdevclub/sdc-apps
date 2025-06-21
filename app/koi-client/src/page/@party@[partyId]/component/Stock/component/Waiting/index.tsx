@@ -31,8 +31,22 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
     hasLoan: true,
     isOpenInfo: false,
     isTransaction: true,
-    personalStockLimit: false,
-    publicStockLimit: false,
+    is쀼머니게임: false,
+    maxStockHintCount: Infinity,
+    stockNames: [
+      '고양기획',
+      '꿀벌생명',
+      '늑대통신',
+      '멍멍제과',
+      '수달물산',
+      '여우은행',
+      '용용카드',
+      '토끼건설',
+      '햄찌금융',
+      '호랑전자',
+    ] as [string, string, string, string, string, string, string, string, string, string],
+    // personalStockLimit: true,
+    // publicStockLimit: true,
   });
 
   const { partyId } = useParams();
@@ -45,6 +59,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
   const { mutateAsync: mutateResetGame } = Query.Stock.useResetStock(stockId);
   const { mutateAsync: mutateInitStock } = Query.Stock.useInitStock(stockId);
   const { mutateAsync: mutateUpdateGame } = Query.Stock.useUpdateStock();
+  const { mutateAsync: mutateUserInitialize } = Query.Stock.useUserInitialize(stockId);
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
 
   const userId = supabaseSession?.user.id;
@@ -70,6 +85,15 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
     setGameOption((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const handleStockNameChange = (index: number, value: string) => {
+    const newStockNames = [...gameOption.stockNames];
+    newStockNames[index] = value;
+    setGameOption((prev) => ({
+      ...prev,
+      stockNames: newStockNames as [string, string, string, string, string, string, string, string, string, string],
+    }));
+  };
+
   const openWideScreen = () => {
     window.open(`${window.location.origin}/backoffice/screen/${partyId}`, '_blank');
   };
@@ -90,13 +114,150 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
 
     await mutateAlignIndex({});
     await mutateResetGame({});
-    await mutateInitStock({});
+    if (gameOption.is쀼머니게임) {
+      await mutateInitStock({
+        companies: {
+          QQQ: [
+            { 가격: 100000 },
+            { 가격: 115000 },
+            { 가격: 138000 },
+            { 가격: 125000 },
+            { 가격: 135000 },
+            { 가격: 115000 },
+            { 가격: 148000 },
+            { 가격: 175000 },
+            { 가격: 185000 },
+            { 가격: 95000 },
+          ],
+          'S&P500': [
+            { 가격: 100000 },
+            { 가격: 112000 },
+            { 가격: 128000 },
+            { 가격: 118000 },
+            { 가격: 125000 },
+            { 가격: 110000 },
+            { 가격: 135000 },
+            { 가격: 158000 },
+            { 가격: 168000 },
+            { 가격: 105000 },
+          ],
+          TDF2030: [
+            { 가격: 100000 },
+            { 가격: 107200 },
+            { 가격: 115900 },
+            { 가격: 120500 },
+            { 가격: 125000 },
+            { 가격: 118000 },
+            { 가격: 130000 },
+            { 가격: 142000 },
+            { 가격: 148000 },
+            { 가격: 68000 },
+          ],
+          금: [
+            { 가격: 100000 },
+            { 가격: 108000 },
+            { 가격: 115200 },
+            { 가격: 125000 },
+            { 가격: 135000 },
+            { 가격: 128000 },
+            { 가격: 145000 },
+            { 가격: 158000 },
+            { 가격: 172000 },
+            { 가격: 195000 },
+          ],
+          미국달러SOFR: [
+            { 가격: 100000 },
+            { 가격: 104200 },
+            { 가격: 107100 },
+            { 가격: 105400 },
+            { 가격: 108800 },
+            { 가격: 106200 },
+            { 가격: 110500 },
+            { 가격: 115200 },
+            { 가격: 112800 },
+            { 가격: 95000 },
+          ],
+          비트코인: [
+            { 가격: 100000 },
+            { 가격: 180000 },
+            { 가격: 320000 },
+            { 가격: 280000 },
+            { 가격: 420000 },
+            { 가격: 220000 },
+            { 가격: 450000 },
+            { 가격: 650000 },
+            { 가격: 580000 },
+            { 가격: 25000 },
+          ],
+          '원화 CMA': [
+            { 가격: 100000 },
+            { 가격: 103000 },
+            { 가격: 106000 },
+            { 가격: 109000 },
+            { 가격: 113000 },
+            { 가격: 116000 },
+            { 가격: 119000 },
+            { 가격: 123000 },
+            { 가격: 127000 },
+            { 가격: 130000 },
+          ],
+          채권: [
+            { 가격: 100000 },
+            { 가격: 105500 },
+            { 가격: 108200 },
+            { 가격: 102500 },
+            { 가격: 98000 },
+            { 가격: 95000 },
+            { 가격: 102000 },
+            { 가격: 106000 },
+            { 가격: 108500 },
+            { 가격: 85000 },
+          ],
+          코스피: [
+            { 가격: 100000 },
+            { 가격: 109500 },
+            { 가격: 125000 },
+            { 가격: 115000 },
+            { 가격: 122000 },
+            { 가격: 105000 },
+            { 가격: 128000 },
+            { 가격: 145000 },
+            { 가격: 152000 },
+            { 가격: 85000 },
+          ],
+          해삐코인: [
+            { 가격: 100000 },
+            { 가격: 170000 },
+            { 가격: 300000 },
+            { 가격: 150000 },
+            { 가격: 200000 },
+            { 가격: 80000 },
+            { 가격: 120000 },
+            { 가격: 180000 },
+            { 가격: 90000 },
+            { 가격: 8000 },
+          ],
+        },
+        isCustomCompanies: true,
+        maxMarketStockCount: Infinity,
+        maxStockHintCount: gameOption.maxStockHintCount,
+      });
+    } else {
+      await mutateInitStock({
+        isCustomCompanies: false,
+        maxMarketStockCount: Infinity,
+        maxStockHintCount: gameOption.maxStockHintCount,
+        stockNames: gameOption.stockNames,
+      });
+    }
     await mutateUpdateGame({
       _id: stockId,
       fluctuationsInterval: stock?.fluctuationsInterval,
       hasLoan: gameOption.hasLoan,
       isTransaction: gameOption.isTransaction,
+      maxPersonalStockCount: Infinity,
     });
+    await mutateUserInitialize({});
   };
 
   if (!stockId) return <></>;
@@ -190,7 +351,39 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                       <GameOptionText style={{ minWidth: '24px' }}>{gameOption.hasLoan ? 'ON' : 'OFF'}</GameOptionText>
                     </GameOptionValue>
                   </GameOption>
-                  <GameOption id="game-option-fluctuation-container">
+                  <GameOption>
+                    <GameOptionTitle>주식 정보 기능 여부</GameOptionTitle>
+                    <GameOptionValue style={{ justifyContent: 'flex-end', paddingRight: '10px' }}>
+                      <Switch
+                        checked={gameOption.maxStockHintCount === Infinity}
+                        onChange={() => {
+                          if (gameOption.maxStockHintCount === Infinity) {
+                            setGameOption((prev) => ({ ...prev, maxStockHintCount: 0 }));
+                          } else {
+                            setGameOption((prev) => ({ ...prev, maxStockHintCount: Infinity }));
+                          }
+                        }}
+                        style={{ backgroundColor: gameOption.maxStockHintCount === Infinity ? '#6339E3' : '#030711' }}
+                      />
+                      <GameOptionText style={{ minWidth: '24px' }}>
+                        {gameOption.maxStockHintCount === Infinity ? 'ON' : 'OFF'}
+                      </GameOptionText>
+                    </GameOptionValue>
+                  </GameOption>
+                  <GameOption>
+                    <GameOptionTitle>쀼머니 게임 모드</GameOptionTitle>
+                    <GameOptionValue style={{ justifyContent: 'flex-end', paddingRight: '10px' }}>
+                      <Switch
+                        checked={gameOption.is쀼머니게임}
+                        onChange={() => changeGameOption('is쀼머니게임')}
+                        style={{ backgroundColor: gameOption.is쀼머니게임 ? '#6339E3' : '#030711' }}
+                      />
+                      <GameOptionText style={{ minWidth: '24px' }}>
+                        {gameOption.is쀼머니게임 ? 'ON' : 'OFF'}
+                      </GameOptionText>
+                    </GameOptionValue>
+                  </GameOption>
+                  <GameOption id="game-option-initial-money-container">
                     <GameOptionTitle>초기 자금</GameOptionTitle>
                     <Dropdown
                       menu={{
@@ -200,7 +393,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                         style: gameOptionDropdownStyle,
                       }}
                       trigger={['click']}
-                      getPopupContainer={() => document.getElementById('game-option-fluctuation-container')!}
+                      getPopupContainer={() => document.getElementById('game-option-initial-money-container')!}
                     >
                       <GameOptionValue dark>
                         <GameOptionText>
@@ -218,6 +411,21 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                       </GameOptionValue>
                     </Dropdown>
                   </GameOption>
+                  {!gameOption.is쀼머니게임 && (
+                    <GameOption style={{ display: 'block', gap: '10px' }}>
+                      <GameOptionTitle>종목명</GameOptionTitle>
+                      <StockNameInputGrid>
+                        {gameOption.stockNames.map((name, index) => (
+                          <StockNameInput
+                            key={name}
+                            value={name}
+                            onChange={(e) => handleStockNameChange(index, e.target.value)}
+                            maxLength={6}
+                          />
+                        ))}
+                      </StockNameInputGrid>
+                    </GameOption>
+                  )}
                   {/* <GameOption gap={34}>
                     <GameOptionTitle>개인주식 보유개수제한</GameOptionTitle>
                     <GameOptionValue>
@@ -239,8 +447,8 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                       />
                       <GameOptionText>{gameOption.publicStockLimit ? 'ON' : 'OFF'}</GameOptionText>
                     </GameOptionValue>
-                  </GameOption>
-                  <GameOption gap={34}>
+                  </GameOption> */}
+                  {/* <GameOption gap={34}>
                     <GameOptionTitle>정보 이어진 사람 공개</GameOptionTitle>
                     <GameOptionValue>
                       <Switch
@@ -573,6 +781,28 @@ const ButtonText = styled.span`
   font-size: 23px;
   font-family: 'DungGeunMo', sans-serif;
   line-height: 135%;
+`;
+
+const StockNameInputGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+`;
+
+const StockNameInput = styled.input`
+  width: 100%;
+  padding: 15px;
+  background-color: #030711;
+  border: 1px solid #1d283a;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
 `;
 
 export default Waiting;

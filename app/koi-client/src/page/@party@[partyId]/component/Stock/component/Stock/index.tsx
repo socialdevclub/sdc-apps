@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { SwitchCase } from '@toss/react';
-import { Suspense, useCallback, useEffect, useRef } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { message } from 'antd';
 import dayjs from 'dayjs';
@@ -97,9 +97,14 @@ const Stock = ({ stockId }: Props) => {
     [setSearchParams],
   );
 
+  const tabItems = useMemo(
+    () => (stock?.maxStockHintCount === 0 ? items.filter((item) => item.key !== '정보') : items),
+    [stock?.maxStockHintCount],
+  );
+
   return (
     <Container ref={contentRef}>
-      <Tabs defaultActiveKey={searchParams.get('page') ?? '홈'} items={items} onChange={onClickTab} />
+      <Tabs defaultActiveKey={searchParams.get('page') ?? '홈'} items={tabItems} onChange={onClickTab} />
       <ContentContainer>
         <Suspense fallback={<></>}>
           {contextHolder}

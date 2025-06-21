@@ -70,8 +70,23 @@ export type StockSchema = {
   round: number;
   initialMoney: number;
   hasLoan: boolean;
-  maxStockHint: number;
+  /**
+   * 최대 주식 힌트 개수
+   *
+   * 백엔드에서는 무한개를 `null`로 관리합니다.
+   */
+  maxStockHintCount: number;
+  /**
+   * 최대 개인 보유 주식 개수
+   *
+   * 백엔드에서는 무한개를 `null`로 관리합니다.
+   */
   maxPersonalStockCount: number;
+  /**
+   * 최대 시장 주식 개수
+   *
+   * 백엔드에서는 무한개를 `null`로 관리합니다.
+   */
   maxMarketStockCount: number;
 };
 export type StockSchemaWithId = StockSchema;

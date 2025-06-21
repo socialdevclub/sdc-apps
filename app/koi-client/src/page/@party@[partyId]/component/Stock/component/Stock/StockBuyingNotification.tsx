@@ -22,7 +22,7 @@ const StockBuyingNotification = ({ stockProfitRate, remainingStock, maxBuyableCo
         title={
           <TooltipContent>
             <div>보유가능개수: {maxBuyableCountWithLimit}주</div>
-            <div>남은주식개수: {remainingStock}주</div>
+            {remainingStock !== Infinity && <div>남은주식개수: {remainingStock}주</div>}
           </TooltipContent>
         }
         color="#111827"

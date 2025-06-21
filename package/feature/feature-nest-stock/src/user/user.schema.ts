@@ -47,7 +47,7 @@ export class StockUser implements StockUserSchema {
 
   resultByRound: number[];
 
-  constructor(required: Pick<StockUserSchema, StockUserRequired>, partial: StockUserForm) {
+  constructor(required: Pick<StockUserSchema, StockUserRequired>, partial: StockUserForm, companyNames: string[]) {
     this.userId = required.userId;
     this.stockId = required.stockId;
     this.userInfo = required.userInfo;
@@ -57,8 +57,7 @@ export class StockUser implements StockUserSchema {
     this.lastActivityTime = dayjs().toISOString();
     this.loanCount = partial.loanCount ?? 0;
 
-    const companies = StockConfig.getRandomCompanyNames();
-    const stockStorages = companies.map((company) => {
+    const stockStorages = companyNames.map((company) => {
       return {
         companyName: company,
         stockAveragePrice: 0,

@@ -46,7 +46,7 @@ const Home = ({ stockId, messageApi }: Props) => {
       </Container>
       <Divider />
       <StockHoldingsList stockId={stockId} userId={userId} messageApi={messageApi} />
-      {stock.roomOptions.hasLoan && (
+      {stock.hasLoan && (
         <StickyBottom>
           <StartLoan stockId={stockId} money={user.money} loanCount={user.loanCount} allSellPrice={myAllSellPrice} />
         </StickyBottom>

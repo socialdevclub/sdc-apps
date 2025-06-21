@@ -50,10 +50,14 @@ export class UserController {
   }
 
   @Post('/register')
-  async registerUser(@Body() body: StockUser): Promise<Response.GetCreateUser> {
-    console.log('🚀 ~ UserController ~ registerUser ~ body:', body);
+  async registerUser(@Body() body: Request.PostCreateUser): Promise<Response.GetCreateUser> {
     await this.userRepository.create(body);
     return { messageId: 'direct' };
+  }
+
+  @Post('/initialize')
+  async initializeUsers(@Query('stockId') stockId: string): Promise<boolean> {
+    return this.userService.initializeUsers(stockId);
   }
 
   @Post('/align-index')

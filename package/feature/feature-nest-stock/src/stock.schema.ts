@@ -27,7 +27,7 @@ export class Stock implements StockSchema {
 
   hasLoan: boolean;
 
-  maxStockHint: number;
+  maxStockHintCount: number;
 
   maxMarketStockCount: number;
 
@@ -46,8 +46,8 @@ export class Stock implements StockSchema {
     this.round = 0;
     this.initialMoney = 1000000;
     this.hasLoan = true;
-    this.maxMarketStockCount = 200;
-    this.maxPersonalStockCount = 30;
-    this.maxStockHint = 6;
+    this.maxMarketStockCount = null;
+    this.maxPersonalStockCount = null;
+    this.maxStockHintCount = null;
   }
 }

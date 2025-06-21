@@ -79,7 +79,7 @@ const StockInfoList = ({ stockId, messageApi }: Props) => {
               <Flex style={{ alignItems: 'center', columnGap: 16, flexDirection: 'row' }}>
                 <img src={getAnimalImageSource(stock.companyName)} alt={stock.companyName} width={50} />
                 <Flex style={{ gap: 10 }}>
-                  <CompanyName>{stock.companyName.slice(0, 4)}</CompanyName>
+                  <CompanyName>{stock.companyName}</CompanyName>
                   <FlexRowStart>
                     {stock.priceChange >= 0 ? (
                       <PriceTrend>

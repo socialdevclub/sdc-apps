@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import type { Request, Response } from 'shared~type-stock';
 import { getDateDistance } from '@toss/date';
-import { isStockOverLimit } from 'shared~config/dist/stock';
 import dayjs from 'dayjs';
 import { UserRepository } from './user/user.repository';
 import { StockRepository } from './stock.repository';
@@ -55,7 +54,7 @@ export class StockProcessor {
         throw new Error('회사를 찾을 수 없습니다');
       }
 
-      if (remainingStocks[company] < amount) {
+      if (remainingStocks[company] !== null && remainingStocks[company] < amount) {
         throw new Error('시장에 주식이 없습니다');
       }
 
@@ -79,23 +78,6 @@ export class StockProcessor {
 
       const companyCount = stockStorage.stockCountCurrent;
 
-      if (isStockOverLimit(playerCount, companyCount, amount)) {
-        throw new Error('주식 보유 한도 초과');
-      }
-
-      // 필요한 로그 확인
-      // const log = await this.logService.findOne({ queueId: attributes?.queueMessageId });
-
-      // switch (log?.status) {
-      //   case 'CANCEL':
-      //     throw new Error('취소된 요청입니다');
-      //   case 'FAILED':
-      //     throw new Error('실패된 요청입니다');
-      //   case 'SUCCESS':
-      //     throw new Error('이미 처리된 요청입니다');
-      //   default:
-      // }
-
       // 평균 단가 업데이트 (기존 금액 * 기존 수량 + 현재 금액 * 구매 수량) / (기존 수량 + 구매 수량)
       const stockAveragePrice =
         (stockStorage.stockAveragePrice * stockStorage.stockCountCurrent + companyPrice * amount) /
@@ -116,7 +98,12 @@ export class StockProcessor {
 
       // 남은 주식 업데이트
       const updatedRemainingStocks = { ...remainingStocks };
-      updatedRemainingStocks[company] = remainingStocks[company] - amount;
+      if (updatedRemainingStocks[company] !== null) {
+        updatedRemainingStocks[company] -= amount;
+        if (updatedRemainingStocks[company] < 0) {
+          updatedRemainingStocks[company] = 0;
+        }
+      }
 
       await Promise.all([
         this.userRepository.updateOneWithAdd(
@@ -254,7 +241,9 @@ export class StockProcessor {
 
       // 남은 주식 업데이트
       const updatedRemainingStocks = { ...remainingStocks };
-      updatedRemainingStocks[company] = remainingCompanyStock + amount;
+      if (updatedRemainingStocks[company] !== null) {
+        updatedRemainingStocks[company] += amount;
+      }
 
       await Promise.all([
         this.userRepository.updateOneWithAdd(

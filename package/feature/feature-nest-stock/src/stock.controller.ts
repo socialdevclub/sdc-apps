@@ -65,8 +65,8 @@ export class StockController {
   }
 
   @Post('/init')
-  initStock(@Query('stockId') stockId: string): Promise<StockSchema> {
-    return this.stockService.initStock(stockId);
+  initStock(@Query('stockId') stockId: string, @Body() body: Request.PostStockInit): Promise<StockSchema> {
+    return this.stockService.initStock(stockId, body);
   }
 
   @Post('/buy')
