@@ -1,7 +1,6 @@
 import { getDateDistance } from '@toss/date';
-import { objectEntries, objectValues } from '@toss/utils';
+import { objectEntries } from '@toss/utils';
 import dayjs from 'dayjs';
-import { COMPANY_NAMES, CompanyNames } from 'shared~config/dist/stock';
 import { GetStock } from 'shared~type-stock/Response';
 import {
   ANIMAL_NAME,
@@ -228,7 +227,7 @@ export const renderStockChangesInfo = (
 
 export const getAnimalImageSource = (companyName: string): string => {
   // 입력된 회사 이름이 유효한 CompanyNames 타입인지 확인
-  const isValidCompanyName = objectValues(COMPANY_NAMES).includes(companyName as CompanyNames);
+  const isValidCompanyName = Object.keys(ANIMAL_NAME).some((v) => v === companyName);
 
   if (isValidCompanyName) {
     // 유효한 회사 이름이면 해당 동물 이미지 URL 반환
