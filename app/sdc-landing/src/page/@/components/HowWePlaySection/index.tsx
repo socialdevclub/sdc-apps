@@ -1,23 +1,15 @@
 import { Style } from './index.style';
-import SocialDevClubPeople1 from '../../../../assets/img/SocialDevClubPeople1.jpg';
-import SocialDevClubPeople2 from '../../../../assets/img/SocialDevClubPeople2.jpg';
-import SocialDevClubPeople3 from '../../../../assets/img/SocialDevClubPeople3.jpg';
-import SocialDevClubPeople4 from '../../../../assets/img/SocialDevClubPeople4.jpg';
-import SocialDevClubPeople5 from '../../../../assets/img/SocialDevClubPeople5.jpg';
-import SocialDevClubPeople6 from '../../../../assets/img/SocialDevClubPeople6.jpg';
-import SocialDevClubPeople7 from '../../../../assets/img/SocialDevClubPeople7.jpg';
-import SocialDevClubPeople8 from '../../../../assets/img/SocialDevClubPeople8.jpg';
 
 const HowWePlaySection = () => {
   const image = [
-    SocialDevClubPeople1,
-    SocialDevClubPeople2,
-    SocialDevClubPeople3,
-    SocialDevClubPeople4,
-    SocialDevClubPeople5,
-    SocialDevClubPeople6,
-    SocialDevClubPeople7,
-    SocialDevClubPeople8,
+    '/assets/img/SocialDevClubPeople1.jpg',
+    '/assets/img/SocialDevClubPeople2.jpg',
+    '/assets/img/SocialDevClubPeople3.jpg',
+    '/assets/img/SocialDevClubPeople4.jpg',
+    '/assets/img/SocialDevClubPeople5.jpg',
+    '/assets/img/SocialDevClubPeople6.jpg',
+    '/assets/img/SocialDevClubPeople7.jpg',
+    '/assets/img/SocialDevClubPeople8.jpg',
   ];
   const images = [...image, ...image, ...image];
   return (

@@ -4,12 +4,12 @@ const imageUrls = [
   {
     highlights: ['게임 개발'],
     text: '독창적인 게임 개발',
-    url: 'src/assets/img/Gamepad.png',
+    url: '/assets/img/Gamepad.png',
   },
   {
     highlights: ['게임 콘텐츠 설계'],
     text: '누구나 즐길 수 있는\n게임 콘텐츠 설계',
-    url: 'src/assets/img/Confetti.png',
+    url: '/assets/img/Confetti.png',
   },
   // {
   //   highlights: ['브랜드 협업'],
@@ -19,7 +19,7 @@ const imageUrls = [
   {
     highlights: ['양방향 네트워킹'],
     text: '사람과 사람을 연결하는\n양방향 네트워킹',
-    url: 'src/assets/img/Chain.png',
+    url: '/assets/img/Chain.png',
   },
 ];
 

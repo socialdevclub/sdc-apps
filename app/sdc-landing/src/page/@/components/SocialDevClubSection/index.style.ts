@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import backgroundImage from '../../../../assets/img/SocialDevClubBackgroundImage.png';
 import { MEDIA_QUERY } from '../../../../config/common';
 
 const Container = styled.div`
@@ -7,7 +6,7 @@ const Container = styled.div`
 `;
 
 const BackgroundImage = styled.div`
-  background-image: url(${backgroundImage});
+  background-image: url('/assets/img/SocialDevClubBackgroundImage.png');
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
@@ -24,9 +23,9 @@ const Title = styled.div`
 `;
 
 const Subtitle = styled.div`
-  font-size: 1.125rem
+  font-size: 1.125rem;
   line-height: 150%;
-  margin-top:  0.5rem;
+  margin-top: 0.5rem;
   font-weight: 300;
   @media ${MEDIA_QUERY.DESKTOP} {
     margin-top: 1.5rem;
@@ -35,7 +34,7 @@ const Subtitle = styled.div`
 `;
 
 const Highlight = styled.div`
-  font-size: 1.125rem
+  font-size: 1.125rem;
   font-weight: 500;
   line-height: 150%;
   font-weight: 700;
