@@ -1,23 +1,45 @@
-import DiscordIcon from '@assets/icon/discord-white.svg';
-import RightArrowIcon from '@assets/icon/right-arrow.svg';
-import { Style } from './index.style';
-
-const DISCORD_INVITE_LINK = 'https://discord.gg/H8sq77NabR';
+import styled from '@emotion/styled';
+import { HeroBanner, OurGoalSection, SignatureGameSection } from './components';
+import HowWePlaySection from './components/HowWePlaySection';
+import SocialDevClubSection from './components/SocialDevClubSection';
+import { applyResponsiveStyles } from '../../utils/styles';
 
 const Home = () => {
   return (
-    <Style.Container>
-      <Style.Title>소셜데브클럽</Style.Title>
-      <Style.Subtitle>
-        사람과 사람을 연결시켜주는 <span>소셜 게임을 함께 만들고 즐겨요 👾</span>
-      </Style.Subtitle>
-      <Style.Button onClick={() => window.open(DISCORD_INVITE_LINK, '_blank')}>
-        <img src={DiscordIcon} alt="Discord Icon" width="24" height="24" />
-        <span>디스코드 입장하기</span>
-        <img src={RightArrowIcon} alt="Right Arrow Icon" width="24" height="24" />
-      </Style.Button>
-    </Style.Container>
+    <Container>
+      <BannerWrapper>
+        <HeroBanner />
+      </BannerWrapper>
+      <SocialDevClubSection />
+      <OurGoalSection />
+      <HowWePlaySection />
+      <SignatureGameSection />
+    </Container>
   );
 };
+
+const BannerWrapper = styled.div(
+  applyResponsiveStyles({
+    DESKTOP: {
+      marginBottom: '-100px',
+    },
+    base: {},
+  }),
+);
+
+const Container = styled.div(
+  applyResponsiveStyles({
+    DESKTOP: {
+      gap: '400px',
+    },
+    base: {
+      backgroundColor: '#000000',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '100px',
+      minHeight: '100dvh',
+    },
+  }),
+);
 
 export default Home;
