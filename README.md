@@ -1,5 +1,7 @@
 # SDC-STOCK
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/socialdevclub/sdc-apps)
+
 ## 소개
 SDC-STOCK은 실시간 주식 거래 게임 플랫폼입니다. React와 NestJS를 기반으로 제작된 모노레포 프로젝트입니다.
 
