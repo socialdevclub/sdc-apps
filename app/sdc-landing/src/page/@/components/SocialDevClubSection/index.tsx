@@ -1,5 +1,4 @@
 import { Style } from './index.style';
-import SocialDevClubPeopleImage from '../../../../assets/img/SocialDevClubImage.png';
 
 const SocialDevClubSection = () => {
   return (
@@ -11,7 +10,7 @@ const SocialDevClubSection = () => {
           네트워킹 게임 개발 커뮤니티, <Style.HighlightSpan>소셜데브클럽</Style.HighlightSpan>
         </Style.Highlight>
       </Style.BackgroundImage>
-      <Style.Image src={SocialDevClubPeopleImage} alt="Social Dev Club People" />
+      <Style.Image src="/assets/img/SocialDevClubImage.png" alt="Social Dev Club People" />
     </Style.Container>
   );
 };
