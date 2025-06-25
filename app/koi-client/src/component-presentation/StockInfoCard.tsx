@@ -18,8 +18,6 @@ const StockInfoCard = ({
   profitLoss,
   profitLossPercentage,
 }: StockCardProps) => {
-  const company = companyName.slice(0, companyName.length - 2);
-
   return (
     <ButtonContainer onClick={() => onClick?.(companyName)}>
       <div>
@@ -27,7 +25,7 @@ const StockInfoCard = ({
       </div>
       <FlexRowBetween>
         <FlexCol>
-          <Company>{company}</Company>
+          <Company>{companyName}</Company>
           <OwnStock>{stockCount}주</OwnStock>
         </FlexCol>
         <PriceWrapper>
@@ -49,12 +47,12 @@ const StockInfoCard = ({
   );
 };
 
-const Skeleton = styled.div`
-  width: 50px;
-  height: 50px;
-  border-radius: 6px;
-  background-color: black;
-`;
+// const Skeleton = styled.div`
+//   width: 50px;
+//   height: 50px;
+//   border-radius: 6px;
+//   background-color: black;
+// `;
 
 const ButtonContainer = styled.div`
   width: 100%;
