@@ -51,7 +51,7 @@ const Result = ({ stockId }: Props) => {
   const getRoundAvg = stock.round === 0 ? getRound0Avg : getRound12Avg;
   const roundAvg = getRoundAvg(userId);
   const fluctuation = roundAvg - stock.initialMoney;
-  const percentage = fluctuation / (stock.initialMoney * 100);
+  const percentage = (fluctuation / stock.initialMoney) * 100;
 
   const animal =
     percentage < 0
