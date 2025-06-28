@@ -1,19 +1,14 @@
 import { Drawer } from 'antd';
-import { useMemo } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useAtomValue } from 'jotai';
 import { MessageInstance } from 'antd/es/message/interface';
 import { StockConfig } from 'shared~config';
+import { useState } from 'react';
 import { MEDIA_QUERY } from '../../../../../../../config/common';
-import InfoHeader from '../../../../../../../component-presentation/InfoHeader';
-import { calculateProfitRate, getAnimalImageSource, renderStockChangesInfo } from '../../../../../../../utils/stock';
-import MessageBalloon from '../../../../../../../component-presentation/MessageBalloon';
-import StockLineChart from '../../../../../../../component-presentation/StockLineChart';
-import ButtonGroup from '../../../../../../../component-presentation/ButtonGroup';
 import { Query } from '../../../../../../../hook';
 import { UserStore } from '../../../../../../../store';
-import StockBuyingNotification from '../StockBuyingNotification';
 import { useTradeStock } from '../../../../../hook/useTradeStock';
+import StockOverview from './StockOverview';
 
 interface Props {
   drawerOpen: boolean;
@@ -38,6 +33,8 @@ const StockDrawer = ({
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
+  const [drawerState, setDrawerState] = useState<'overview' | 'buy' | 'sell'>('overview');
+
   const {
     refetch: refetchUser,
     isFreezed,
@@ -55,43 +52,7 @@ const StockDrawer = ({
   } = Query.Stock.useQueryStock(stockId, {
     refetchInterval: Number.POSITIVE_INFINITY,
   });
-  const { isBuyLoading, isSellLoading, onClickBuy, onClickSell } = useTradeStock({
-    messageApi,
-  });
-
-  const 보유주식 = useMemo(() => {
-    return (
-      user?.stockStorages
-        .filter(({ stockCountCurrent }) => stockCountCurrent > 0)
-        .map(({ companyName, stockCountCurrent }) => ({
-          company: companyName,
-          count: stockCountCurrent,
-        })) ?? []
-    );
-  }, [user?.stockStorages]);
-
-  const currentStockStorage = useMemo(
-    () => user?.stockStorages.find(({ companyName }) => companyName === selectedCompany),
-    [selectedCompany, user?.stockStorages],
-  );
-
-  const averagePurchasePrice = useMemo(
-    () => currentStockStorage?.stockAveragePrice ?? 0,
-    [currentStockStorage?.stockAveragePrice],
-  );
-
-  const stockProfitRate = useMemo(
-    () =>
-      selectedCompany && 보유주식.find(({ company }) => company === selectedCompany)
-        ? calculateProfitRate(companiesPrice[selectedCompany], averagePurchasePrice)
-        : null,
-    [averagePurchasePrice, companiesPrice, selectedCompany, 보유주식],
-  );
-
-  const chartPriceData = useMemo(
-    () => (selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]),
-    [priceData, selectedCompany, timeIdx],
-  );
+  const { isBuyLoading, isSellLoading } = useTradeStock({ messageApi });
 
   if (!stock || !userId || !user) {
     return <>불러오는 중</>;
@@ -114,9 +75,6 @@ const StockDrawer = ({
 
   // 최종 구매 가능 개수 계산 (돈, 남은 주식, 플레이어 수 제한 고려)
   const maxBuyableCountWithLimit = Math.min(maxBuyableCount, remainingStock ?? 0, maxStockLimitByPlayer);
-  console.log('🚀 ~ remainingStock:', remainingStock);
-  console.log('🚀 ~ maxStockLimitByPlayer:', maxStockLimitByPlayer);
-  console.log('🚀 ~ maxBuyableCount:', maxBuyableCount);
 
   // TODO :: timeIdx (현재 라운드 정보) 타입가드 엄격한 처리 필요 (임시로 땜빵 타입가드 설정함)
   // if (!timeIdx) {
@@ -157,90 +115,24 @@ const StockDrawer = ({
         },
       }}
     >
-      {selectedCompany && (
-        <InfoHeader
-          title={selectedCompany}
-          subtitle={`보유 주식: ${currentStockCount}`}
-          subTitleColor="#d1d5db"
-          value={selectedCompany ? companiesPrice[selectedCompany] : 0}
-          valueFormatted={`${selectedCompany ? companiesPrice[selectedCompany].toLocaleString() : 0}원`}
-          valueColor={isBuyable ? 'white' : 'red'}
-          badge={renderStockChangesInfo(selectedCompany, stock, companiesPrice, timeIdx ?? 0)}
-          src={getAnimalImageSource(selectedCompany)}
-          width={50}
-        />
-      )}
-
-      <MessageBalloon messages={stockMessages} />
-      <StockLineChart
-        company={selectedCompany}
-        priceData={chartPriceData}
-        fluctuationsInterval={stock.fluctuationsInterval}
-        averagePurchasePrice={averagePurchasePrice}
-      />
-      <StockBuyingNotification
-        stockProfitRate={stockProfitRate}
-        remainingStock={remainingStock}
-        maxBuyableCountWithLimit={maxBuyableCountWithLimit}
-      />
-      <ButtonGroup
-        buttons={[
-          {
-            backgroundColor: '#007aff',
-            disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
-            flex: 1,
-            onClick: () =>
-              onClickSell({
-                amount: 1,
-                callback: () => refetchUser(),
-                company: selectedCompany,
-                round: stock.round,
-                stockId,
-                unitPrice: companiesPrice[selectedCompany],
-                userId,
-              }),
-            text: '판매하기',
-          },
-          {
-            backgroundColor: '#f63c6b',
-            disabled: isDisabled || !isCanBuy || maxBuyableCountWithLimit === 0,
-            flex: 1,
-            onClick: () =>
-              onClickBuy({
-                amount: 1,
-                callback: () => refetchUser(),
-                company: selectedCompany,
-                round: stock.round,
-                stockId,
-                unitPrice: companiesPrice[selectedCompany],
-                userId,
-              }),
-            text: '구매하기',
-          },
-        ]}
-        direction="row"
-        padding="0 16px 12px 16px"
-      />
-      {/* <ButtonGroup
-        buttons={[
-          {
-            backgroundColor: '#374151',
-            disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
-            onClick: () =>
-              onClickSell({
-                amount: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
-                callback: () => refetchUser(),
-                company: selectedCompany,
-                round: stock.round,
-                stockId,
-                unitPrice: companiesPrice[selectedCompany],
-                userId,
-              }),
-            text: '모두 팔기',
-          },
-        ]}
-        padding="0 16px 12px 16px"
-      /> */}
+      {(() => {
+        switch (drawerState) {
+          default:
+            return (
+              <StockOverview
+                stockId={stockId}
+                selectedCompany={selectedCompany}
+                stockMessages={stockMessages}
+                currentStockCount={currentStockCount}
+                priceData={priceData}
+                remainingStock={remainingStock}
+                maxBuyableCountWithLimit={maxBuyableCountWithLimit}
+                isDisabled={isDisabled}
+                isCanBuy={isCanBuy}
+              />
+            );
+        }
+      })()}
     </Drawer>
   );
 };
