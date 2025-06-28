@@ -8,7 +8,7 @@ import useStockChanges from '../../../../../../hook/query/Stock/useStockChange.t
 import { getAnimalImageSource, getStockMessages } from '../../../../../../utils/stock.ts';
 import { useQueryStock } from '../../../../../../hook/query/Stock';
 import { UserStore } from '../../../../../../store';
-import StockDrawer from './StockDrawer.tsx';
+import StockDrawer from './StockDrawer/index.tsx';
 
 interface Props {
   stockId: string;

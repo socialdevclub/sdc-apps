@@ -4,16 +4,16 @@ import { useMediaQuery } from 'react-responsive';
 import { useAtomValue } from 'jotai';
 import { MessageInstance } from 'antd/es/message/interface';
 import { StockConfig } from 'shared~config';
-import { MEDIA_QUERY } from '../../../../../../config/common';
-import InfoHeader from '../../../../../../component-presentation/InfoHeader';
-import { calculateProfitRate, getAnimalImageSource, renderStockChangesInfo } from '../../../../../../utils/stock';
-import MessageBalloon from '../../../../../../component-presentation/MessageBalloon';
-import StockLineChart from '../../../../../../component-presentation/StockLineChart';
-import ButtonGroup from '../../../../../../component-presentation/ButtonGroup';
-import { Query } from '../../../../../../hook';
-import { UserStore } from '../../../../../../store';
-import StockBuyingNotification from './StockBuyingNotification';
-import { useTradeStock } from '../../../../hook/useTradeStock';
+import { MEDIA_QUERY } from '../../../../../../../config/common';
+import InfoHeader from '../../../../../../../component-presentation/InfoHeader';
+import { calculateProfitRate, getAnimalImageSource, renderStockChangesInfo } from '../../../../../../../utils/stock';
+import MessageBalloon from '../../../../../../../component-presentation/MessageBalloon';
+import StockLineChart from '../../../../../../../component-presentation/StockLineChart';
+import ButtonGroup from '../../../../../../../component-presentation/ButtonGroup';
+import { Query } from '../../../../../../../hook';
+import { UserStore } from '../../../../../../../store';
+import StockBuyingNotification from '../StockBuyingNotification';
+import { useTradeStock } from '../../../../../hook/useTradeStock';
 
 interface Props {
   drawerOpen: boolean;
@@ -187,22 +187,6 @@ const StockDrawer = ({
         buttons={[
           {
             backgroundColor: '#007aff',
-            disabled: isDisabled || !isCanBuy || maxBuyableCountWithLimit === 0,
-            flex: 1,
-            onClick: () =>
-              onClickBuy({
-                amount: 1,
-                callback: () => refetchUser(),
-                company: selectedCompany,
-                round: stock.round,
-                stockId,
-                unitPrice: companiesPrice[selectedCompany],
-                userId,
-              }),
-            text: '사기',
-          },
-          {
-            backgroundColor: '#f63c6b',
             disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
             flex: 1,
             onClick: () =>
@@ -215,13 +199,29 @@ const StockDrawer = ({
                 unitPrice: companiesPrice[selectedCompany],
                 userId,
               }),
-            text: '팔기',
+            text: '판매하기',
+          },
+          {
+            backgroundColor: '#f63c6b',
+            disabled: isDisabled || !isCanBuy || maxBuyableCountWithLimit === 0,
+            flex: 1,
+            onClick: () =>
+              onClickBuy({
+                amount: 1,
+                callback: () => refetchUser(),
+                company: selectedCompany,
+                round: stock.round,
+                stockId,
+                unitPrice: companiesPrice[selectedCompany],
+                userId,
+              }),
+            text: '구매하기',
           },
         ]}
         direction="row"
-        padding="0 16px 8px 16px"
+        padding="0 16px 12px 16px"
       />
-      <ButtonGroup
+      {/* <ButtonGroup
         buttons={[
           {
             backgroundColor: '#374151',
@@ -240,7 +240,7 @@ const StockDrawer = ({
           },
         ]}
         padding="0 16px 12px 16px"
-      />
+      /> */}
     </Drawer>
   );
 };

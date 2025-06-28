@@ -7,7 +7,7 @@ import { H3, TitleWrapper } from '../Home.styles.tsx';
 import StockInfoCard from '../../../../../../../../component-presentation/StockInfoCard.tsx';
 import { useQueryStock } from '../../../../../../../../hook/query/Stock';
 import { getStockMessages } from '../../../../../../../../utils/stock.ts';
-import StockDrawer from '../../StockDrawer.tsx';
+import StockDrawer from '../../StockDrawer/index.tsx';
 
 interface StockHoldingsListProps {
   stockId: string;
