@@ -18,6 +18,7 @@ import { useAtomValue } from 'jotai';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
 import { fluctuationMenuItems, initialMoneyMenuItems } from './constant';
+import { 쀼머니게임_회사 } from '../../constant';
 
 interface Props {
   HeaderComponent?: JSX.Element;
@@ -29,7 +30,6 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
   const [isOpenGameOption, setIsOpenGameOption] = useState(false);
   const [gameOption, setGameOption] = useState({
     hasLoan: true,
-    isOpenInfo: false,
     isTransaction: true,
     is쀼머니게임: false,
     maxStockHintCount: Infinity,
@@ -116,128 +116,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
     await mutateResetGame({});
     if (gameOption.is쀼머니게임) {
       await mutateInitStock({
-        companies: {
-          QQQ: [
-            { 가격: 100000 },
-            { 가격: 115000 },
-            { 가격: 138000 },
-            { 가격: 125000 },
-            { 가격: 135000 },
-            { 가격: 115000 },
-            { 가격: 148000 },
-            { 가격: 175000 },
-            { 가격: 185000 },
-            { 가격: 95000 },
-          ],
-          'S&P500': [
-            { 가격: 100000 },
-            { 가격: 112000 },
-            { 가격: 128000 },
-            { 가격: 118000 },
-            { 가격: 125000 },
-            { 가격: 110000 },
-            { 가격: 135000 },
-            { 가격: 158000 },
-            { 가격: 168000 },
-            { 가격: 105000 },
-          ],
-          TDF2030: [
-            { 가격: 100000 },
-            { 가격: 107200 },
-            { 가격: 115900 },
-            { 가격: 120500 },
-            { 가격: 125000 },
-            { 가격: 118000 },
-            { 가격: 130000 },
-            { 가격: 142000 },
-            { 가격: 148000 },
-            { 가격: 68000 },
-          ],
-          금: [
-            { 가격: 100000 },
-            { 가격: 108000 },
-            { 가격: 115200 },
-            { 가격: 125000 },
-            { 가격: 135000 },
-            { 가격: 128000 },
-            { 가격: 145000 },
-            { 가격: 158000 },
-            { 가격: 172000 },
-            { 가격: 195000 },
-          ],
-          미국달러SOFR: [
-            { 가격: 100000 },
-            { 가격: 104200 },
-            { 가격: 107100 },
-            { 가격: 105400 },
-            { 가격: 108800 },
-            { 가격: 106200 },
-            { 가격: 110500 },
-            { 가격: 115200 },
-            { 가격: 112800 },
-            { 가격: 95000 },
-          ],
-          비트코인: [
-            { 가격: 100000 },
-            { 가격: 180000 },
-            { 가격: 320000 },
-            { 가격: 280000 },
-            { 가격: 420000 },
-            { 가격: 220000 },
-            { 가격: 450000 },
-            { 가격: 650000 },
-            { 가격: 580000 },
-            { 가격: 25000 },
-          ],
-          '원화 CMA': [
-            { 가격: 100000 },
-            { 가격: 103000 },
-            { 가격: 106000 },
-            { 가격: 109000 },
-            { 가격: 113000 },
-            { 가격: 116000 },
-            { 가격: 119000 },
-            { 가격: 123000 },
-            { 가격: 127000 },
-            { 가격: 130000 },
-          ],
-          채권: [
-            { 가격: 100000 },
-            { 가격: 105500 },
-            { 가격: 108200 },
-            { 가격: 102500 },
-            { 가격: 98000 },
-            { 가격: 95000 },
-            { 가격: 102000 },
-            { 가격: 106000 },
-            { 가격: 108500 },
-            { 가격: 85000 },
-          ],
-          코스피: [
-            { 가격: 100000 },
-            { 가격: 109500 },
-            { 가격: 125000 },
-            { 가격: 115000 },
-            { 가격: 122000 },
-            { 가격: 105000 },
-            { 가격: 128000 },
-            { 가격: 145000 },
-            { 가격: 152000 },
-            { 가격: 85000 },
-          ],
-          해삐코인: [
-            { 가격: 100000 },
-            { 가격: 170000 },
-            { 가격: 300000 },
-            { 가격: 150000 },
-            { 가격: 200000 },
-            { 가격: 80000 },
-            { 가격: 120000 },
-            { 가격: 180000 },
-            { 가격: 90000 },
-            { 가격: 8000 },
-          ],
-        },
+        companies: 쀼머니게임_회사,
         isCustomCompanies: true,
         maxMarketStockCount: Infinity,
         maxStockHintCount: gameOption.maxStockHintCount,
@@ -375,7 +254,22 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                     <GameOptionValue style={{ justifyContent: 'flex-end', paddingRight: '10px' }}>
                       <Switch
                         checked={gameOption.is쀼머니게임}
-                        onChange={() => changeGameOption('is쀼머니게임')}
+                        onChange={() => {
+                          if (!gameOption.is쀼머니게임) {
+                            setGameOption((prev) => ({
+                              ...prev,
+                              hasLoan: false,
+                              is쀼머니게임: true,
+                              maxStockHintCount: 0,
+                            }));
+                            mutateUpdateGame({
+                              _id: stockId,
+                              initialMoney: 100_000_000,
+                            });
+                          } else {
+                            changeGameOption('is쀼머니게임');
+                          }
+                        }}
                         style={{ backgroundColor: gameOption.is쀼머니게임 ? '#6339E3' : '#030711' }}
                       />
                       <GameOptionText style={{ minWidth: '24px' }}>
