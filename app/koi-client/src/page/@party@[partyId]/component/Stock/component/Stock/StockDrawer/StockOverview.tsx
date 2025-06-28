@@ -8,6 +8,8 @@ import ButtonGroup from '../../../../../../../component-presentation/ButtonGroup
 import { Query } from '../../../../../../../hook';
 import { calculateProfitRate, getAnimalImageSource, renderStockChangesInfo } from '../../../../../../../utils/stock';
 import { UserStore } from '../../../../../../../store';
+import { StockDrawerState } from '.';
+import { BEARISH_COLOR, BULLISH_COLOR } from '../../../color';
 
 interface StockOverviewProps {
   stockId: string;
@@ -19,6 +21,11 @@ interface StockOverviewProps {
   maxBuyableCountWithLimit: number;
   isDisabled: boolean;
   isCanBuy: boolean;
+  보유주식: {
+    company: string;
+    count: number;
+  }[];
+  setDrawerState: (state: StockDrawerState) => void;
 }
 
 const StockOverview: React.FC<StockOverviewProps> = ({
@@ -31,6 +38,8 @@ const StockOverview: React.FC<StockOverviewProps> = ({
   maxBuyableCountWithLimit,
   isDisabled,
   isCanBuy,
+  보유주식,
+  setDrawerState,
 }) => {
   const {
     data: stock,
@@ -67,17 +76,6 @@ const StockOverview: React.FC<StockOverviewProps> = ({
     () => currentStockStorage?.stockAveragePrice ?? 0,
     [currentStockStorage?.stockAveragePrice],
   );
-
-  const 보유주식 = useMemo(() => {
-    return (
-      user?.stockStorages
-        .filter(({ stockCountCurrent }) => stockCountCurrent > 0)
-        .map(({ companyName, stockCountCurrent }) => ({
-          company: companyName,
-          count: stockCountCurrent,
-        })) ?? []
-    );
-  }, [user?.stockStorages]);
 
   const stockProfitRate = useMemo(
     () =>
@@ -122,10 +120,11 @@ const StockOverview: React.FC<StockOverviewProps> = ({
       <ButtonGroup
         buttons={[
           {
-            backgroundColor: '#007aff',
+            backgroundColor: BEARISH_COLOR,
             disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
             flex: 1,
             onClick: () => {
+              setDrawerState('SELL');
               //   onClickSell({
               //     amount: 1,
               //     callback: () => refetchUser(),
@@ -139,10 +138,11 @@ const StockOverview: React.FC<StockOverviewProps> = ({
             text: '판매하기',
           },
           {
-            backgroundColor: '#f63c6b',
+            backgroundColor: BULLISH_COLOR,
             disabled: isDisabled || !isCanBuy || maxBuyableCountWithLimit === 0,
             flex: 1,
             onClick: () => {
+              setDrawerState('BUY');
               //   onClickBuy({
               //     amount: 1,
               //     callback: () => refetchUser(),

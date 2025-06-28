@@ -3,3 +3,6 @@ export const PROFIT_BADGE_COLOR = {
   NEUTRAL: 'rgba(148, 163, 184, 0.2)',
   PROFIT: 'rgba(163, 230, 53, 0.2)',
 };
+
+export const BULLISH_COLOR = '#f63c6b';
+export const BEARISH_COLOR = '#007aff';

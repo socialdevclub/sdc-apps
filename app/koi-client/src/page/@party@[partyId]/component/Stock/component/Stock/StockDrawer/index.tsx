@@ -3,12 +3,15 @@ import { useMediaQuery } from 'react-responsive';
 import { useAtomValue } from 'jotai';
 import { MessageInstance } from 'antd/es/message/interface';
 import { StockConfig } from 'shared~config';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MEDIA_QUERY } from '../../../../../../../config/common';
 import { Query } from '../../../../../../../hook';
 import { UserStore } from '../../../../../../../store';
 import { useTradeStock } from '../../../../../hook/useTradeStock';
 import StockOverview from './StockOverview';
+import StockTransaction from './StockTransaction';
+
+export type StockDrawerState = 'OVERVIEW' | 'BUY' | 'SELL';
 
 interface Props {
   drawerOpen: boolean;
@@ -33,7 +36,13 @@ const StockDrawer = ({
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const userId = supabaseSession?.user.id;
 
-  const [drawerState, setDrawerState] = useState<'overview' | 'buy' | 'sell'>('overview');
+  const [drawerState, setDrawerState] = useState<StockDrawerState>('OVERVIEW');
+
+  useEffect(() => {
+    if (!selectedCompany) {
+      setDrawerState('OVERVIEW');
+    }
+  }, [selectedCompany]);
 
   const {
     refetch: refetchUser,
@@ -52,7 +61,18 @@ const StockDrawer = ({
   } = Query.Stock.useQueryStock(stockId, {
     refetchInterval: Number.POSITIVE_INFINITY,
   });
-  const { isBuyLoading, isSellLoading } = useTradeStock({ messageApi });
+  const { isBuyLoading, isSellLoading, onClickBuy, onClickSell } = useTradeStock({ messageApi, refetchUser });
+
+  const 보유주식 = useMemo(() => {
+    return (
+      user?.stockStorages
+        .filter(({ stockCountCurrent }) => stockCountCurrent > 0)
+        .map(({ companyName, stockCountCurrent }) => ({
+          company: companyName,
+          count: stockCountCurrent,
+        })) ?? []
+    );
+  }, [user?.stockStorages]);
 
   if (!stock || !userId || !user) {
     return <>불러오는 중</>;
@@ -117,7 +137,7 @@ const StockDrawer = ({
     >
       {(() => {
         switch (drawerState) {
-          default:
+          case 'OVERVIEW':
             return (
               <StockOverview
                 stockId={stockId}
@@ -129,6 +149,23 @@ const StockDrawer = ({
                 maxBuyableCountWithLimit={maxBuyableCountWithLimit}
                 isDisabled={isDisabled}
                 isCanBuy={isCanBuy}
+                setDrawerState={setDrawerState}
+                보유주식={보유주식}
+              />
+            );
+          default:
+            return (
+              <StockTransaction
+                type={drawerState}
+                perPrice={companiesPrice[selectedCompany]}
+                maxBuyableCountWithLimit={maxBuyableCountWithLimit}
+                maxSellableCount={보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0}
+                selectedCompany={selectedCompany}
+                stockId={stockId}
+                userId={userId}
+                onClickBuy={onClickBuy}
+                onClickSell={onClickSell}
+                handleCloseDrawer={handleCloseDrawer}
               />
             );
         }
