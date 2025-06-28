@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Tooltip } from 'antd';
-import { renderProfitBadge } from '../../../../../../utils/stock';
+import { renderProfitBadge } from '../../utils/renderProfitBadge';
 
 interface Props {
   stockProfitRate: number | null;
