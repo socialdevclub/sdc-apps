@@ -33,6 +33,8 @@ export class Stock implements StockSchema {
 
   maxPersonalStockCount: number;
 
+  gameMode: 'realism' | 'stock';
+
   constructor() {
     this._id = randomUUID();
     this.stockPhase = 'CROWDING';
@@ -49,5 +51,6 @@ export class Stock implements StockSchema {
     this.maxMarketStockCount = null;
     this.maxPersonalStockCount = null;
     this.maxStockHintCount = null;
+    this.gameMode = 'stock';
   }
 }

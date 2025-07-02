@@ -132,6 +132,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
     await mutateUpdateGame({
       _id: stockId,
       fluctuationsInterval: stock?.fluctuationsInterval,
+      gameMode: gameOption.is쀼머니게임 ? 'realism' : 'stock',
       hasLoan: gameOption.hasLoan,
       isTransaction: gameOption.isTransaction,
       maxPersonalStockCount: Infinity,
@@ -182,7 +183,11 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                   menu={{
                     inlineIndent: 10,
                     items: fluctuationMenuItems,
-                    onClick: ({ key }) => mutateUpdateGame({ _id: stockId, fluctuationsInterval: Number(key) }),
+                    onClick: ({ key }) =>
+                      mutateUpdateGame({
+                        _id: stockId,
+                        fluctuationsInterval: Number(key),
+                      }),
                     style: gameOptionDropdownStyle,
                   }}
                   trigger={['click']}
@@ -283,7 +288,11 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                       menu={{
                         inlineIndent: 10,
                         items: initialMoneyMenuItems,
-                        onClick: ({ key }) => mutateUpdateGame({ _id: stockId, initialMoney: Number(key) }),
+                        onClick: ({ key }) =>
+                          mutateUpdateGame({
+                            _id: stockId,
+                            initialMoney: Number(key),
+                          }),
                         style: gameOptionDropdownStyle,
                       }}
                       trigger={['click']}
