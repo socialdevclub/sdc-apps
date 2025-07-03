@@ -29,7 +29,7 @@ export const HeroBanner = () => {
       </styles.TitleWrapper>
       <styles.TitleWrapper>
         <styles.TitleText>S</styles.TitleText>
-        <styles.ChatImage src="src/assets/img/Chat.png" alt="chat" />
+        <styles.ChatImage src="/assets/img/Chat.png" alt="chat" />
         <styles.TitleText>cial</styles.TitleText>
         <styles.DevWrapper>
           <styles.PurpleText fontFamily="DungGeunMo">&lt;</styles.PurpleText>
