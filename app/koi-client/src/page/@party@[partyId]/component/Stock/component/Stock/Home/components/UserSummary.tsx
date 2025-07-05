@@ -6,6 +6,7 @@ import { type UseStockInfo } from '../hooks/useStockInfo';
 import { MyLevel } from './MyLevel';
 import { BEARISH_COLOR, BULLISH_COLOR } from '../../../../color';
 
+// 상수 분리
 const TITLE_MAP = {
   모두팔고난뒤의금액: {
     // 총액, 총자산
@@ -45,8 +46,9 @@ const TITLE_MAP = {
     [게임모드.STOCK]: '현재 주식 수익', // 사용 안함
     [게임모드.REALISM]: '순수익',
   },
-};
+} as const;
 
+// 타입 정의 개선
 type UserSummaryProps = Pick<
   UseStockInfo,
   'user' | 'users' | 'userId' | 'allUserSellPriceDesc' | 'allProfitDesc' | 'stock'
@@ -55,6 +57,30 @@ type UserSummaryProps = Pick<
   allSellPrice: number;
   totalInvestment: number;
   totalProfitLoss: number;
+};
+
+// 유틸리티 함수들 추출
+const formatCurrency = (amount: number): string => `₩${commaizeNumber(amount)}`;
+
+const calculateProfitLossPercentage = (totalProfitLoss: number, totalInvestment: number): number => {
+  if (totalInvestment <= 0) return 0;
+  return Math.round((totalProfitLoss / totalInvestment) * 100 * 10) / 10;
+};
+
+const formatProfitLossPercentage = (totalProfitLoss: number, percentage: number): string => {
+  const sign = totalProfitLoss > 0 ? '+' : '';
+  return `${sign}${percentage}%`;
+};
+
+const getProfitLossColor = (percentage: number): string => {
+  if (percentage > 0) return BULLISH_COLOR;
+  if (percentage < 0) return BEARISH_COLOR;
+  return '#FFFFFF';
+};
+
+const getRankComponent = (isVisibleRank: boolean, rankIndex: number | undefined): JSX.Element | null => {
+  if (!isVisibleRank || rankIndex === undefined) return null;
+  return <>{rankIndex + 1}위</>;
 };
 
 const UserSummary = ({
@@ -71,72 +97,69 @@ const UserSummary = ({
 }: UserSummaryProps) => {
   if (!user || !stock) return null;
 
-  const totalProfitLossPercentage =
-    totalInvestment > 0 ? Math.round((totalProfitLoss / totalInvestment) * 100 * 10) / 10 : 0;
-  const formattedProfitLossPercentage = `${totalProfitLoss > 0 ? '+' : ''}${totalProfitLossPercentage}%`;
+  const totalProfitLossPercentage = calculateProfitLossPercentage(totalProfitLoss, totalInvestment);
+  const formattedProfitLossPercentage = formatProfitLossPercentage(totalProfitLoss, totalProfitLossPercentage);
+
+  // 순위 계산 함수들
+  const getMoneyRank = (): number | undefined => {
+    if (!users) return undefined;
+    return users.sort((a, b) => b.money - a.money).findIndex((v) => v.userId === userId);
+  };
+
+  const getStockValueRank = (): number => {
+    return allUserSellPriceDesc().findIndex((v) => v.userId === userId);
+  };
+
+  const getProfitRank = (): number => {
+    return allProfitDesc.findIndex((v) => v.userId === userId);
+  };
 
   return (
     <>
       <MyLevel moneyRatio={moneyRatio} initialMoney={stock.initialMoney} />
+
+      {/* 잔액 카드 */}
       <Card
-        title={TITLE_MAP['잔액'][stock.gameMode]}
-        value={`₩${commaizeNumber(user.money)}`}
+        title={TITLE_MAP.잔액[stock.gameMode]}
+        value={formatCurrency(user.money)}
         valueColor={COLOR.pastelGreen}
-        rightComponent={
-          stock.isVisibleRank && users ? (
-            <>{users.sort((a, b) => b.money - a.money).findIndex((v) => v.userId === userId) + 1}위</>
-          ) : (
-            <></>
-          )
-        }
+        rightComponent={getRankComponent(stock.isVisibleRank, getMoneyRank())}
       />
+
+      {/* 주식 가치 카드 */}
       <Card
-        title={TITLE_MAP['주식가치'][stock.gameMode]}
+        title={TITLE_MAP.주식가치[stock.gameMode]}
+        value={formatCurrency(allSellPrice)}
         valueColor={COLOR.pastelViolet}
-        value={`₩${commaizeNumber(allSellPrice)}`}
-        rightComponent={
-          stock.isVisibleRank ? <>{allUserSellPriceDesc().findIndex((v) => v.userId === userId) + 1}위</> : <></>
-        }
+        rightComponent={getRankComponent(stock.isVisibleRank, getStockValueRank())}
       />
+
+      {/* STOCK 게임모드 전용 카드들 */}
       {stock.gameMode === 게임모드.STOCK && (
-        <Card
-          title={TITLE_MAP['모두팔고난뒤의금액'][stock.gameMode]}
-          value={`₩${commaizeNumber(user.money + allSellPrice)}`}
-          rightComponent={
-            stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>
-          }
-        />
+        <>
+          <Card
+            title={TITLE_MAP.모두팔고난뒤의금액[stock.gameMode]}
+            value={formatCurrency(user.money + allSellPrice)}
+            rightComponent={getRankComponent(stock.isVisibleRank, getProfitRank())}
+          />
+          <Card
+            title={TITLE_MAP.모두팔고난뒤의순이익[stock.gameMode]}
+            value={`${moneyRatio}%`}
+            rightComponent={getRankComponent(stock.isVisibleRank, getProfitRank())}
+          />
+        </>
       )}
-      {stock.gameMode === 게임모드.STOCK && (
-        <Card
-          title={TITLE_MAP['모두팔고난뒤의순이익'][stock.gameMode]}
-          value={`${moneyRatio}%`}
-          rightComponent={
-            stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>
-          }
-        />
-      )}
+
+      {/* REALISM 게임모드 전용 카드들 */}
       {stock.gameMode === 게임모드.REALISM && (
-        <Card
-          title={TITLE_MAP['투자비용'][stock.gameMode]}
-          value={`₩${commaizeNumber(totalInvestment)}`}
-          rightComponent={
-            stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>
-          }
-        />
-      )}
-      {stock.gameMode === 게임모드.REALISM && (
-        <Card
-          title={TITLE_MAP['현재주식수익'][stock.gameMode]}
-          value={`₩${commaizeNumber(totalProfitLoss)} (${formattedProfitLossPercentage})`}
-          rightComponent={
-            stock.isVisibleRank ? <>{allProfitDesc.findIndex((v) => v.userId === userId) + 1}위</> : <></>
-          }
-          valueColor={
-            // totalProfitLossPercentage > 0 ? COLOR.red : totalProfitLossPercentage < 0 ? COLOR.colorDown : '#FFFFFF'
-            totalProfitLossPercentage > 0 ? BULLISH_COLOR : totalProfitLossPercentage < 0 ? BEARISH_COLOR : '#FFFFFF'
-          }
-        />
+        <>
+          <Card title={TITLE_MAP.투자비용[stock.gameMode]} value={formatCurrency(totalInvestment)} />
+          <Card
+            title={TITLE_MAP.현재주식수익[stock.gameMode]}
+            value={`${formatCurrency(totalProfitLoss)} (${formattedProfitLossPercentage})`}
+            valueColor={getProfitLossColor(totalProfitLossPercentage)}
+          />
+        </>
       )}
     </>
   );
