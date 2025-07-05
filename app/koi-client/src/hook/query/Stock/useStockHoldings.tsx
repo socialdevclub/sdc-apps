@@ -75,7 +75,7 @@ interface Props {
  *   </div>
  * );
  */
-export const useStockHoldings = ({ stockId, userId }: Props) => {
+const useStockHoldings = ({ stockId, userId }: Props) => {
   // 주식 정보 가져오기
   const { companiesPrice, data: stockData } = useQueryStock(stockId);
 
