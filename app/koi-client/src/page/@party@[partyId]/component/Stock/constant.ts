@@ -120,3 +120,9 @@ export const 쀼머니게임_회사 = {
     { 가격: 8000 },
   ],
 };
+
+export const 게임모드 = {
+  REALISM: 'realism',
+  STOCK: 'stock',
+} as const;
+export type 게임모드 = (typeof 게임모드)[keyof typeof 게임모드];

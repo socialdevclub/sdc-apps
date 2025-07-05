@@ -18,7 +18,7 @@ import { useAtomValue } from 'jotai';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
 import { fluctuationMenuItems, initialMoneyMenuItems } from './constant';
-import { 쀼머니게임_회사 } from '../../constant';
+import { 게임모드, 쀼머니게임_회사 } from '../../constant';
 
 interface Props {
   HeaderComponent?: JSX.Element;
@@ -132,7 +132,7 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
     await mutateUpdateGame({
       _id: stockId,
       fluctuationsInterval: stock?.fluctuationsInterval,
-      gameMode: gameOption.is쀼머니게임 ? 'realism' : 'stock',
+      gameMode: gameOption.is쀼머니게임 ? 게임모드.REALISM : 게임모드.STOCK,
       hasLoan: gameOption.hasLoan,
       isTransaction: gameOption.isTransaction,
       maxPersonalStockCount: Infinity,
