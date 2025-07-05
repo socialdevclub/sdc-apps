@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import dayjs from 'dayjs';
-import { CompanyInfo, StockPhase, StockSchema } from 'shared~type-stock';
+import { CompanyInfo, StockGameMode, StockPhase, StockSchema } from 'shared~type-stock';
 
 export class Stock implements StockSchema {
   _id: string;
@@ -33,7 +33,7 @@ export class Stock implements StockSchema {
 
   maxPersonalStockCount: number;
 
-  gameMode: 'realism' | 'stock';
+  gameMode: StockGameMode;
 
   constructor() {
     this._id = randomUUID();

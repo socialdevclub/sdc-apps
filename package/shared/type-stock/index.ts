@@ -46,6 +46,12 @@ export type CompanyInfo = {
   정보: string[];
 };
 
+const StockGameMode = {
+  REALISM: 'realism',
+  STOCK: 'stock',
+} as const;
+export type StockGameMode = (typeof StockGameMode)[keyof typeof StockGameMode];
+
 export type StockSchema = {
   _id: string;
   stockPhase: StockPhase;
@@ -95,7 +101,7 @@ export type StockSchema = {
    * 게임 모드는 백엔드에서 정의한 문자열로 관리합니다.
    * 예시: 'realism', 'stock', 'custom'
    */
-  gameMode: 'realism' | 'stock';
+  gameMode: StockGameMode;
 };
 export type StockSchemaWithId = StockSchema;
 
