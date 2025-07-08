@@ -200,7 +200,7 @@ export const getAnimalImageSource = (companyName: string): string => {
 
   if (isValidCompanyName) {
     // 유효한 회사 이름이면 해당 동물 이미지 URL 반환
-    return `/no_bg_animal/${ANIMAL_NAME[companyName.slice(0, 4)]}.webp`;
+    return `/no_bg_animal/${ANIMAL_NAME[companyName]}.webp`;
   }
   // 유효하지 않은 회사 이름이면 기본값으로 햄찌금융 이미지 반환
   return `/no_bg_animal/${ANIMAL_NAME['햄찌금융']}.webp`;
