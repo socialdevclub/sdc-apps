@@ -681,7 +681,7 @@ const ButtonContent = styled.div`
 
 const ButtonText = styled.span`
   color: white;
-  font-size: 23px;
+  font-size: 22px;
   font-family: 'DungGeunMo', sans-serif;
   line-height: 135%;
 `;
