@@ -3,7 +3,6 @@ import { Query } from '../../../../../../../hook';
 import useStockHoldings from '../../../../../../../hook/query/Stock/useStockHoldings.tsx';
 import StartLoan from '../StartLoan';
 import { Container, Divider, StickyBottom } from './Home.styles';
-import { StockHoldingsList } from './components/StockInfoList.tsx';
 import TimeIndicator from './components/TimeIndicator.tsx';
 import UserSummary from './components/UserSummary';
 import { useStockInfo } from './hooks/useStockInfo';
@@ -49,8 +48,6 @@ const Home = ({ stockId, messageApi }: Props) => {
       <Container>
         <TimeIndicator />
       </Container>
-      <Divider />
-      <StockHoldingsList stockId={stockId} userId={userId} messageApi={messageApi} />
       {stock.hasLoan && (
         <StickyBottom>
           <StartLoan stockId={stockId} money={user.money} loanCount={user.loanCount} allSellPrice={myAllSellPrice} />

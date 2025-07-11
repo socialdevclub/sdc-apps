@@ -8,6 +8,7 @@ import Home from './Home/Home';
 import Information from './Information';
 import { Tabs, type TabsProps } from './Tabs';
 import StockInfoList from './StockInfoList.tsx';
+import Portfolio from './Portfolio/index.tsx';
 import { Query } from '../../../../../../hook';
 
 const items: TabsProps['items'] = [
@@ -22,6 +23,10 @@ const items: TabsProps['items'] = [
   {
     key: '주식',
     label: '주식',
+  },
+  {
+    key: '포트폴리오',
+    label: '포트폴리오',
   },
 ];
 
@@ -89,6 +94,9 @@ const Stock = ({ stockId }: Props) => {
         case '주식':
           setSearchParams({ page: '주식' }, { replace: true });
           break;
+        case '포트폴리오':
+          setSearchParams({ page: '포트폴리오' }, { replace: true });
+          break;
         default:
           setSearchParams({ page: '홈' }, { replace: true });
           break;
@@ -114,6 +122,7 @@ const Stock = ({ stockId }: Props) => {
               // 룰: <Rule stockId={stockId} />,
               정보: <Information stockId={stockId} messageApi={messageApi} />,
               주식: <StockInfoList stockId={stockId} messageApi={messageApi} />,
+              포트폴리오: <Portfolio stockId={stockId} messageApi={messageApi} />,
               홈: <Home stockId={stockId} messageApi={messageApi} />,
             }}
             defaultComponent={<Home stockId={stockId} messageApi={messageApi} />}
