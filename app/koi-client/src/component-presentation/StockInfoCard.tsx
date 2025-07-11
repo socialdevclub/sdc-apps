@@ -20,9 +20,7 @@ const StockInfoCard = ({
 }: StockCardProps) => {
   return (
     <ButtonContainer onClick={() => onClick?.(companyName)}>
-      <div>
-        <Image src={getAnimalImageSource(companyName)} alt={companyName} />
-      </div>
+      <Image src={getAnimalImageSource(companyName)} alt={companyName} />
       <FlexRowBetween>
         <FlexCol>
           <Company>{companyName}</Company>
@@ -77,7 +75,7 @@ const OwnStock = styled.div`
 `;
 
 const Company = styled.div`
-  font-size: 20px;
+  font-size: 18px;
   line-height: 22px;
   font-weight: 400;
   color: white;
@@ -113,7 +111,7 @@ const PriceWrapper = styled.div`
 `;
 
 const Price = styled.div`
-  font-size: 20px;
+  font-size: 18px;
   line-height: 22px;
   font-weight: 400;
   color: white;
@@ -122,7 +120,7 @@ const Price = styled.div`
 const PriceTrendRed = styled.div`
   display: flex;
   flex-direction: column;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 22px;
   letter-spacing: 0.5px;
   font-weight: 400;
@@ -132,7 +130,7 @@ const PriceTrendRed = styled.div`
 const PriceTrendBlue = styled.div`
   display: flex;
   flex-direction: column;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 22px;
   letter-spacing: 0.5px;
   font-weight: 400;
@@ -143,8 +141,6 @@ const Image = styled.img`
   width: 50px;
   height: 50px;
   border-radius: 6px;
-  margin-right: 12px;
-  margin-left: 10px;
 `;
 
 export default StockInfoCard;
