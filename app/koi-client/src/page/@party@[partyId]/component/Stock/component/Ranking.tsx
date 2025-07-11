@@ -6,8 +6,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useRef } from 'react';
 import html2canvas from 'html2canvas';
 import saveAs from 'file-saver';
-import { commaizeNumber } from '@toss/utils';
-import { css } from '@linaria/core';
 // import { GetStockUser } from 'shared~type-stock/Response';
 import { UserStore } from '../../../../../store';
 import { Query } from '../../../../../hook';
@@ -158,7 +156,7 @@ function Ranking({ stockId }: RankingProps) {
 
   return (
     <Container>
-      <CaptureArea ref={captureAreaRef}>
+      {/* <CaptureArea ref={captureAreaRef}>
         <Title>주식게임 결과</Title>
         <Wrapper>
           <Box>
@@ -186,7 +184,7 @@ function Ranking({ stockId }: RankingProps) {
         onClick={() => handleDownload()}
       >
         <Label>이미지 저장</Label>
-      </Button>
+      </Button> */}
 
       <SubTitle>
         <Bookmark size={24} />

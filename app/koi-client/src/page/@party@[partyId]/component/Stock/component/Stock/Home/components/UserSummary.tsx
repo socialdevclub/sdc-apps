@@ -3,7 +3,6 @@ import Card from '../../../../../../../../component-presentation/Card';
 import * as COLOR from '../../../../../../../../config/color';
 import { 게임모드 } from '../../../../constant';
 import { type UseStockInfo } from '../hooks/useStockInfo';
-import { MyLevel } from './MyLevel';
 import { BEARISH_COLOR, BULLISH_COLOR } from '../../../../color';
 
 // 상수 분리
@@ -116,7 +115,7 @@ const UserSummary = ({
 
   return (
     <>
-      <MyLevel moneyRatio={moneyRatio} initialMoney={stock.initialMoney} />
+      {/* <MyLevel moneyRatio={moneyRatio} initialMoney={stock.initialMoney} /> */}
 
       {/* 잔액 카드 */}
       <Card
