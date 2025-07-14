@@ -7,9 +7,13 @@ import { useRef } from 'react';
 import html2canvas from 'html2canvas';
 import saveAs from 'file-saver';
 // import { GetStockUser } from 'shared~type-stock/Response';
+import { commaizeNumber } from '@toss/utils';
+import { css } from '@linaria/core';
 import { UserStore } from '../../../../../store';
 import { Query } from '../../../../../hook';
 import { LOCAL_STORAGE_KEY } from '../../../../../config/localStorage';
+import { calculateAllPortfolios } from '../../../../../utils/stock';
+import DoughnutChart from '../../../../../component-presentation/DoughnutChart';
 
 interface RankingProps {
   stockId: string;
@@ -118,6 +122,11 @@ function Ranking({ stockId }: RankingProps) {
       ? '타고난 리더십으로 팀을 이끌고 신뢰를 쌓아가는 호랑이예요. 함께하면 더 큰 시너지를 만들어낼 수 있어요.'
       : '전설적인 케미의 드래곤이예요. 뛰어난 통찰력과 매력으로 모든 이의 마음을 사로잡고 최고의 팀워크를 만들어요.';
 
+  const portfolios = calculateAllPortfolios({
+    companies: stock.companies,
+    stockStorages: user?.stockStorages ?? [],
+  });
+
   const handleDownload = async () => {
     if (!captureAreaRef.current) return;
 
@@ -156,89 +165,114 @@ function Ranking({ stockId }: RankingProps) {
 
   return (
     <Container>
-      {/* <CaptureArea ref={captureAreaRef}>
-        <Title>주식게임 결과</Title>
-        <Wrapper>
-          <Box>
-            <BoxContainer>
-              <TitleContainer>
-                <Name>{animalResult}</Name>
-              </TitleContainer>
-              <AnimalImg src={`/animal/${animal}.jpg`} />
-              <Text>{animalDescription}</Text>
-              <Text>
-                순수익 : {commaizeNumber(fluctuation)}원 ({percentage.toFixed(2)}%)
-              </Text>
-              <Text>
-                랭킹 : {rank}위 (상위 {rankPercentage}%)
-              </Text>
-            </BoxContainer>
-          </Box>
-        </Wrapper>
-      </CaptureArea>
-      <Button
-        className={css`
-          margin-bottom: 35px;
-        `}
-        color="#9333EA"
-        onClick={() => handleDownload()}
-      >
-        <Label>이미지 저장</Label>
-      </Button> */}
+      {stock.gameMode !== 'realism' && (
+        <>
+          <CaptureArea ref={captureAreaRef}>
+            <Title>주식게임 결과</Title>
+            <Wrapper>
+              <Box>
+                <BoxContainer>
+                  <TitleContainer>
+                    <Name>{animalResult}</Name>
+                  </TitleContainer>
+                  <AnimalImg src={`/animal/${animal}.jpg`} />
+                  <Text>{animalDescription}</Text>
+                  <Text>
+                    순수익 : {commaizeNumber(fluctuation)}원 ({percentage.toFixed(2)}%)
+                  </Text>
+                  <Text>
+                    랭킹 : {rank}위 (상위 {rankPercentage}%)
+                  </Text>
+                </BoxContainer>
+              </Box>
+            </Wrapper>
+          </CaptureArea>
+          <Button
+            className={css`
+              margin-bottom: 35px;
+            `}
+            color="#9333EA"
+            onClick={() => handleDownload()}
+          >
+            <Label>이미지 저장</Label>
+          </Button>
 
-      <SubTitle>
-        <Bookmark size={24} />
-        <span>내 순위</span>
-      </SubTitle>
+          <SubTitle>
+            <Bookmark size={24} />
+            <span>내 순위</span>
+          </SubTitle>
 
-      <RankCard color={getRankColor(rank)}>
-        <Rank>{rank}</Rank>
-        <Avatar size={50} style={{ flexShrink: 0 }}>
-          {user?.userInfo.nickname[0]}
-        </Avatar>
-        <Column align="flex-start">
-          <Nickname>{getRankNickname(rank, user?.userInfo.nickname)}</Nickname>
-          <AnimalName>{animalResult}</AnimalName>
-        </Column>
-        <Column align="flex-end">
-          <Percentage percent={percentage}>
-            {percentage >= 0 ? '+' : ''}
-            {percentage}%
-          </Percentage>
-          <Avg>{roundAvg.toLocaleString()}원</Avg>
-        </Column>
-      </RankCard>
-
-      <SubTitle>
-        <AlignLeft size={24} />
-        <span>전체 순위</span>
-      </SubTitle>
-      {sortedUser.map((user, index) => {
-        const userAvg = getRoundAvg(user.userId);
-        const userFluctuation = userAvg - stock.initialMoney;
-        const userPercentage = Math.round((userFluctuation / stock.initialMoney) * 100 * 10) / 10;
-        const animalResult = getAnimalByPercentage(userPercentage);
-
-        return (
-          <RankCard key={user.userId} color={getRankColor(index + 1)}>
-            <Rank>{index + 1}</Rank>
+          <RankCard color={getRankColor(rank)}>
+            <Rank>{rank}</Rank>
             <Avatar size={50} style={{ flexShrink: 0 }}>
-              {user.userInfo.nickname[0]}
+              {user?.userInfo.nickname[0]}
             </Avatar>
             <Column align="flex-start">
-              <Nickname>{getRankNickname(index + 1, user.userInfo.nickname)}</Nickname>
+              <Nickname>{getRankNickname(rank, user?.userInfo.nickname)}</Nickname>
               <AnimalName>{animalResult}</AnimalName>
             </Column>
             <Column align="flex-end">
-              <Percentage percent={userPercentage}>
-                {userPercentage >= 0 ? '+' : ''}
-                {userPercentage}%
+              <Percentage percent={percentage}>
+                {percentage >= 0 ? '+' : ''}
+                {percentage}%
               </Percentage>
-              <Avg>{userAvg.toLocaleString()}원</Avg>
+              <Avg>{roundAvg.toLocaleString()}원</Avg>
             </Column>
           </RankCard>
-        );
-      })}
+
+          <SubTitle>
+            <AlignLeft size={24} />
+            <span>전체 순위</span>
+          </SubTitle>
+          {sortedUser.map((user, index) => {
+            const userAvg = getRoundAvg(user.userId);
+            const userFluctuation = userAvg - stock.initialMoney;
+            const userPercentage = Math.round((userFluctuation / stock.initialMoney) * 100 * 10) / 10;
+            const animalResult = getAnimalByPercentage(userPercentage);
+
+            return (
+              <RankCard key={user.userId} color={getRankColor(index + 1)}>
+                <Rank>{index + 1}</Rank>
+                <Avatar size={50} style={{ flexShrink: 0 }}>
+                  {user.userInfo.nickname[0]}
+                </Avatar>
+                <Column align="flex-start">
+                  <Nickname>{getRankNickname(index + 1, user.userInfo.nickname)}</Nickname>
+                  <AnimalName>{animalResult}</AnimalName>
+                </Column>
+                <Column align="flex-end">
+                  <Percentage percent={userPercentage}>
+                    {userPercentage >= 0 ? '+' : ''}
+                    {userPercentage}%
+                  </Percentage>
+                  <Avg>{userAvg.toLocaleString()}원</Avg>
+                </Column>
+              </RankCard>
+            );
+          })}
+        </>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', width: '100%' }}>
+        {stock.gameMode === 'realism' &&
+          Object.entries(portfolios).map(([timeIdx, companyPortfolio]) => {
+            const portfolioData = Object.entries(companyPortfolio).map(([company, { stockPrice, profitRate }]) => {
+              return {
+                label: `${company} (${profitRate}%)`,
+                value: stockPrice,
+              };
+            });
+
+            return (
+              <div key={timeIdx}>
+                <h2 style={{ paddingLeft: '16px' }}>{Number(timeIdx) + 1}년차 포트폴리오</h2>
+                <div style={{ width: '100%' }}>
+                  <DoughnutChart height="700px" data={portfolioData} containerHeight="500px" />
+                </div>
+              </div>
+            );
+          })}
+      </div>
 
       <BottomSection>
         <Button color="#374151" onClick={handleShare}>
