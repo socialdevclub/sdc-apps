@@ -62,7 +62,7 @@ function Ranking({ stockId }: RankingProps) {
   const getRoundAvg = stock.round === 0 ? getRound0Avg : getRound12Avg;
   const roundAvg = getRoundAvg(userId);
   const fluctuation = roundAvg - stock.initialMoney;
-  const percentage = fluctuation / (stock.initialMoney * 100);
+  const percentage = Math.round((fluctuation / stock.initialMoney) * 100 * 10) / 10;
 
   if (!users) {
     return <></>;
@@ -188,7 +188,7 @@ function Ranking({ stockId }: RankingProps) {
 
       <SubTitle>
         <Bookmark size={24} />
-        <span>내순위</span>
+        <span>내 순위</span>
       </SubTitle>
 
       <RankCard color={getRankColor(rank)}>
@@ -216,7 +216,7 @@ function Ranking({ stockId }: RankingProps) {
       {sortedUser.map((user, index) => {
         const userAvg = getRoundAvg(user.userId);
         const userFluctuation = userAvg - stock.initialMoney;
-        const userPercentage = userFluctuation / (stock.initialMoney * 100);
+        const userPercentage = Math.round((userFluctuation / stock.initialMoney) * 100 * 10) / 10;
         const animalResult = getAnimalByPercentage(userPercentage);
 
         return (
