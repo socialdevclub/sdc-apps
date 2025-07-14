@@ -7,6 +7,13 @@ import * as echarts from 'echarts';
 import { Query } from '../../../../../hook';
 import { UserStore } from '../../../../../store';
 import { LOCAL_STORAGE_KEY } from '../../../../../config/localStorage';
+import {
+  calculateInvestmentData,
+  calculateTotalReturnsData,
+  calculateReturnsData,
+  type Stock,
+  type User,
+} from '../../../../../utils/portfolio';
 
 interface RankingProps {
   stockId: string;
@@ -33,218 +40,45 @@ function Ranking({ stockId }: RankingProps) {
   const investmentData = useMemo(() => {
     if (!stock || !user) return [];
 
-    const yearlyData: Array<{ year: string; companies: Array<{ name: string; value: number }> }> = [];
+    // 타입 변환
+    const stockData: Stock = {
+      companies: stock.companies as Record<string, Array<{ 가격: number; 정보: unknown[] }>>,
+    };
+    const userData: User = {
+      stockStorages: user.stockStorages as Array<{ companyName: string; stockCountHistory: number[] }>,
+    };
 
-    // 0~8년차 각각의 포트폴리오 구성 계산
-    for (let year = 0; year < 9; year++) {
-      const companiesPortfolio: Array<{ name: string; value: number }> = [];
-      let totalPortfolioValue = 0;
-
-      // 각 회사별 누적 보유량 계산
-      user.stockStorages.forEach((storage) => {
-        const { companyName, stockCountHistory } = storage;
-        const companyPrices = stock.companies[companyName];
-
-        if (!companyPrices || year >= stockCountHistory.length) return;
-
-        // 해당 연차까지의 누적 보유량 계산
-        let cumulativeHolding = 0;
-        for (let i = 0; i <= year; i++) {
-          cumulativeHolding += stockCountHistory[i] || 0;
-        }
-
-        // 보유량이 양수인 경우만 포트폴리오에 포함
-        if (cumulativeHolding > 0 && companyPrices[year]) {
-          const portfolioValue = cumulativeHolding * companyPrices[year].가격;
-          totalPortfolioValue += portfolioValue;
-
-          companiesPortfolio.push({
-            name: companyName,
-            value: Math.round(portfolioValue),
-          });
-        }
-      });
-
-      // 포트폴리오가 있다면 추가, 없다면 빈 포트폴리오 표시
-      if (totalPortfolioValue > 0) {
-        yearlyData.push({
-          companies: companiesPortfolio,
-          year: `${year}년차`,
-        });
-      } else {
-        // 보유 주식이 없는 년차
-        yearlyData.push({
-          companies: [{ name: '보유 주식 없음', value: 1 }],
-          year: `${year}년차`,
-        });
-      }
-    }
-
-    return yearlyData;
+    return calculateInvestmentData(stockData, userData);
   }, [stock, user]);
 
   // 전체 포트폴리오 연차별 수익률 데이터 계산
   const totalReturnsData = useMemo(() => {
     if (!stock || !user) return { returns: [], years: [] };
 
-    const years = Array.from({ length: 10 }, (_, i) => `${i}년차`);
-    const returns: number[] = [];
+    // 타입 변환
+    const stockData: Stock = {
+      companies: stock.companies as Record<string, Array<{ 가격: number; 정보: unknown[] }>>,
+    };
+    const userData: User = {
+      stockStorages: user.stockStorages as Array<{ companyName: string; stockCountHistory: number[] }>,
+    };
 
-    // 각 연차별 전체 포트폴리오 수익률 계산
-    for (let year = 0; year < 10; year++) {
-      let totalInvestedAmount = 0;
-      let totalCurrentValue = 0;
-      let totalRealizedProfitLoss = 0;
-
-      // 모든 회사를 대상으로 계산
-      user.stockStorages.forEach((storage) => {
-        const { companyName, stockCountHistory } = storage;
-        const companyPrices = stock.companies[companyName];
-
-        if (!companyPrices || year >= stockCountHistory.length) return;
-
-        let currentHolding = 0;
-        let companyInvestedAmount = 0;
-        let companyRealizedProfitLoss = 0;
-        const purchases: Array<{ count: number; price: number }> = [];
-
-        // 해당 연도까지의 거래 내역을 누적하여 계산
-        for (let i = 0; i <= year; i++) {
-          const tradeCount = stockCountHistory[i] || 0;
-          const price = companyPrices[i]?.가격 || 0;
-
-          if (tradeCount > 0) {
-            // 매수: 투자 비용 증가, 보유량 증가
-            companyInvestedAmount += tradeCount * price;
-            currentHolding += tradeCount;
-            purchases.push({ count: tradeCount, price });
-          } else if (tradeCount < 0) {
-            // 매도: 실현손익 계산 (FIFO 방식)
-            let remainingSellCount = Math.abs(tradeCount);
-            currentHolding -= remainingSellCount;
-
-            while (remainingSellCount > 0 && purchases.length > 0) {
-              const purchase = purchases[0];
-              const sellFromThisPurchase = Math.min(remainingSellCount, purchase.count);
-
-              // 실현손익 = (매도가 - 매수가) * 매도량
-              companyRealizedProfitLoss += sellFromThisPurchase * (price - purchase.price);
-
-              purchase.count -= sellFromThisPurchase;
-              remainingSellCount -= sellFromThisPurchase;
-
-              if (purchase.count === 0) {
-                purchases.shift();
-              }
-            }
-          }
-        }
-
-        // 전체 포트폴리오에 반영
-        totalInvestedAmount += companyInvestedAmount;
-        totalCurrentValue += currentHolding * (companyPrices[year]?.가격 || 0);
-        totalRealizedProfitLoss += companyRealizedProfitLoss;
-      });
-
-      // 수익률 계산
-      if (totalInvestedAmount > 0) {
-        const totalAssetValue = totalCurrentValue + totalRealizedProfitLoss;
-        const returnRate = ((totalAssetValue - totalInvestedAmount) / totalInvestedAmount) * 100;
-        returns.push(Math.round(returnRate * 10) / 10);
-      } else {
-        returns.push(0);
-      }
-    }
-
-    return { returns, years };
+    return calculateTotalReturnsData(stockData, userData);
   }, [stock, user]);
 
   // 회사별 연차수익률 데이터 계산
   const returnsData = useMemo(() => {
     if (!stock || !user) return { companies: [], years: [] };
 
-    const years = Array.from({ length: 10 }, (_, i) => `${i}년차`);
-    const companies: { name: string; data: number[] }[] = [];
+    // 타입 변환
+    const stockData: Stock = {
+      companies: stock.companies as Record<string, Array<{ 가격: number; 정보: unknown[] }>>,
+    };
+    const userData: User = {
+      stockStorages: user.stockStorages as Array<{ companyName: string; stockCountHistory: number[] }>,
+    };
 
-    user.stockStorages.forEach((storage) => {
-      const { companyName, stockCountHistory } = storage;
-      const companyPrices = stock.companies[companyName];
-
-      if (!companyPrices) return;
-
-      const companyReturns: number[] = [];
-
-      // 각 연차별 수익률 계산
-      for (let year = 0; year < 10; year++) {
-        if (year >= stockCountHistory.length) {
-          companyReturns.push(0);
-          continue;
-        }
-
-        let currentHolding = 0;
-        let totalInvestedAmount = 0;
-        let realizedProfitLoss = 0;
-        const purchases: Array<{ count: number; price: number }> = [];
-
-        // 해당 연도까지의 거래 내역을 누적하여 계산
-        for (let i = 0; i <= year; i++) {
-          const tradeCount = stockCountHistory[i] || 0;
-          const price = companyPrices[i]?.가격 || 0;
-
-          if (tradeCount > 0) {
-            // 매수: 투자 비용 증가, 보유량 증가
-            totalInvestedAmount += tradeCount * price;
-            currentHolding += tradeCount;
-            purchases.push({ count: tradeCount, price });
-          } else if (tradeCount < 0) {
-            // 매도: 실현손익 계산 (FIFO 방식)
-            let remainingSellCount = Math.abs(tradeCount);
-            currentHolding -= remainingSellCount;
-
-            while (remainingSellCount > 0 && purchases.length > 0) {
-              const purchase = purchases[0];
-              const sellFromThisPurchase = Math.min(remainingSellCount, purchase.count);
-
-              // 실현손익 = (매도가 - 매수가) * 매도량
-              realizedProfitLoss += sellFromThisPurchase * (price - purchase.price);
-
-              purchase.count -= sellFromThisPurchase;
-              remainingSellCount -= sellFromThisPurchase;
-
-              if (purchase.count === 0) {
-                purchases.shift();
-              }
-            }
-          }
-        }
-
-        // 수익률 계산
-        if (totalInvestedAmount > 0) {
-          // 현재 보유 주식의 시장가치
-          const currentMarketValue = currentHolding * (companyPrices[year]?.가격 || 0);
-
-          // 총 자산가치 = 현재 보유 주식 가치 + 실현손익
-          const totalAssetValue = currentMarketValue + realizedProfitLoss;
-
-          // 수익률 = (총자산가치 - 총투자액) / 총투자액 * 100
-          const returnRate = ((totalAssetValue - totalInvestedAmount) / totalInvestedAmount) * 100;
-          companyReturns.push(Math.round(returnRate * 10) / 10);
-        } else {
-          companyReturns.push(0);
-        }
-      }
-
-      // 의미있는 거래가 있는 회사만 추가
-      const hasTrading = companyReturns.some((val) => val !== 0);
-      if (hasTrading) {
-        companies.push({
-          data: companyReturns,
-          name: companyName,
-        });
-      }
-    });
-
-    return { companies, years };
+    return calculateReturnsData(stockData, userData);
   }, [stock, user]);
 
   // 연차별 투자 비중 차트들 초기화
