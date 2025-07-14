@@ -1,6 +1,7 @@
 import { getDateDistance } from '@toss/date';
 import { objectEntries } from '@toss/utils';
 import dayjs from 'dayjs';
+import { CompanyInfo, StockStorageSchema } from 'shared~type-stock';
 import { GetStock } from 'shared~type-stock/Response';
 import {
   ANIMAL_NAME,
@@ -221,4 +222,43 @@ export const secondsToMMSS = (seconds: number): string => {
   const formattedSeconds = String(remainingSeconds).padStart(2, '0');
 
   return `${formattedMinutes}:${formattedSeconds}`;
+};
+
+type CompanyName = string;
+
+interface StockValue {
+  investmentPrice: number;
+  stockCount: number;
+  stockPrice: number;
+  profitRate: number;
+}
+
+export const calculateCurrentPortfolio = ({
+  stockStorages,
+  companies,
+  timeIdx,
+}: {
+  stockStorages: StockStorageSchema[];
+  companies: Record<string, CompanyInfo[]>;
+  timeIdx: number;
+}): Record<CompanyName, StockValue> => {
+  const portfolio: Record<CompanyName, StockValue> = {};
+
+  stockStorages.forEach((storage) => {
+    const { companyName, stockCountCurrent, stockAveragePrice } = storage;
+    const stockCurrentPrice = companies[companyName][timeIdx].가격;
+
+    const investmentPrice = Math.round(stockCountCurrent * stockAveragePrice);
+    const totalStockPrice = Math.round(stockCountCurrent * stockCurrentPrice);
+    const profitRate = Math.round(((totalStockPrice - investmentPrice) / investmentPrice) * 100 * 10) / 10;
+
+    portfolio[companyName] = {
+      investmentPrice,
+      profitRate,
+      stockCount: stockCountCurrent,
+      stockPrice: totalStockPrice,
+    };
+  });
+
+  return portfolio;
 };

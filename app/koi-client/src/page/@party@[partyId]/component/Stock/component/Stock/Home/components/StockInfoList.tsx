@@ -1,13 +1,15 @@
 import styled from '@emotion/styled';
-import { useMemo, useState } from 'react';
 import { objectEntries } from '@toss/utils';
 import { MessageInstance } from 'antd/es/message/interface';
-import useStockHoldings from '../../../../../../../../hook/query/Stock/useStockHoldings.tsx';
-import { H3, TitleWrapper } from '../Home.styles.tsx';
+import { useMemo, useState } from 'react';
+import DoughnutChart from '../../../../../../../../component-presentation/DoughnutChart.tsx';
 import StockInfoCard from '../../../../../../../../component-presentation/StockInfoCard.tsx';
+import { Query } from '../../../../../../../../hook/index.ts';
 import { useQueryStock } from '../../../../../../../../hook/query/Stock';
-import { getStockMessages } from '../../../../../../../../utils/stock.ts';
+import useStockHoldings from '../../../../../../../../hook/query/Stock/useStockHoldings.tsx';
+import { calculateCurrentPortfolio, getStockMessages } from '../../../../../../../../utils/stock.ts';
 import StockDrawer from '../../StockDrawer/index.tsx';
+import { H3, TitleWrapper } from '../Home.styles.tsx';
 
 interface StockHoldingsListProps {
   stockId: string;
@@ -22,6 +24,7 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
   const { holdings } = useStockHoldings({ stockId, userId });
 
   const { data: stock, timeIdx } = useQueryStock(stockId);
+  const { data: user } = Query.Stock.useUserFindOne(stockId, userId);
 
   const priceData = useMemo(() => {
     const result: Record<string, number[]> = {};
@@ -48,6 +51,24 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
     }, [] as Array<{ company: string; timeIdx: number; price: number }>),
   );
 
+  const portfolio = calculateCurrentPortfolio({
+    companies: stock.companies,
+    stockStorages: user?.stockStorages ?? [],
+    timeIdx: timeIdx ?? 0,
+  });
+
+  // const totalStockQuantity = Object.values(portfolio).reduce((acc, curr) => acc + curr.stockCount, 0);
+  const totalStockAmount = Object.values(portfolio).reduce((acc, curr) => acc + curr.stockPrice, 0);
+
+  const portfolioData = Object.entries(portfolio).map(([company, { stockPrice }]) => {
+    const stockPriceRatio = Math.round((stockPrice / totalStockAmount) * 100 * 10) / 10;
+
+    return {
+      label: `${company} (${stockPriceRatio}%)`,
+      value: stockPrice,
+    };
+  });
+
   const stockMessages = getStockMessages({
     companyName: selectedCompany,
     currentTimeIdx: timeIdx ?? 0,
@@ -72,17 +93,20 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
       <Space />
       <Container>
         {holdings.length > 0 ? (
-          holdings.map((stock) => (
-            <StockInfoCard
-              key={stock.companyName}
-              companyName={stock.companyName}
-              stockCount={stock.stockCount}
-              onClick={handleOpenDrawer}
-              totalValue={stock.totalValue}
-              profitLoss={stock.profitLoss}
-              profitLossPercentage={parseFloat(stock.profitLossPercentage.toFixed(1))}
-            />
-          ))
+          <>
+            <DoughnutChart height="700px" data={portfolioData} containerHeight="500px" />
+            {holdings.map((stock) => (
+              <StockInfoCard
+                key={stock.companyName}
+                companyName={stock.companyName}
+                stockCount={stock.stockCount}
+                onClick={handleOpenDrawer}
+                totalValue={stock.totalValue}
+                profitLoss={stock.profitLoss}
+                profitLossPercentage={parseFloat(stock.profitLossPercentage.toFixed(1))}
+              />
+            ))}
+          </>
         ) : (
           <Label>보유 중인 주식이 없습니다.</Label>
         )}
