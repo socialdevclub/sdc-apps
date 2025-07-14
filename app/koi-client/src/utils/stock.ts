@@ -249,16 +249,58 @@ export const calculateCurrentPortfolio = ({
     const stockCurrentPrice = companies[companyName][timeIdx].가격;
 
     const investmentPrice = Math.round(stockCountCurrent * stockAveragePrice);
-    const totalStockPrice = Math.round(stockCountCurrent * stockCurrentPrice);
-    const profitRate = Math.round(((totalStockPrice - investmentPrice) / investmentPrice) * 100 * 10) / 10;
+    const stockPrice = Math.round(stockCountCurrent * stockCurrentPrice);
+    const profitRate = Math.round(((stockPrice - investmentPrice) / investmentPrice) * 100 * 10) / 10;
 
     portfolio[companyName] = {
       investmentPrice,
       profitRate,
       stockCount: stockCountCurrent,
-      stockPrice: totalStockPrice,
+      stockPrice,
     };
   });
 
   return portfolio;
+};
+
+type TimeIdx = string;
+
+export const calculateAllPortfolios = ({
+  stockStorages,
+  companies,
+}: {
+  stockStorages: StockStorageSchema[];
+  companies: Record<CompanyName, CompanyInfo[]>;
+}): Record<TimeIdx, Record<CompanyName, StockValue>> => {
+  const portfolios: Record<TimeIdx, Record<CompanyName, StockValue>> = {};
+
+  stockStorages.forEach((storage) => {
+    const { companyName, stockCountHistory } = storage;
+
+    stockCountHistory.forEach((_, timeIdx) => {
+      if (timeIdx === 9) return;
+
+      const stockCurrentPrice = companies[companyName][timeIdx].가격;
+      const stockCurrentCount = stockCountHistory.filter((v) => v > 0).reduce((acc, curr) => acc + curr, 0);
+      const stockPrice = stockCurrentCount * stockCurrentPrice;
+      const stockNextPrice = companies[companyName][timeIdx + 1].가격;
+      const profitRate =
+        stockCurrentCount === 0
+          ? 0
+          : Math.round(((stockNextPrice - stockCurrentPrice) / stockCurrentPrice) * 100 * 10) / 10;
+
+      if (!portfolios[timeIdx]) {
+        portfolios[timeIdx] = {};
+      }
+
+      portfolios[timeIdx][companyName] = {
+        investmentPrice: stockPrice,
+        profitRate,
+        stockCount: stockCurrentCount,
+        stockPrice: stockNextPrice,
+      };
+    });
+  });
+
+  return portfolios;
 };
