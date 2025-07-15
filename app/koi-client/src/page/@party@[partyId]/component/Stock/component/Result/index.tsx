@@ -1,17 +1,17 @@
 import styled from '@emotion/styled';
-import { useAtomValue } from 'jotai';
-import { Bookmark, AlignLeft, Share, LogOut } from 'lucide-react';
 import { Avatar } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useRef } from 'react';
-import html2canvas from 'html2canvas';
 import saveAs from 'file-saver';
+import html2canvas from 'html2canvas';
+import { useAtomValue } from 'jotai';
+import { AlignLeft, Bookmark, LogOut, Share } from 'lucide-react';
+import { useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 // import { GetStockUser } from 'shared~type-stock/Response';
-import { commaizeNumber } from '@toss/utils';
 import { css } from '@linaria/core';
-import { UserStore } from '../../../../../../store';
-import { Query } from '../../../../../../hook';
+import { commaizeNumber } from '@toss/utils';
 import { LOCAL_STORAGE_KEY } from '../../../../../../config/localStorage';
+import { Query } from '../../../../../../hook';
+import { UserStore } from '../../../../../../store';
 import ResultRealism from './ResultRealism';
 
 interface ResultProps {
