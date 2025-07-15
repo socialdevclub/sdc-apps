@@ -12,6 +12,7 @@ import { commaizeNumber } from '@toss/utils';
 import { LOCAL_STORAGE_KEY } from '../../../../../../config/localStorage';
 import { Query } from '../../../../../../hook';
 import { UserStore } from '../../../../../../store';
+import { formatPercentage } from '../../../../../../utils/stock';
 import ResultRealism from './ResultRealism';
 
 interface ResultProps {
@@ -65,7 +66,7 @@ function Result({ stockId }: ResultProps) {
   const getRoundAvg = stock.round === 0 ? getRound0Avg : getRound12Avg;
   const roundAvg = getRoundAvg(userId);
   const fluctuation = roundAvg - stock.initialMoney;
-  const percentage = Math.round((fluctuation / stock.initialMoney) * 100 * 10) / 10;
+  const percentage = formatPercentage(fluctuation / stock.initialMoney);
 
   if (!users) {
     return <></>;
@@ -225,7 +226,7 @@ function Result({ stockId }: ResultProps) {
           {sortedUser.map((user, index) => {
             const userAvg = getRoundAvg(user.userId);
             const userFluctuation = userAvg - stock.initialMoney;
-            const userPercentage = Math.round((userFluctuation / stock.initialMoney) * 100 * 10) / 10;
+            const userPercentage = formatPercentage(userFluctuation / stock.initialMoney);
             const animalResult = getAnimalByPercentage(userPercentage);
 
             return (

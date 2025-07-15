@@ -7,7 +7,7 @@ import StockInfoCard from '../../../../../../../../component-presentation/StockI
 import { Query } from '../../../../../../../../hook/index.ts';
 import { useQueryStock } from '../../../../../../../../hook/query/Stock';
 import useStockHoldings from '../../../../../../../../hook/query/Stock/useStockHoldings.tsx';
-import { calculateCurrentPortfolio, getStockMessages } from '../../../../../../../../utils/stock.ts';
+import { calculateCurrentPortfolio, getStockMessages, formatPercentage } from '../../../../../../../../utils/stock.ts';
 import StockDrawer from '../../StockDrawer/index.tsx';
 import { H3, TitleWrapper } from '../Home.styles.tsx';
 
@@ -58,7 +58,7 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
   });
   const totalStockAmount = Object.values(portfolio).reduce((acc, curr) => acc + curr.stockPrice, 0);
   const portfolioData = Object.entries(portfolio).map(([company, { stockPrice }]) => {
-    const stockPriceRatio = Math.round((stockPrice / totalStockAmount) * 100 * 10) / 10;
+    const stockPriceRatio = formatPercentage(stockPrice / totalStockAmount);
     return {
       label: `${company} (${stockPriceRatio}%)`,
       value: stockPrice,

@@ -1,6 +1,7 @@
 import { commaizeNumber } from '@toss/utils';
 import Card from '../../../../../../../../component-presentation/Card';
 import * as COLOR from '../../../../../../../../config/color';
+import { formatPercentage } from '../../../../../../../../utils/stock';
 import { 게임모드 } from '../../../../constant';
 import { type UseStockInfo } from '../hooks/useStockInfo';
 import { BEARISH_COLOR, BULLISH_COLOR } from '../../../../color';
@@ -63,7 +64,7 @@ const formatCurrency = (amount: number): string => `₩${commaizeNumber(amount)}
 
 const calculateProfitLossPercentage = (totalProfitLoss: number, totalInvestment: number): number => {
   if (totalInvestment <= 0) return 0;
-  return Math.round((totalProfitLoss / totalInvestment) * 100 * 10) / 10;
+  return formatPercentage(totalProfitLoss / totalInvestment);
 };
 
 const formatProfitLossPercentage = (totalProfitLoss: number, percentage: number): string => {

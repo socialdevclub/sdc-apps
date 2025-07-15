@@ -53,6 +53,10 @@ export function calculateProfitRate(currentPrice: number, averagePrice: number):
   return Math.round(profitRate * 10) / 10;
 }
 
+export const formatPercentage = (value: number): number => {
+  return Math.round(value * 100 * 10) / 10;
+};
+
 /**
  * 주식 정보 메시지 타입
  */
@@ -250,7 +254,7 @@ export const calculateCurrentPortfolio = ({
     const stockCurrentPrice = companies[companyName][timeIdx].가격;
     const investmentPrice = Math.round(stockCountCurrent * stockAveragePrice);
     const stockPrice = Math.round(stockCountCurrent * stockCurrentPrice);
-    const profitRate = Math.round(((stockPrice - investmentPrice) / investmentPrice) * 100 * 10) / 10;
+    const profitRate = formatPercentage((stockPrice - investmentPrice) / investmentPrice);
 
     portfolio[companyName] = {
       investmentPrice,
@@ -285,9 +289,7 @@ export const calculateAllPortfolios = ({
       const stockPrice = stockCurrentCount * stockCurrentPrice;
       const stockNextPrice = companies[companyName][timeIdx + 1].가격;
       const profitRate =
-        stockCurrentCount === 0
-          ? 0
-          : Math.round(((stockNextPrice - stockCurrentPrice) / stockCurrentPrice) * 100 * 10) / 10;
+        stockCurrentCount === 0 ? 0 : formatPercentage((stockNextPrice - stockCurrentPrice) / stockCurrentPrice);
 
       if (!portfolios[timeIdx]) {
         portfolios[timeIdx] = {};
