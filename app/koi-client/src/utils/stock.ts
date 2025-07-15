@@ -285,7 +285,9 @@ export const calculateAllPortfolios = ({
       if (timeIdx === 9) return;
 
       const stockCurrentPrice = companies[companyName][timeIdx].가격;
-      const stockCurrentCount = stockCountHistory.filter((v) => v > 0).reduce((acc, curr) => acc + curr, 0);
+      const stockCurrentCount = stockCountHistory
+        .filter((_, idx) => idx <= timeIdx)
+        .reduce((acc, curr) => acc + curr, 0);
       const stockPrice = stockCurrentCount * stockCurrentPrice;
       const stockNextPrice = companies[companyName][timeIdx + 1].가격;
       const profitRate =

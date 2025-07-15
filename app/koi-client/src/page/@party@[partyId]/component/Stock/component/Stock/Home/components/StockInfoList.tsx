@@ -90,7 +90,7 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
       <Container>
         {holdings.length > 0 ? (
           <>
-            <DoughnutChart height="700px" data={portfolioData} containerHeight="500px" />
+            <DoughnutChart data={portfolioData.filter((v) => v.value > 0)} />
             {holdings.map((stock) => (
               <StockInfoCard
                 key={stock.companyName}
