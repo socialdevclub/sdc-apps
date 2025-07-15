@@ -22,4 +22,7 @@ export default defineConfig({
   resolve: {
     alias: [{ find: '@', replacement: '/src' }],
   },
+  server: {
+    allowedHosts: ['local.socialdev.club'],
+  },
 });
