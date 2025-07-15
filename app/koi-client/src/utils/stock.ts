@@ -246,8 +246,8 @@ export const calculateCurrentPortfolio = ({
 
   stockStorages.forEach((storage) => {
     const { companyName, stockCountCurrent, stockAveragePrice } = storage;
-    const stockCurrentPrice = companies[companyName][timeIdx].가격;
 
+    const stockCurrentPrice = companies[companyName][timeIdx].가격;
     const investmentPrice = Math.round(stockCountCurrent * stockAveragePrice);
     const stockPrice = Math.round(stockCountCurrent * stockCurrentPrice);
     const profitRate = Math.round(((stockPrice - investmentPrice) / investmentPrice) * 100 * 10) / 10;

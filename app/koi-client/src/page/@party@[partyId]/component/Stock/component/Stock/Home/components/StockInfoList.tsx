@@ -56,13 +56,9 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
     stockStorages: user?.stockStorages ?? [],
     timeIdx: timeIdx ?? 0,
   });
-
-  // const totalStockQuantity = Object.values(portfolio).reduce((acc, curr) => acc + curr.stockCount, 0);
   const totalStockAmount = Object.values(portfolio).reduce((acc, curr) => acc + curr.stockPrice, 0);
-
   const portfolioData = Object.entries(portfolio).map(([company, { stockPrice }]) => {
     const stockPriceRatio = Math.round((stockPrice / totalStockAmount) * 100 * 10) / 10;
-
     return {
       label: `${company} (${stockPriceRatio}%)`,
       value: stockPrice,
