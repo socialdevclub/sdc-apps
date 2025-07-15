@@ -9,17 +9,16 @@ import saveAs from 'file-saver';
 // import { GetStockUser } from 'shared~type-stock/Response';
 import { commaizeNumber } from '@toss/utils';
 import { css } from '@linaria/core';
-import { UserStore } from '../../../../../store';
-import { Query } from '../../../../../hook';
-import { LOCAL_STORAGE_KEY } from '../../../../../config/localStorage';
-import { calculateAllPortfolios } from '../../../../../utils/stock';
-import DoughnutChart from '../../../../../component-presentation/DoughnutChart';
+import { UserStore } from '../../../../../../store';
+import { Query } from '../../../../../../hook';
+import { LOCAL_STORAGE_KEY } from '../../../../../../config/localStorage';
+import ResultRealism from './ResultRealism';
 
-interface RankingProps {
+interface ResultProps {
   stockId: string;
 }
 
-function Ranking({ stockId }: RankingProps) {
+function Result({ stockId }: ResultProps) {
   const supabaseSession = useAtomValue(UserStore.supabaseSession);
   const { getRound0Avg, getRound12Avg } = Query.Stock.useQueryResult(stockId);
 
@@ -122,11 +121,6 @@ function Ranking({ stockId }: RankingProps) {
       ? '타고난 리더십으로 팀을 이끌고 신뢰를 쌓아가는 호랑이예요. 함께하면 더 큰 시너지를 만들어낼 수 있어요.'
       : '전설적인 케미의 드래곤이예요. 뛰어난 통찰력과 매력으로 모든 이의 마음을 사로잡고 최고의 팀워크를 만들어요.';
 
-  const portfolios = calculateAllPortfolios({
-    companies: stock.companies,
-    stockStorages: user?.stockStorages ?? [],
-  });
-
   const handleDownload = async () => {
     if (!captureAreaRef.current) return;
 
@@ -148,8 +142,12 @@ function Ranking({ stockId }: RankingProps) {
     }
   };
 
+  if (!user) {
+    return <></>;
+  }
+
   const shareData = {
-    text: `${user?.userInfo.nickname}님의 순위는 ${rank}위! ${animalResult}입니다! `,
+    text: `${user.userInfo.nickname}님의 순위는 ${rank}위! ${animalResult}입니다! `,
     title: '주식게임결과',
     url: 'https://play.socialdev.club?share=stock',
   };
@@ -253,26 +251,7 @@ function Ranking({ stockId }: RankingProps) {
         </>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', width: '100%' }}>
-        {stock.gameMode === 'realism' &&
-          Object.entries(portfolios).map(([timeIdx, companyPortfolio]) => {
-            const portfolioData = Object.entries(companyPortfolio).map(([company, { stockPrice, profitRate }]) => {
-              return {
-                label: `${company} (${profitRate}%)`,
-                value: stockPrice,
-              };
-            });
-
-            return (
-              <div key={timeIdx}>
-                <h2 style={{ paddingLeft: '16px' }}>{Number(timeIdx) + 1}년차 포트폴리오</h2>
-                <div style={{ width: '100%' }}>
-                  <DoughnutChart height="700px" data={portfolioData} containerHeight="500px" />
-                </div>
-              </div>
-            );
-          })}
-      </div>
+      {stock.gameMode === 'realism' && <ResultRealism stock={stock} user={user} />}
 
       <BottomSection>
         <Button color="#374151" onClick={handleShare}>
@@ -288,7 +267,7 @@ function Ranking({ stockId }: RankingProps) {
   );
 }
 
-export default Ranking;
+export default Result;
 
 const RankColorCode = {
   bronze: '205, 127, 50',
