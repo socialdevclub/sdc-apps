@@ -39,6 +39,8 @@ export class StockUser implements StockUserSchema {
 
   money: number;
 
+  moneyHistory: number[];
+
   lastActivityTime: string;
 
   loanCount: number;
@@ -54,6 +56,7 @@ export class StockUser implements StockUserSchema {
 
     this.index = partial.index ?? 0;
     this.money = partial.money ?? INIT_USER_MONEY;
+    this.moneyHistory = new Array(StockConfig.MAX_STOCK_IDX + 1).fill(0);
     this.lastActivityTime = dayjs().toISOString();
     this.loanCount = partial.loanCount ?? 0;
 

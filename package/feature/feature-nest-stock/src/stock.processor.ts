@@ -105,11 +105,15 @@ export class StockProcessor {
         }
       }
 
+      const moneyHistory = [...user.moneyHistory];
+      moneyHistory[idx] = user.money - totalPrice;
+
       await Promise.all([
         this.userRepository.updateOneWithAdd(
           { stockId, userId },
           {
             lastActivityTime: dayjs().toISOString(),
+            moneyHistory,
             stockStorages: updatedStockStorages,
           },
           {
@@ -245,11 +249,15 @@ export class StockProcessor {
         updatedRemainingStocks[company] += amount;
       }
 
+      const moneyHistory = [...user.moneyHistory];
+      moneyHistory[idx] = user.money + totalPrice;
+
       await Promise.all([
         this.userRepository.updateOneWithAdd(
           { stockId, userId },
           {
             lastActivityTime: dayjs().toISOString(),
+            moneyHistory,
             stockStorages: updatedStockStorages,
           },
           {

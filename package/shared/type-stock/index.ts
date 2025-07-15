@@ -25,6 +25,7 @@ export type StockUserSchema = {
   userInfo: StockUserInfoSchema;
   index: number;
   money: number;
+  moneyHistory: number[];
   lastActivityTime: string;
   loanCount: number;
   stockStorages: StockStorageSchema[];
