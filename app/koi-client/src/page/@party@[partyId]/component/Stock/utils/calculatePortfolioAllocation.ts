@@ -1,3 +1,4 @@
+import { StockConfig } from 'shared~config';
 import { Response, StockSchemaWithId } from 'shared~type-stock';
 
 /**
@@ -49,7 +50,7 @@ export function calculatePortfolioAllocation(
     // 해당 연차까지의 누적 보유량 계산 (매수 +, 매도 -)
     // 예: [100, 30, 0, -4] → 0년차:100주, 1년차:130주, 2년차:130주, 3년차:126주
     let cumulativeHolding = 0;
-    for (let i = 0; i <= year; i++) {
+    for (let i = 0; i <= Math.min(year, StockConfig.MAX_STOCK_IDX - 1); i++) {
       cumulativeHolding += stockCountHistory[i] || 0;
     }
 
@@ -67,7 +68,7 @@ export function calculatePortfolioAllocation(
   });
 
   // 2단계: 현금 보유량 추가
-  const cashAmount = user.moneyHistory[year];
+  const cashAmount = user.moneyHistory[Math.min(year, StockConfig.MAX_STOCK_IDX - 1)];
   if (cashAmount && cashAmount > 0) {
     isEmpty = false; // 현금이 있으면 빈 포트폴리오가 아님
     companiesPortfolio.push({

@@ -111,7 +111,9 @@ export class StockProcessor {
       }
 
       const moneyHistory = [...user.moneyHistory];
-      moneyHistory[idx] = user.money - totalPrice;
+      for (let i = idx; i < moneyHistory.length; i++) {
+        moneyHistory[i] = user.money - totalPrice;
+      }
 
       await Promise.all([
         this.userRepository.updateOneWithAdd(
@@ -260,7 +262,9 @@ export class StockProcessor {
       }
 
       const moneyHistory = [...user.moneyHistory];
-      moneyHistory[idx] = user.money + totalPrice;
+      for (let i = idx; i < moneyHistory.length; i++) {
+        moneyHistory[i] = user.money + totalPrice;
+      }
 
       await Promise.all([
         this.userRepository.updateOneWithAdd(

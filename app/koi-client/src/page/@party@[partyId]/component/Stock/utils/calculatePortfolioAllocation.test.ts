@@ -174,9 +174,8 @@ describe('calculatePortfolioAllocation', () => {
   it('범위를 벗어난 연차에 대해 적절히 처리해요', () => {
     const result = calculatePortfolioAllocation(mockStock, mockUser, 20);
 
-    // 범위를 벗어난 연차에는 데이터가 없으므로 빈 포트폴리오여야 함
-    expect(result.isEmpty).toBe(true);
-    expect(result.companies).toEqual([{ name: '보유 자산 없음', value: 1 }]);
+    expect(result.isEmpty).toBe(false);
+    expect(result.companies).toEqual([{ name: '현금', value: 11202000 }]);
   });
 
   it('누적 보유량을 정확히 계산해요', () => {
@@ -200,17 +199,20 @@ describe('calculatePortfolioAllocation', () => {
     expect(cash4).toBe(14068100); // moneyHistory[4]
   });
 
-  it('마지막 연차에 음수 누적으로 보유량이 0이 된 경우를 처리해요', () => {
+  it('마지막 연차는 무시해요', () => {
     // 9년차: QQQ의 경우 100+30+0+(-4)+(-23)+0+0+0+(-10)+(-93) = 0
     const result = calculatePortfolioAllocation(mockStock, mockUser, 9);
 
     // QQQ는 최종적으로 0주이므로 포트폴리오에 없어야 함
     const qqqEntry = result.companies.find((c) => c.name === 'QQQ');
-    expect(qqqEntry).toBeUndefined();
+    expect(qqqEntry).toEqual({
+      name: 'QQQ',
+      value: 95000 * 93,
+    });
 
     // 하지만 현금은 있어야 함
     const cashEntry = result.companies.find((c) => c.name === '현금');
     expect(cashEntry).toBeDefined();
-    expect(cashEntry?.value).toBe(1000000); // moneyHistory[9]
+    expect(cashEntry?.value).toBe(11202000); // moneyHistory[9]
   });
 });

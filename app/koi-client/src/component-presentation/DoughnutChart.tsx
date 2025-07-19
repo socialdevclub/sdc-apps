@@ -85,7 +85,7 @@ const useDoughnutChart = (data: DoughnutChartData[]) => {
           animationType: 'scale',
           avoidLabelOverlap: true,
 
-          center: ['50%', '15%'], // 차트 중심 위치
+          center: ['50%', '50%'], // 차트 중심 위치
 
           // 라벨 겹침 방지 활성화
           data: chartData,
@@ -139,7 +139,7 @@ const useDoughnutChart = (data: DoughnutChartData[]) => {
           },
 
           name: '포트폴리오',
-          radius: ['0%', '40%'], // 도넛 크기를 조금 줄여서 라벨 공간 확보
+          radius: ['0%', '70%'], // 도넛 크기를 조금 줄여서 라벨 공간 확보
           type: 'pie',
         },
       ],
@@ -180,7 +180,7 @@ const DoughnutChart = ({ data, width = '100%', minHeight = 350, maxHeight = 700 
   const dynamicContainerHeight = useMemo(() => {
     // 컨테이너 높이는 차트 높이보다 약간 작게 설정
     const calculatedHeight = calculateDynamicHeight(validDataCount, minHeight, maxHeight);
-    const containerHeightValue = Math.max(calculatedHeight + 100, minHeight + 100); // 지시선을 위한 충분한 여유 공간
+    const containerHeightValue = Math.max(calculatedHeight, minHeight); // 지시선을 위한 충분한 여유 공간
     console.log(`📦 DoughnutChart: 컨테이너 높이 ${containerHeightValue}px (지시선 포함)`);
     return containerHeightValue;
   }, [validDataCount, minHeight, maxHeight]);

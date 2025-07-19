@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Response, StockSchemaWithId } from 'shared~type-stock';
 import DoughnutChart from '../../../../../../component-presentation/DoughnutChart';
 import { calculateInvestmentData } from '../../utils/calculateInvestmentData';
+import { calculateCompanyReturnRate } from '../../utils/calculateReturnRate';
 
 interface ResultRealismProps {
   stock: StockSchemaWithId;
@@ -79,6 +80,139 @@ const getAssetColor = (assetName: string): string => {
 };
 
 /**
+ * 포트폴리오 테이블 컴포넌트
+ * 자산별 색상, 이름, 비율, 이후 수익률을 테이블로 표시해요
+ */
+interface PortfolioTableProps {
+  data: Array<{
+    color: string;
+    label: string;
+    value: number;
+  }>;
+  totalValue: number;
+  currentRound: number;
+  stock: StockSchemaWithId;
+  user: Response.GetStockUser;
+}
+
+const PortfolioTable = ({ data, totalValue, currentRound, stock, user }: PortfolioTableProps) => {
+  return (
+    <div style={{ marginTop: '20px', padding: '0 16px' }}>
+      <table style={{ borderCollapse: 'collapse', fontSize: '14px', width: '100%' }}>
+        <thead>
+          <tr style={{ borderBottom: '2px solid #e0e0e0' }}>
+            <th style={{ fontWeight: '600', padding: '12px 8px', textAlign: 'left' }}>자산</th>
+            <th style={{ fontWeight: '600', padding: '12px 8px', textAlign: 'right' }}>가치</th>
+            <th style={{ fontWeight: '600', padding: '12px 8px', textAlign: 'right' }}>비율</th>
+            <th style={{ fontWeight: '600', padding: '12px 8px', textAlign: 'right' }}>수익률</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((item, index) => {
+            // 비율 계산 (소수점 2자리까지)
+            const percentage = ((item.value / totalValue) * 100).toFixed(2);
+
+            // 이후 수익률 계산
+            let returnRate: number | null = null;
+            if (item.label !== '현금' && item.label !== '보유 자산 없음') {
+              returnRate = calculateCompanyReturnRate(stock, user, item.label, currentRound);
+            }
+
+            return (
+              <tr key={`${item.label}-${item.value}`} style={{ borderBottom: '1px solid #f0f0f0', fontSize: '12px' }}>
+                <td style={{ padding: '10px 8px' }}>
+                  <div style={{ alignItems: 'center', display: 'flex', gap: '6px' }}>
+                    {/* 색상 표시 */}
+                    <div
+                      style={{
+                        backgroundColor: item.color,
+                        borderRadius: '3px',
+                        flexShrink: 0,
+                        height: '12px',
+                        width: '12px',
+                      }}
+                    />
+                    <span>{item.label}</span>
+                  </div>
+                </td>
+                <td style={{ fontWeight: '500', padding: '10px 8px', textAlign: 'right' }}>
+                  {item.value.toLocaleString()}원
+                </td>
+                <td style={{ fontWeight: '500', padding: '10px 8px', textAlign: 'right' }}>{percentage}%</td>
+                <td style={{ padding: '10px 8px', textAlign: 'right' }}>
+                  {returnRate !== null ? (
+                    <span
+                      style={{
+                        color: returnRate >= 0 ? '#22c55e' : '#ef4444',
+                        fontWeight: '500',
+                      }}
+                    >
+                      {returnRate >= 0 ? '+' : ''}
+                      {returnRate}%
+                    </span>
+                  ) : (
+                    <span style={{ color: '#6b7280' }}>-</span>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+          {/* 합계 행 */}
+          {(() => {
+            // 0년차는 null, 다른 년차는 전체 포트폴리오 기준 수익률 계산
+            let averageReturn: number | null = null;
+
+            if (currentRound > 0) {
+              // 이전 라운드의 총 포트폴리오 가치 계산
+              const previousRoundData = calculateInvestmentData(stock, user)[currentRound - 1];
+              if (previousRoundData) {
+                const previousTotalValue = previousRoundData.companies.reduce((acc, company) => acc + company.value, 0);
+
+                // 전체 포트폴리오 수익률 계산: (현재 총가치 - 이전 총가치) / 이전 총가치 * 100
+                if (previousTotalValue > 0) {
+                  averageReturn = ((totalValue - previousTotalValue) / previousTotalValue) * 100;
+                }
+              }
+            }
+
+            return (
+              <tr
+                style={{
+                  // backgroundColor: '#f5f5f5',
+                  // borderTop: '2px solid #333333',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  fontSize: '12px',
+                }}
+              >
+                <td style={{ fontWeight: '500', padding: '10px 8px 10px 4px' }} />
+                <td style={{ fontWeight: '500', padding: '10px 8px 10px 0px', textAlign: 'right' }}>
+                  {totalValue.toLocaleString()}원
+                </td>
+                <td style={{ fontWeight: '500', padding: '10px 8px 10px 4px', textAlign: 'right' }}>100.00%</td>
+                <td style={{ fontWeight: '500', padding: '10px 8px 10px 4px', textAlign: 'right' }}>
+                  {averageReturn !== null ? (
+                    <span
+                      style={{
+                        color: averageReturn >= 0 ? '#22c55e' : '#ef4444',
+                      }}
+                    >
+                      {averageReturn >= 0 ? '+' : ''}
+                      {averageReturn.toFixed(2)}%
+                    </span>
+                  ) : (
+                    <span style={{ color: '#6b7280' }}>-</span>
+                  )}
+                </td>
+              </tr>
+            );
+          })()}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+/**
  * 주식 게임 결과를 현실적인 포트폴리오 차트로 보여주는 컴포넌트예요
  * 연도별로 사용자의 주식 보유 현황과 현금을 포함한 전체 자산을 도넛 차트로 시각화해요
  */
@@ -90,9 +224,13 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
   const portfolioList = useMemo(
     () =>
       portfolioData.map((yearData) => {
+        // 연도를 라운드 인덱스로 변환 ("0년차" -> 0)
+        const currentRound = parseInt(yearData.year.replace('년차', ''), 10);
+
         // 빈 포트폴리오인 경우 차트를 표시하지 않아요
         if (yearData.companies.length === 1 && yearData.companies[0].name === '보유 자산 없음') {
           return {
+            currentRound,
             isEmpty: true,
             portfolioData: [],
             totalValue: 0,
@@ -116,6 +254,7 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
         });
 
         return {
+          currentRound,
           isEmpty: false,
           portfolioData: chartData,
           totalValue,
@@ -128,7 +267,7 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', width: '100%' }}>
       {/* 각 연도별 포트폴리오를 차트로 표시해요 */}
-      {portfolioList.map(({ year, portfolioData: chartData, isEmpty }) => {
+      {portfolioList.map(({ year, portfolioData: chartData, isEmpty, totalValue, currentRound }) => {
         return (
           <div key={year}>
             {/* 연도별 제목과 총 자산 가치를 표시해요 */}
@@ -146,8 +285,19 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
                   보유 자산이 없어요
                 </div>
               ) : (
-                /* 주식과 현금을 포함한 전체 자산을 차트에 표시해요 */
-                <DoughnutChart data={chartData.toSorted((a, b) => b.value - a.value)} minHeight={0} maxHeight={100} />
+                <>
+                  {/* 주식과 현금을 포함한 전체 자산을 차트에 표시해요 */}
+                  <DoughnutChart data={chartData.toSorted((a, b) => b.value - a.value)} minHeight={0} maxHeight={200} />
+
+                  {/* 포트폴리오 상세 테이블 */}
+                  <PortfolioTable
+                    data={chartData.toSorted((a, b) => b.value - a.value)}
+                    totalValue={totalValue}
+                    currentRound={currentRound}
+                    stock={stock}
+                    user={user}
+                  />
+                </>
               )}
             </div>
           </div>

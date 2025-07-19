@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { Response, StockSchemaWithId } from 'shared~type-stock';
+import { StockConfig } from 'shared~config';
 import { calculateInvestmentData } from './calculateInvestmentData';
 import { MOCK_STOCK, MOCK_USER } from '../__mock__';
 
@@ -8,11 +9,11 @@ const mockStock = MOCK_STOCK as unknown as StockSchemaWithId;
 const mockUser = MOCK_USER as unknown as Response.GetStockUser;
 
 describe('calculateInvestmentData', () => {
-  it('0~8년차의 연차별 포트폴리오 구성 데이터를 정확히 계산해요', () => {
+  it('0~9년차의 연차별 포트폴리오 구성 데이터를 정확히 계산해요', () => {
     const result = calculateInvestmentData(mockStock, mockUser);
 
-    // 9개의 연차 데이터가 반환되는지 확인
-    expect(result).toHaveLength(9);
+    // 10개의 연차 데이터가 반환되는지 확인
+    expect(result).toHaveLength(10);
 
     // 각 연차 데이터 구조 확인
     result.forEach((yearData, index) => {
@@ -49,7 +50,7 @@ describe('calculateInvestmentData', () => {
     expect(qqqEntry?.value).toBe(100 * 100000); // 100주 * 100,000원
   });
 
-  it('마지막 연차(8년차)의 포트폴리오 구성을 정확히 계산해요', () => {
+  it('8년차의 포트폴리오 구성을 정확히 계산해요', () => {
     const result = calculateInvestmentData(mockStock, mockUser);
     const lastYearData = result[8];
 
@@ -73,7 +74,9 @@ describe('calculateInvestmentData', () => {
     const result = calculateInvestmentData(mockStock, mockUser);
 
     // 각 연차별 현금 보유량 확인
-    const expectedCashByYear = [35100000, 13975200, 15882500, 11295700, 14068100, 9828100, 7789600, 11282800, 11202000];
+    const expectedCashByYear = [
+      35100000, 13975200, 15882500, 11295700, 14068100, 9828100, 7789600, 11282800, 11202000, 11202000,
+    ];
 
     result.forEach((yearData, index) => {
       const cashEntry = yearData.companies.find((company) => company.name === '현금');
@@ -89,7 +92,7 @@ describe('calculateInvestmentData', () => {
     } as unknown as Response.GetStockUser;
     const result = calculateInvestmentData(mockStock, emptyUser);
 
-    expect(result).toHaveLength(9);
+    expect(result).toHaveLength(StockConfig.MAX_STOCK_IDX + 1);
 
     // 모든 연차에 대해 '보유 자산 없음' 상태여야 함
     result.forEach((yearData) => {
