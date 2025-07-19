@@ -7,11 +7,12 @@ import StockInfoCard from '../../../../../../../../component-presentation/StockI
 import { Query } from '../../../../../../../../hook/index.ts';
 import { useQueryStock } from '../../../../../../../../hook/query/Stock';
 import useStockHoldings from '../../../../../../../../hook/query/Stock/useStockHoldings.tsx';
-import { calculateCurrentPortfolio, getStockMessages } from '../../../../../../../../utils/stock.ts';
+import { getStockMessages } from '../../../../../../../../utils/stock.ts';
 import StockDrawer from '../../StockDrawer/index.tsx';
 import { H3, TitleWrapper } from '../Home.styles.tsx';
 import { calculatePortfolioAllocationWithAllStocks } from '../../../../utils/calculatePortfolioAllocation.ts';
 import { formatRatio } from '../../../../utils/calculatePercentage.ts';
+import { getAssetColor } from '../../../../utils/getAssetColor';
 
 interface StockHoldingsListProps {
   stockId: string;
@@ -53,35 +54,16 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
     }, [] as Array<{ company: string; timeIdx: number; price: number }>),
   );
 
-  const portfolio = calculateCurrentPortfolio({
-    companies: stock.companies,
-    stockStorages: user?.stockStorages ?? [],
-    timeIdx: timeIdx ?? 0,
-  });
-
   const portfolioAllocation = calculatePortfolioAllocationWithAllStocks(stock, user, timeIdx);
   const portfolioAllValue = portfolioAllocation.companies.reduce((acc, curr) => acc + curr.value, 0);
 
-  // 현금을 포함한 전체 포트폴리오 값
-  const totalPortfolioValueWithCash = portfolioAllValue + user.money;
-
   const portfolioData = [
-    // 주식 데이터
-    ...Object.entries(portfolio)
-      .filter(([, { stockPrice }]) => stockPrice > 0)
-      .map(([company, { stockPrice }]) => ({
-        label: `${company}`,
-        value: stockPrice,
-      })),
-    // 현금 데이터 (현금이 0보다 클 때만 표시)
-    ...(user.money > 0
-      ? [
-          {
-            label: '현금',
-            value: user.money,
-          },
-        ]
-      : []),
+    // 주식 데이터 (종목별 색상 포함)
+    ...portfolioAllocation.companies.map((company) => ({
+      color: getAssetColor(company.name),
+      label: `${company.name}`,
+      value: company.value, // 종목별 고정 색상 추가
+    })),
   ];
 
   const stockMessages = getStockMessages({
@@ -124,7 +106,7 @@ export const StockHoldingsList = ({ stockId, userId, messageApi }: StockHoldings
                   profitLossPercentage={parseFloat(stock.profitLossPercentage.toFixed(1))}
                   investmentRatio={formatRatio(
                     portfolioAllocation.companies.find((v) => v.name === stock.companyName)?.value ?? 0,
-                    totalPortfolioValueWithCash,
+                    portfolioAllValue,
                   )}
                 />
               ))
