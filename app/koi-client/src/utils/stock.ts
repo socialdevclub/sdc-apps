@@ -228,9 +228,9 @@ export const secondsToMMSS = (seconds: number): string => {
   return `${formattedMinutes}:${formattedSeconds}`;
 };
 
-type CompanyName = string;
+export type CompanyName = string;
 
-interface StockValue {
+export interface StockValue {
   investmentPrice: number;
   stockCount: number;
   stockPrice: number;
@@ -265,46 +265,4 @@ export const calculateCurrentPortfolio = ({
   });
 
   return portfolio;
-};
-
-type TimeIdx = string;
-
-export const calculateAllPortfolios = ({
-  stockStorages,
-  companies,
-}: {
-  stockStorages: StockStorageSchema[];
-  companies: Record<CompanyName, CompanyInfo[]>;
-}): Record<TimeIdx, Record<CompanyName, StockValue>> => {
-  const portfolios: Record<TimeIdx, Record<CompanyName, StockValue>> = {};
-
-  stockStorages.forEach((storage) => {
-    const { companyName, stockCountHistory } = storage;
-
-    stockCountHistory.forEach((_, timeIdx) => {
-      if (timeIdx === 9) return;
-
-      const stockCurrentPrice = companies[companyName][timeIdx].가격;
-      const stockCurrentCount = stockCountHistory
-        .filter((_, idx) => idx <= timeIdx)
-        .reduce((acc, curr) => acc + curr, 0);
-      const stockPrice = stockCurrentCount * stockCurrentPrice;
-      const stockNextPrice = companies[companyName][timeIdx + 1].가격;
-      const profitRate =
-        stockCurrentCount === 0 ? 0 : formatPercentage((stockNextPrice - stockCurrentPrice) / stockCurrentPrice);
-
-      if (!portfolios[timeIdx]) {
-        portfolios[timeIdx] = {};
-      }
-
-      portfolios[timeIdx][companyName] = {
-        investmentPrice: stockPrice,
-        profitRate,
-        stockCount: stockCurrentCount,
-        stockPrice: stockNextPrice,
-      };
-    });
-  });
-
-  return portfolios;
 };
