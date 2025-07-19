@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { Response, StockSchemaWithId } from 'shared~type-stock';
 import DoughnutChart from '../../../../../../component-presentation/DoughnutChart';
-import { formatPercentage } from '../../../../../../utils/stock';
 import { calculateInvestmentData } from '../../utils/calculateInvestmentData';
 
 interface ResultRealismProps {
@@ -107,12 +106,10 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
         // 각 자산별 데이터를 차트용 데이터로 변환해요
         const chartData = yearData.companies.map((company) => {
           // 전체 포트폴리오에서 해당 자산이 차지하는 비율을 계산해요
-          const ratio = formatPercentage(company.value / totalValue);
           return {
             // 해당 자산의 총 가치예요
             color: getAssetColor(company.name),
-
-            label: `${company.name} (${ratio}%)`,
+            label: `${company.name}`,
             // 자산명과 비율을 표시해요
             value: company.value, // 자산별 고정 색상을 지정해요
           };
@@ -150,7 +147,7 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
                 </div>
               ) : (
                 /* 주식과 현금을 포함한 전체 자산을 차트에 표시해요 */
-                <DoughnutChart data={chartData.toSorted((a, b) => b.value - a.value)} />
+                <DoughnutChart data={chartData.toSorted((a, b) => b.value - a.value)} minHeight={0} maxHeight={100} />
               )}
             </div>
           </div>

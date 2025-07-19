@@ -63,11 +63,6 @@ const useDoughnutChart = (data: DoughnutChartData[]) => {
       .filter((item) => item.value > 0)
       .map((item, index) => ({
         itemStyle: {
-          borderColor: 'rgba(255, 255, 255, 0.8)',
-
-          borderRadius: 8,
-
-          borderWidth: 2,
           // 개별 색상이 지정되어 있으면 사용, 없으면 기본 팔레트에서 선택
           color: item.color || defaultColorPalette[index % defaultColorPalette.length],
           shadowBlur: 10,
@@ -82,41 +77,69 @@ const useDoughnutChart = (data: DoughnutChartData[]) => {
       backgroundColor: 'transparent',
       color: defaultColorPalette, // 기본 색상 팔레트 (개별 itemStyle이 우선)
       legend: {
-        itemGap: 20,
-        itemHeight: 14,
-        itemWidth: 14,
-        left: 'center',
-        textStyle: {
-          color: '#FFFFFF', // 흰색 텍스트로 변경
-          fontSize: 14,
-          fontWeight: 500,
-        },
+        show: false, // 범례는 숨기고 지시선으로 대체
       },
       series: [
         {
           animationDuration: 500,
           animationType: 'scale',
-          avoidLabelOverlap: false,
+          avoidLabelOverlap: true,
+
+          center: ['50%', '15%'], // 차트 중심 위치
+
+          // 라벨 겹침 방지 활성화
           data: chartData,
+
           emphasis: {
             label: {
               color: '#FFFFFF',
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: 'bold',
               show: true,
             },
             scale: true,
-            scaleSize: 5,
+            scaleSize: 8,
           },
+
           label: {
-            position: 'center',
-            show: false,
+            // 라벨 텍스트 색상
+            color: '#FFFFFF',
+
+            // 지시선과 라벨 사이 거리 증가
+            distanceToLabelLine: 10,
+
+            // 폰트 크기를 약간 줄여서 공간 확보
+            fontSize: 12,
+            fontWeight: 500,
+
+            // 자산명만 표시 (비율은 제거)
+            formatter: '{b}',
+
+            // 라벨을 차트 외부에 배치
+            position: 'outside',
+
+            // 라벨 표시 활성화
+            show: true,
           },
+
           labelLine: {
-            show: false,
+            // 지시선 표시 활성화
+            length: 20,
+            // 첫 번째 지시선 길이 증가
+            length2: 15,
+            // 직선 지시선
+            lineStyle: {
+              color: 'rgba(255, 255, 255, 0.8)', // 지시선 색상
+              width: 1.5, // 지시선 두께
+            },
+
+            show: true,
+            // 두 번째 지시선 길이 증가
+            smooth: false,
           },
+
           name: '포트폴리오',
-          radius: ['35%', '65%'],
+          radius: ['0%', '40%'], // 도넛 크기를 조금 줄여서 라벨 공간 확보
           type: 'pie',
         },
       ],
@@ -135,23 +158,12 @@ interface Props {
     color?: string; // 개별 색상 속성 추가
     [key: string]: unknown;
   }[];
-  height?: number | string;
   width?: number | string;
-  containerHeight?: number | string;
-  autoHeight?: boolean; // 자동 높이 조정 옵션
   minHeight?: number; // 최소 높이
   maxHeight?: number; // 최대 높이
 }
 
-const DoughnutChart = ({
-  data,
-  height = 400,
-  width = '100%',
-  containerHeight = 450,
-  autoHeight = true,
-  minHeight = 350,
-  maxHeight = 700,
-}: Props) => {
+const DoughnutChart = ({ data, width = '100%', minHeight = 350, maxHeight = 700 }: Props) => {
   const { chartRef } = useDoughnutChart(data);
 
   // 유효한 데이터 개수 계산 (value > 0인 항목만)
@@ -159,22 +171,19 @@ const DoughnutChart = ({
     return data.filter((item) => item.value > 0).length;
   }, [data]);
 
-  // 동적 높이 계산
+  // 동적 높이 계산 (지시선을 위해 조금 더 여유 공간 확보)
   const dynamicHeight = useMemo(() => {
-    if (!autoHeight) return height;
     const calculatedHeight = calculateDynamicHeight(validDataCount, minHeight, maxHeight);
-    console.log(`🎯 DoughnutChart: 데이터 ${validDataCount}개 → 높이 ${calculatedHeight}px`);
     return calculatedHeight;
-  }, [autoHeight, validDataCount, height, minHeight, maxHeight]);
+  }, [validDataCount, minHeight, maxHeight]);
 
   const dynamicContainerHeight = useMemo(() => {
-    if (!autoHeight) return containerHeight;
     // 컨테이너 높이는 차트 높이보다 약간 작게 설정
     const calculatedHeight = calculateDynamicHeight(validDataCount, minHeight, maxHeight);
-    const containerHeightValue = Math.max(calculatedHeight - 50, minHeight - 50);
-    console.log(`📦 DoughnutChart: 컨테이너 높이 ${containerHeightValue}px`);
+    const containerHeightValue = Math.max(calculatedHeight + 100, minHeight + 100); // 지시선을 위한 충분한 여유 공간
+    console.log(`📦 DoughnutChart: 컨테이너 높이 ${containerHeightValue}px (지시선 포함)`);
     return containerHeightValue;
-  }, [autoHeight, validDataCount, containerHeight, minHeight, maxHeight]);
+  }, [validDataCount, minHeight, maxHeight]);
 
   return (
     <div style={{ height: dynamicContainerHeight, overflowY: 'hidden' }}>
