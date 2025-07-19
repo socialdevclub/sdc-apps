@@ -91,3 +91,102 @@ export function calculatePortfolioAllocation(
     isEmpty,
   };
 }
+
+/**
+ * 모든 게임 내 종목을 포함한 포트폴리오 구성을 계산해요
+ * 보유량이 0인 종목도 0원으로 표시해서 전체 종목 현황을 볼 수 있어요
+ *
+ * @param stock 주식 데이터 - 각 회사별 연차별 가격 정보를 포함
+ * @param user 사용자 데이터 - 주식 거래 이력과 현금 보유 이력을 포함
+ * @param year 연차 (0부터 시작) - 계산하고자 하는 시점
+ *
+ * @returns 포트폴리오 구성 정보
+ * @returns companies - 모든 게임 내 자산 목록 (회사명과 해당 자산의 시장 가치, 보유량 0인 경우도 포함)
+ * @returns companies[].name - 자산명 (회사명 또는 '현금')
+ * @returns companies[].value - 해당 자산의 현재 시장 가치 (원 단위, 정수로 반올림, 보유량 0이면 0)
+ * @returns isEmpty - 포트폴리오가 비어있는지 여부 (주식도 현금도 없으면 true)
+ */
+export function calculatePortfolioAllocationWithAllStocks(
+  stock: StockSchemaWithId,
+  user: Response.GetStockUser,
+  year: number,
+): {
+  companies: Array<{ name: string; value: number }>;
+  isEmpty: boolean;
+} {
+  const companiesPortfolio: Array<{ name: string; value: number }> = [];
+  let isEmpty = true;
+
+  // 1단계: 모든 게임 내 회사에 대해 포트폴리오 가치 계산
+  const allCompanyNames = Object.keys(stock.companies);
+
+  allCompanyNames.forEach((companyName) => {
+    const companyPrices = stock.companies[companyName];
+
+    // 해당 회사의 가격 정보가 없거나 연차가 범위를 벗어나면 0원으로 처리
+    if (!companyPrices || year >= companyPrices.length) {
+      companiesPortfolio.push({
+        name: companyName,
+        value: 0,
+      });
+      return;
+    }
+
+    // 사용자가 해당 회사에 대한 거래 이력이 있는지 확인
+    const userStorage = user.stockStorages.find((storage) => storage.companyName === companyName);
+
+    if (!userStorage || year >= userStorage.stockCountHistory.length) {
+      // 거래 이력이 없으면 0원으로 처리
+      companiesPortfolio.push({
+        name: companyName,
+        value: 0,
+      });
+      return;
+    }
+
+    // 해당 연차까지의 누적 보유량 계산 (매수 +, 매도 -)
+    let cumulativeHolding = 0;
+    for (let i = 0; i <= Math.min(year, StockConfig.MAX_STOCK_IDX - 1); i++) {
+      cumulativeHolding += userStorage.stockCountHistory[i] || 0;
+    }
+
+    // 현재 시장 가치 = 보유량 × 현재 가격 (보유량이 0이면 0원)
+    const portfolioValue = cumulativeHolding > 0 ? cumulativeHolding * companyPrices[year].가격 : 0;
+
+    if (portfolioValue > 0) {
+      isEmpty = false; // 보유 자산이 있음을 표시
+    }
+
+    companiesPortfolio.push({
+      name: companyName,
+      value: Math.round(portfolioValue), // 원 단위로 반올림
+    });
+  });
+
+  // 2단계: 현금 보유량 추가
+  const cashAmount = user.moneyHistory[Math.min(year, StockConfig.MAX_STOCK_IDX - 1)];
+  const cashValue = cashAmount && cashAmount > 0 ? cashAmount : 0;
+
+  if (cashValue > 0) {
+    isEmpty = false; // 현금이 있으면 빈 포트폴리오가 아님
+  }
+
+  companiesPortfolio.push({
+    name: '현금',
+    value: Math.round(cashValue), // 현금도 원 단위로 반올림
+  });
+
+  // 3단계: 포트폴리오가 완전히 비어있는 경우 처리
+  if (isEmpty) {
+    return {
+      companies: [{ name: '보유 자산 없음', value: 1 }], // 차트 표시용 더미 데이터
+      isEmpty,
+    };
+  }
+
+  // 4단계: 정상적인 포트폴리오 반환 (가치 순으로 정렬)
+  return {
+    companies: companiesPortfolio.sort((a, b) => b.value - a.value),
+    isEmpty,
+  };
+}

@@ -114,7 +114,7 @@ describe('calculateInvestmentData', () => {
     const result = calculateInvestmentData(mockStock, singleCompanyUser);
     const year0Data = result[0];
 
-    expect(year0Data.companies).toHaveLength(2); // QQQ + 현금
+    expect(year0Data.companies).toHaveLength(11); // QQQ + 현금
 
     const qqqEntry = year0Data.companies.find((company) => company.name === 'QQQ');
     const cashEntry = year0Data.companies.find((company) => company.name === '현금');
@@ -138,7 +138,7 @@ describe('calculateInvestmentData', () => {
     const year2Data = result[2];
 
     // 2년차에는 모든 주식을 매도했으므로 현금만 있어야 함
-    expect(year2Data.companies).toHaveLength(1);
+    expect(year2Data.companies).toHaveLength(11);
     expect(year2Data.companies[0].name).toBe('현금');
     expect(year2Data.companies[0].value).toBe(3000000);
   });
