@@ -7,6 +7,7 @@ import { calculateCompanyReturnRate } from '../../utils/calculateReturnRate';
 import { formatRatio, formatPercentage, formatChangeRate, calculateChangeRate } from '../../utils/calculatePercentage';
 import { getAssetColor } from '../../utils/getAssetColor';
 import { exportToPdfMultiPage } from '../../utils/exportToPdfMultiPage';
+import PdfExportModal from './PdfExportModal';
 
 interface ResultRealismProps {
   stock: StockSchemaWithId;
@@ -42,7 +43,7 @@ const PortfolioTable = ({ data, totalValue, currentRound, stock, user }: Portfol
           </tr>
         </thead>
         <tbody>
-          {data.map((item, index) => {
+          {data.map((item) => {
             // 비율 계산 (소수점 2자리까지)
             const percentage = formatRatio(item.value, totalValue);
 
@@ -207,14 +208,27 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
   );
 
   // PDF 내보내기 함수
-  const handleExportToPdf = async () => {
+  const handleExportToPdf = async (isHighQuality: boolean) => {
     try {
       setIsExporting(true);
+
+      const qualityOptions = isHighQuality
+        ? {
+            imageFormat: 'PNG' as const,
+            imageQuality: 0.9,
+            quality: 2,
+          }
+        : {
+            imageFormat: 'JPEG' as const,
+            imageQuality: 0.6,
+            quality: 1.2,
+          };
+
       await exportToPdfMultiPage('portfolio-report-content', {
         backgroundColor: '#030711',
-        filename: `${user.userInfo.nickname}_포트폴리오_리포트.pdf`,
+        filename: `${user.userInfo.nickname}_포트폴리오_리포트_${isHighQuality ? '고화질' : '저화질'}.pdf`,
         margin: 15,
-        quality: 2,
+        ...qualityOptions,
       });
     } catch (error) {
       console.error('PDF 내보내기 실패:', error);
@@ -229,25 +243,7 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
       {/* PDF 내보내기 버튼 */}
       <div style={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', padding: '0 16px' }}>
         <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0, wordBreak: 'keep-all' }}>포트폴리오 리포트</h1>
-        <button
-          onClick={handleExportToPdf}
-          disabled={isExporting}
-          style={{
-            backgroundColor: isExporting ? '#cccccc' : '#2563eb',
-            border: 'none',
-            borderRadius: '8px',
-            color: 'white',
-            cursor: isExporting ? 'not-allowed' : 'pointer',
-            fontFamily: 'DungGeunMo',
-            fontSize: '14px',
-            fontWeight: '500',
-            letterSpacing: '0.02em',
-            padding: '10px 14px',
-            wordBreak: 'keep-all',
-          }}
-        >
-          {isExporting ? '저장 중...' : 'PDF 저장'}
-        </button>
+        <PdfExportModal isExporting={isExporting} onExport={handleExportToPdf} />
       </div>
 
       {/* PDF 내보내기 대상 콘텐츠 */}

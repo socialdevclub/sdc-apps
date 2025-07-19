@@ -6,10 +6,19 @@ interface ExportToPdfOptions {
   quality?: number;
   margin?: number;
   backgroundColor?: string;
+  imageQuality?: number;
+  imageFormat?: 'PNG' | 'JPEG';
 }
 
 export const exportToPdfMultiPage = async (elementId: string, options: ExportToPdfOptions = {}): Promise<void> => {
-  const { filename = 'portfolio-report.pdf', quality = 1, margin = 10, backgroundColor = '#ffffff' } = options;
+  const {
+    filename = 'portfolio-report.pdf',
+    quality = 1,
+    margin = 10,
+    backgroundColor = '#ffffff',
+    imageQuality = 1,
+    imageFormat = 'PNG',
+  } = options;
 
   try {
     const element = document.getElementById(elementId);
@@ -17,16 +26,16 @@ export const exportToPdfMultiPage = async (elementId: string, options: ExportToP
       throw new Error(`Element with id "${elementId}" not found`);
     }
 
-    // HTML 요소를 캔버스로 변환
+    // HTML 요소를 캔버스로 변환 (더 낮은 해상도로)
     const canvas = await html2canvas(element, {
       allowTaint: true,
       backgroundColor,
+      height: element.scrollHeight,
       logging: false,
       scale: quality,
       useCORS: true,
+      width: element.scrollWidth,
     });
-
-    const imgData = canvas.toDataURL('image/png');
 
     // PDF 문서 생성 (A4 크기)
     const pdf = new jsPDF('p', 'mm', 'a4');
@@ -85,10 +94,11 @@ export const exportToPdfMultiPage = async (elementId: string, options: ExportToP
           pageCanvas.height,
         );
 
-        const pageImgData = pageCanvas.toDataURL('image/png');
+        // 이미지 압축 및 포맷 최적화
+        const pageImgData = pageCanvas.toDataURL(`image/${imageFormat.toLowerCase()}`, imageQuality);
 
         // PDF에 이미지 추가
-        pdf.addImage(pageImgData, 'PNG', margin, margin, imgWidth, sourceHeight);
+        pdf.addImage(pageImgData, imageFormat, margin, margin, imgWidth, sourceHeight);
       }
     }
 
