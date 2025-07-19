@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Response, StockSchemaWithId } from 'shared~type-stock';
 import DoughnutChart from '../../../../../../component-presentation/DoughnutChart';
+import LineChart from '../../../../../../component-presentation/LineChart';
 import { calculateInvestmentData } from '../../utils/calculateInvestmentData';
 import { calculateCompanyReturnRate } from '../../utils/calculateReturnRate';
 
@@ -264,8 +265,90 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
     [portfolioData],
   );
 
+  // 년차별 총자산 데이터 생성 (라인 차트용)
+  const lineChartData = useMemo(
+    () =>
+      portfolioList.map((item) => ({
+        value: item.totalValue,
+        year: item.year,
+      })),
+    [portfolioList],
+  );
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', width: '100%' }}>
+      {/* 총자산 변화 그래프 */}
+      <div style={{ padding: '0 16px' }}>
+        <h2 style={{ marginBottom: '20px' }}>총자산 변화</h2>
+        <LineChart data={lineChartData} height={400} />
+
+        {/* 총자산 변화 테이블 */}
+        <div style={{ marginTop: '20px' }}>
+          <table style={{ borderCollapse: 'collapse', fontSize: '14px', width: '100%' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid #e0e0e0' }}>
+                <th style={{ fontWeight: '600', padding: '12px 8px', textAlign: 'center' }}>년차</th>
+                <th style={{ fontWeight: '600', padding: '12px 8px', textAlign: 'right' }}>총자산</th>
+                <th style={{ fontWeight: '600', padding: '12px 8px', textAlign: 'right' }}>증감액</th>
+                <th style={{ fontWeight: '600', padding: '12px 8px', textAlign: 'right' }}>증감률</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lineChartData.map((item, index) => {
+                const currentValue = item.value;
+                const previousValue = index > 0 ? lineChartData[index - 1].value : 0;
+
+                // 증감액 계산
+                const changeAmount = index > 0 ? currentValue - previousValue : 0;
+
+                // 증감률 계산
+                const changeRate =
+                  index > 0 && previousValue > 0 ? ((currentValue - previousValue) / previousValue) * 100 : 0;
+
+                return (
+                  <tr key={item.year} style={{ borderBottom: '1px solid #f0f0f0', fontSize: '12px' }}>
+                    <td style={{ fontWeight: '500', padding: '10px 8px', textAlign: 'center' }}>{item.year}</td>
+                    <td style={{ fontWeight: '500', padding: '10px 8px', textAlign: 'right' }}>
+                      {currentValue.toLocaleString()}원
+                    </td>
+                    <td style={{ padding: '10px 8px', textAlign: 'right' }}>
+                      {index > 0 ? (
+                        <span
+                          style={{
+                            color: changeAmount >= 0 ? '#22c55e' : '#ef4444',
+                            fontWeight: '500',
+                          }}
+                        >
+                          {changeAmount >= 0 ? '+' : ''}
+                          {changeAmount.toLocaleString()}원
+                        </span>
+                      ) : (
+                        <span style={{ color: '#6b7280' }}>-</span>
+                      )}
+                    </td>
+                    <td style={{ padding: '10px 8px', textAlign: 'right' }}>
+                      {index > 0 ? (
+                        <span
+                          style={{
+                            color: changeRate >= 0 ? '#22c55e' : '#ef4444',
+                            fontWeight: '500',
+                          }}
+                        >
+                          {changeRate >= 0 ? '+' : ''}
+                          {changeRate.toFixed(2)}%
+                        </span>
+                      ) : (
+                        <span style={{ color: '#6b7280' }}>-</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* 각 연도별 포트폴리오를 차트로 표시해요 */}
       {portfolioList.map(({ year, portfolioData: chartData, isEmpty, totalValue, currentRound }) => {
         return (
