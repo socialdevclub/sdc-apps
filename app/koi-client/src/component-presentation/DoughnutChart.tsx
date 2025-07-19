@@ -4,6 +4,7 @@ import { useEffect, useRef, useMemo } from 'react';
 interface DoughnutChartData {
   label: string;
   value: number;
+  color?: string; // 개별 데이터의 색상 속성 추가
 }
 
 // 데이터 개수에 따른 높이 계산 함수 (2개 단위로 조정)
@@ -42,8 +43,8 @@ const useDoughnutChart = (data: DoughnutChartData[]) => {
   useEffect(() => {
     if (!myChart.current) return;
 
-    // 어두운 배경에 맞는 밝고 생동감 있는 색상 팔레트
-    const colorPalette = [
+    // 어두운 배경에 맞는 밝고 생동감 있는 색상 팔레트 (기본 색상)
+    const defaultColorPalette = [
       '#FF6B6B', // 산호 핑크
       '#4ECDC4', // 터쿼이즈
       '#45B7D1', // 스카이 블루
@@ -54,12 +55,32 @@ const useDoughnutChart = (data: DoughnutChartData[]) => {
       '#F7DC6F', // 골든 옐로우
       '#BB8FCE', // 연보라
       '#85C1E9', // 라이트 블루
+      '#CCCCCC', // 그레이
     ];
+
+    // 각 데이터 항목의 개별 색상을 추출하거나 기본 색상 사용
+    const chartData = data
+      .filter((item) => item.value > 0)
+      .map((item, index) => ({
+        itemStyle: {
+          borderColor: 'rgba(255, 255, 255, 0.8)',
+
+          borderRadius: 8,
+
+          borderWidth: 2,
+          // 개별 색상이 지정되어 있으면 사용, 없으면 기본 팔레트에서 선택
+          color: item.color || defaultColorPalette[index % defaultColorPalette.length],
+          shadowBlur: 10,
+          shadowColor: 'rgba(0, 0, 0, 0.3)',
+        },
+        name: item.label,
+        value: item.value,
+      }));
 
     const option: echarts.EChartsOption = {
       // 전체 차트 배경색을 투명하게 설정
       backgroundColor: 'transparent',
-      color: colorPalette,
+      color: defaultColorPalette, // 기본 색상 팔레트 (개별 itemStyle이 우선)
       legend: {
         itemGap: 20,
         itemHeight: 14,
@@ -76,8 +97,7 @@ const useDoughnutChart = (data: DoughnutChartData[]) => {
           animationDuration: 500,
           animationType: 'scale',
           avoidLabelOverlap: false,
-          // data: data.map((item) => ({ name: item.label, value: item.value })),
-          data: data.filter((item) => item.value > 0).map((item) => ({ name: item.label, value: item.value })),
+          data: chartData,
           emphasis: {
             label: {
               color: '#FFFFFF',
@@ -87,13 +107,6 @@ const useDoughnutChart = (data: DoughnutChartData[]) => {
             },
             scale: true,
             scaleSize: 5,
-          },
-          itemStyle: {
-            borderColor: 'rgba(255, 255, 255, 0.8)', // 반투명 흰색 테두리
-            borderRadius: 8,
-            borderWidth: 2,
-            shadowBlur: 10,
-            shadowColor: 'rgba(0, 0, 0, 0.3)',
           },
           label: {
             position: 'center',
@@ -119,6 +132,7 @@ interface Props {
   data: {
     label: string;
     value: number;
+    color?: string; // 개별 색상 속성 추가
     [key: string]: unknown;
   }[];
   height?: number | string;
