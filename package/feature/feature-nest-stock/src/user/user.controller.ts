@@ -1,17 +1,12 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Query } from '@nestjs/common';
 import { Request, Response } from 'shared~type-stock';
-import { HttpService } from '@nestjs/axios';
 import { UserService } from './user.service';
 import { StockUser } from './user.schema';
 import { UserRepository } from './user.repository';
 
 @Controller('/stock/user')
 export class UserController {
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly userService: UserService,
-    private readonly userRepository: UserRepository,
-  ) {}
+  constructor(private readonly userService: UserService, private readonly userRepository: UserRepository) {}
 
   @Get()
   async getUsers(@Query('stockId') stockId: string): Promise<Response.GetStockUser[]> {

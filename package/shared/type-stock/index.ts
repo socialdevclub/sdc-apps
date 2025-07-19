@@ -16,6 +16,10 @@ export type StockStorageSchema = {
   companyName: string;
   stockCountCurrent: number;
   stockAveragePrice: number;
+  /**
+   * idx별로 가장 마지막에 거래한 것을 기준으로 평균 주가를 저장합니다.
+   */
+  stockAveragePriceHistory: number[];
   stockCountHistory: number[];
 };
 

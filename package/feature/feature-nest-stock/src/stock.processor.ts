@@ -29,7 +29,6 @@ export class StockProcessor {
         this.userRepository.find({ stockId }, { consistentRead: true }),
       ]);
       const user = users.find((v) => v.userId === userId);
-      const playerCount = users.length;
 
       if (!stock) {
         throw new Error('스톡 정보를 불러올 수 없습니다');
@@ -83,10 +82,16 @@ export class StockProcessor {
         (stockStorage.stockAveragePrice * stockStorage.stockCountCurrent + companyPrice * amount) /
         (stockStorage.stockCountCurrent + amount);
 
+      const stockAveragePriceHistory = [...stockStorage.stockAveragePriceHistory];
+      for (let i = idx; i < stockAveragePriceHistory.length; i++) {
+        stockAveragePriceHistory[i] = stockAveragePrice;
+      }
+
       // 주식 및 보유량 업데이트
       const updatedStockStorage = {
         ...stockStorage,
         stockAveragePrice,
+        stockAveragePriceHistory,
         stockCountCurrent: companyCount + amount,
         stockCountHistory: [...stockStorage.stockCountHistory],
       };
@@ -186,7 +191,6 @@ export class StockProcessor {
 
       const { companies, remainingStocks } = stock;
       const companyInfo = companies[company];
-      const remainingCompanyStock = remainingStocks[company];
 
       if (!companyInfo) {
         throw new HttpException('회사 정보를 불러올 수 없습니다', HttpStatus.CONFLICT);
@@ -229,10 +233,16 @@ export class StockProcessor {
       // 평균 단가 업데이트 - 판매 후 보유 수량이 0이 되면 0으로 초기화, 보유 시 평균 단가 유지
       const stockAveragePrice = companyCount <= amount ? 0 : stockStorage.stockAveragePrice;
 
+      const stockAveragePriceHistory = [...stockStorage.stockAveragePriceHistory];
+      for (let i = idx; i < stockAveragePriceHistory.length; i++) {
+        stockAveragePriceHistory[i] = stockAveragePrice;
+      }
+
       // 주식 및 보유량 업데이트
       const updatedStockStorage = {
         ...stockStorage,
         stockAveragePrice,
+        stockAveragePriceHistory,
         stockCountCurrent: companyCount - amount,
         stockCountHistory: [...stockStorage.stockCountHistory],
       };

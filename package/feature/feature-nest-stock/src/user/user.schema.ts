@@ -15,6 +15,8 @@ export class StockUserStorage implements StockStorageSchema {
 
   stockAveragePrice: number;
 
+  stockAveragePriceHistory: number[];
+
   stockCountCurrent: number;
 
   stockCountHistory: number[];
@@ -64,6 +66,7 @@ export class StockUser implements StockUserSchema {
       return {
         companyName: company,
         stockAveragePrice: 0,
+        stockAveragePriceHistory: new Array(StockConfig.MAX_STOCK_IDX).fill(0),
         stockCountCurrent: 0,
         stockCountHistory: new Array(StockConfig.MAX_STOCK_IDX + 1).fill(0),
       } as StockStorageSchema;
