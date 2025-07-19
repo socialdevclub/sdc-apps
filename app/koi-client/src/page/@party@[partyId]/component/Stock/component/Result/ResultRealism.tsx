@@ -4,6 +4,7 @@ import DoughnutChart from '../../../../../../component-presentation/DoughnutChar
 import LineChart from '../../../../../../component-presentation/LineChart';
 import { calculateInvestmentData } from '../../utils/calculateInvestmentData';
 import { calculateCompanyReturnRate } from '../../utils/calculateReturnRate';
+import { formatRatio, formatPercentage, formatChangeRate, calculateChangeRate } from '../../utils/calculatePercentage';
 
 interface ResultRealismProps {
   stock: StockSchemaWithId;
@@ -111,7 +112,7 @@ const PortfolioTable = ({ data, totalValue, currentRound, stock, user }: Portfol
         <tbody>
           {data.map((item, index) => {
             // 비율 계산 (소수점 2자리까지)
-            const percentage = ((item.value / totalValue) * 100).toFixed(2);
+            const percentage = formatRatio(item.value, totalValue);
 
             // 이후 수익률 계산
             let returnRate: number | null = null;
@@ -139,7 +140,7 @@ const PortfolioTable = ({ data, totalValue, currentRound, stock, user }: Portfol
                 <td style={{ fontWeight: '500', padding: '10px 8px 10px 0px', textAlign: 'right' }}>
                   {item.value.toLocaleString()}원
                 </td>
-                <td style={{ fontWeight: '500', padding: '10px 8px', textAlign: 'right' }}>{percentage}%</td>
+                <td style={{ fontWeight: '500', padding: '10px 8px', textAlign: 'right' }}>{percentage}</td>
                 <td style={{ padding: '10px 8px', textAlign: 'right' }}>
                   {returnRate !== null ? (
                     <span
@@ -148,8 +149,7 @@ const PortfolioTable = ({ data, totalValue, currentRound, stock, user }: Portfol
                         fontWeight: '500',
                       }}
                     >
-                      {returnRate >= 0 ? '+' : ''}
-                      {returnRate}%
+                      {formatPercentage(returnRate, { showSign: true })}
                     </span>
                   ) : (
                     <span style={{ color: '#6b7280' }}>-</span>
@@ -197,8 +197,7 @@ const PortfolioTable = ({ data, totalValue, currentRound, stock, user }: Portfol
                         color: averageReturn >= 0 ? '#22c55e' : '#ef4444',
                       }}
                     >
-                      {averageReturn >= 0 ? '+' : ''}
-                      {averageReturn.toFixed(2)}%
+                      {formatPercentage(averageReturn, { showSign: true })}
                     </span>
                   ) : (
                     <span style={{ color: '#6b7280' }}>-</span>
@@ -280,7 +279,7 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
       {/* 총자산 변화 그래프 */}
       <div style={{ padding: '0 16px' }}>
         <h2 style={{ marginBottom: '20px' }}>총자산 변화</h2>
-        <LineChart data={lineChartData} height={400} />
+        <LineChart data={lineChartData} height={200} />
 
         {/* 총자산 변화 테이블 */}
         <div style={{ marginTop: '20px' }}>
@@ -300,10 +299,6 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
 
                 // 증감액 계산
                 const changeAmount = index > 0 ? currentValue - previousValue : 0;
-
-                // 증감률 계산
-                const changeRate =
-                  index > 0 && previousValue > 0 ? ((currentValue - previousValue) / previousValue) * 100 : 0;
 
                 return (
                   <tr key={item.year} style={{ borderBottom: '1px solid #f0f0f0', fontSize: '12px' }}>
@@ -330,12 +325,11 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
                       {index > 0 ? (
                         <span
                           style={{
-                            color: changeRate >= 0 ? '#22c55e' : '#ef4444',
+                            color: calculateChangeRate(currentValue, previousValue) >= 0 ? '#22c55e' : '#ef4444',
                             fontWeight: '500',
                           }}
                         >
-                          {changeRate >= 0 ? '+' : ''}
-                          {changeRate.toFixed(2)}%
+                          {formatChangeRate(currentValue, previousValue)}
                         </span>
                       ) : (
                         <span style={{ color: '#6b7280' }}>-</span>
@@ -351,6 +345,7 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
 
       {/* 각 연도별 포트폴리오를 차트로 표시해요 */}
       {portfolioList.map(({ year, portfolioData: chartData, isEmpty, totalValue, currentRound }) => {
+        const sortedChartData = [...chartData].sort((a, b) => b.value - a.value);
         return (
           <div key={year}>
             {/* 연도별 제목과 총 자산 가치를 표시해요 */}
@@ -370,15 +365,11 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
               ) : (
                 <>
                   {/* 주식과 현금을 포함한 전체 자산을 차트에 표시해요 */}
-                  <DoughnutChart
-                    data={chartData.toSorted((a, b) => b.value - a.value)}
-                    minHeight={200}
-                    maxHeight={200}
-                  />
+                  <DoughnutChart data={sortedChartData} minHeight={200} maxHeight={200} />
 
                   {/* 포트폴리오 상세 테이블 */}
                   <PortfolioTable
-                    data={chartData.toSorted((a, b) => b.value - a.value)}
+                    data={sortedChartData}
                     totalValue={totalValue}
                     currentRound={currentRound}
                     stock={stock}

@@ -21,11 +21,11 @@ const LineChart = ({ data, height = 300 }: LineChartProps) => {
 
     const option = {
       grid: {
-        bottom: '15%',
+        bottom: '0%',
         containLabel: true,
-        left: '10%',
-        right: '10%',
-        top: '10%',
+        left: '0%',
+        right: '0%',
+        top: '0%',
       },
       series: [
         {

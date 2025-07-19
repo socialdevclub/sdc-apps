@@ -8,6 +8,7 @@ interface StockCardProps {
   totalValue: number;
   profitLoss: number;
   profitLossPercentage: number;
+  investmentRatio: string;
 }
 
 const StockInfoCard = ({
@@ -17,6 +18,7 @@ const StockInfoCard = ({
   totalValue,
   profitLoss,
   profitLossPercentage,
+  investmentRatio,
 }: StockCardProps) => {
   return (
     <ButtonContainer onClick={() => onClick?.(companyName)}>
@@ -24,7 +26,9 @@ const StockInfoCard = ({
       <FlexRowBetween>
         <FlexCol>
           <Company>{companyName}</Company>
-          <OwnStock>{stockCount}주</OwnStock>
+          <OwnStock>
+            {stockCount}주 / {investmentRatio}
+          </OwnStock>
         </FlexCol>
         <PriceWrapper>
           <Price>{totalValue.toLocaleString('ko-KR')}원</Price>

@@ -186,7 +186,7 @@ const DoughnutChart = ({ data, width = '100%', minHeight = 350, maxHeight = 700 
   }, [validDataCount, minHeight, maxHeight]);
 
   return (
-    <div style={{ height: dynamicContainerHeight, overflowY: 'hidden' }}>
+    <div style={{ height: dynamicContainerHeight, overflow: 'hidden' }}>
       <div
         ref={chartRef}
         style={{
