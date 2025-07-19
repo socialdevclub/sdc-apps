@@ -370,7 +370,11 @@ const ResultRealism = ({ stock, user }: ResultRealismProps) => {
               ) : (
                 <>
                   {/* 주식과 현금을 포함한 전체 자산을 차트에 표시해요 */}
-                  <DoughnutChart data={chartData.toSorted((a, b) => b.value - a.value)} minHeight={0} maxHeight={200} />
+                  <DoughnutChart
+                    data={chartData.toSorted((a, b) => b.value - a.value)}
+                    minHeight={200}
+                    maxHeight={200}
+                  />
 
                   {/* 포트폴리오 상세 테이블 */}
                   <PortfolioTable
