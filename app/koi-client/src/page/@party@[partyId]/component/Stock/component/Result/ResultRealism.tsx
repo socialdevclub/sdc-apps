@@ -135,7 +135,7 @@ const PortfolioTable = ({ data, totalValue, currentRound, stock, user }: Portfol
                     <span>{item.label}</span>
                   </div>
                 </td>
-                <td style={{ fontWeight: '500', padding: '10px 8px', textAlign: 'right' }}>
+                <td style={{ fontWeight: '500', padding: '10px 8px 10px 0px', textAlign: 'right' }}>
                   {item.value.toLocaleString()}원
                 </td>
                 <td style={{ fontWeight: '500', padding: '10px 8px', textAlign: 'right' }}>{percentage}%</td>
