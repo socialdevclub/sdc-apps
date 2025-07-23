@@ -12,7 +12,7 @@ export const getAssetColor = (assetName: string): string => {
     'S&P500': '#45B7D1',
 
     // 따뜻한 노랑 - 안전자산의 안정감
-    TDF2030: '#DDA0DD',
+    TDF2060: '#DDA0DD',
 
     // 레드 - 밈코인의 위험성
     금: '#FFD700',

@@ -25,7 +25,7 @@ export type StockTradeStatus = (typeof STOCK_TRADE_STATUS)[keyof typeof STOCK_TR
 export const ANIMAL_NAME: Record<string, string> = {
   QQQ: 'qqq',
   'S&P500': 'snp500',
-  TDF2030: 'tdf',
+  TDF2060: 'tdf',
   고양기획: 'cat',
   금: 'gold',
   꿀벌생명: 'honeyBee',

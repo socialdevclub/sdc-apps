@@ -120,7 +120,7 @@ describe('calculateAllPortfolios', () => {
     // 실제 회사들 확인
     expect(result['0']).toHaveProperty('QQQ');
     expect(result['0']).toHaveProperty('S&P500');
-    expect(result['0']).toHaveProperty('TDF2030');
+    expect(result['0']).toHaveProperty('TDF2060');
     expect(result['0']).toHaveProperty('금');
     expect(result['0']).toHaveProperty('미국달러SOFR');
     expect(result['0']).toHaveProperty('비트코인');
