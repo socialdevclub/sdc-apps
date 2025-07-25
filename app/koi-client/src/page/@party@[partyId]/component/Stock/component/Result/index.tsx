@@ -254,16 +254,18 @@ function Result({ stockId }: ResultProps) {
 
       {stock.gameMode === 'realism' && <ResultRealism stock={stock} user={user} />}
 
-      <BottomSection>
-        <Button color="#374151" onClick={handleShare}>
-          <Share size={24} />
-          <Label>공유하기</Label>
-        </Button>
-        <Button color="#F63C6B" onClick={() => handleExit()}>
-          <LogOut size={24} />
-          <Label>나가기</Label>
-        </Button>
-      </BottomSection>
+      {stock.gameMode === 'stock' && (
+        <BottomSection>
+          <Button color="#374151" onClick={handleShare}>
+            <Share size={24} />
+            <Label>공유하기</Label>
+          </Button>
+          <Button color="#F63C6B" onClick={() => handleExit()}>
+            <LogOut size={24} />
+            <Label>나가기</Label>
+          </Button>
+        </BottomSection>
+      )}
     </Container>
   );
 }
