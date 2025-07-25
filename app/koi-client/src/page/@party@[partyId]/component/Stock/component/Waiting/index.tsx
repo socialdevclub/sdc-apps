@@ -242,20 +242,26 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
                       <Switch
                         checked={gameOption.is쀼머니게임}
                         onChange={() => {
-                          if (!gameOption.is쀼머니게임) {
-                            setGameOption((prev) => ({
-                              ...prev,
-                              hasLoan: false,
-                              is쀼머니게임: true,
-                              maxStockHintCount: 0,
-                            }));
+                          if (gameOption.is쀼머니게임) {
+                            changeGameOption('is쀼머니게임');
                             mutateUpdateGame({
                               _id: stockId,
-                              initialMoney: 100_000_000,
+                              gameMode: 게임모드.STOCK,
                             });
-                          } else {
-                            changeGameOption('is쀼머니게임');
+                            return;
                           }
+
+                          setGameOption((prev) => ({
+                            ...prev,
+                            hasLoan: false,
+                            is쀼머니게임: true,
+                            maxStockHintCount: 0,
+                          }));
+                          mutateUpdateGame({
+                            _id: stockId,
+                            gameMode: 게임모드.REALISM,
+                            initialMoney: 100_000_000,
+                          });
                         }}
                         style={{ backgroundColor: gameOption.is쀼머니게임 ? '#6339E3' : '#030711' }}
                       />
