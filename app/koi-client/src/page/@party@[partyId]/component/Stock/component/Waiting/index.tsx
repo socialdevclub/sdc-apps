@@ -1,17 +1,6 @@
 import styled from '@emotion/styled';
 import { useState } from 'react';
-import {
-  Info,
-  Copy,
-  ChevronRight,
-  Settings,
-  ChevronUp,
-  ChevronDown,
-  UsersRound,
-  UserRound,
-  Share,
-  Play,
-} from 'lucide-react';
+import { Info, Copy, ChevronRight, Settings, ChevronUp, ChevronDown, UsersRound, UserRound, Play } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { message, Switch, Dropdown } from 'antd';
 import { useAtomValue } from 'jotai';
@@ -98,17 +87,6 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
     window.open(`${window.location.origin}/backoffice/screen/${partyId}`, '_blank');
   };
 
-  const shareParty = () => {
-    if (!stockId) return;
-
-    const url = `${window.location.origin}/party/${partyId}`;
-    navigator.clipboard.writeText(url);
-    messageApi.success({
-      content: '링크가 복사되었습니다. 친구에게 공유해보세요!',
-      duration: 2,
-    });
-  };
-
   const startGame = async () => {
     if (!stockId) return;
 
@@ -160,14 +138,18 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
               <Copy />
             </RoomNumberSection>
           </RoomInfoBox>
-          <WideScreenView onClick={openWideScreen}>
-            <WideScreenText>주식 현황판 크게 보기</WideScreenText>
-            <ChevronRight />
-          </WideScreenView>
-          <InfoText>
-            PC화면이나 빔 프로젝터를 이용하면
-            <br />더 몰입해서 즐길 수 있어요!
-          </InfoText>
+          {isHost && (
+            <>
+              <WideScreenView onClick={openWideScreen}>
+                <WideScreenText>주식 현황판 크게 보기</WideScreenText>
+                <ChevronRight />
+              </WideScreenView>
+              <InfoText>
+                PC화면이나 빔 프로젝터를 이용하면
+                <br />더 몰입해서 즐길 수 있어요!
+              </InfoText>
+            </>
+          )}
         </RoomInfoContainer>
 
         {isHost && (
@@ -388,33 +370,18 @@ const Waiting = ({ HeaderComponent = <></>, stockId }: Props) => {
           </PlayerList>
         </PlayerSection>
       </BodyContainer>
-      <BottomSheet>
-        <ActionButtons>
-          {isHost ? (
-            <>
-              <GrayButton onClick={shareParty}>
-                <ButtonContent>
-                  <Share color="white" />
-                  <ButtonText>공유하기</ButtonText>
-                </ButtonContent>
-              </GrayButton>
-              <PurpleButton onClick={startGame}>
-                <ButtonContent>
-                  <Play color="white" />
-                  <ButtonText>게임시작</ButtonText>
-                </ButtonContent>
-              </PurpleButton>
-            </>
-          ) : (
-            <PurpleButton onClick={shareParty}>
+      {isHost && (
+        <BottomSheet>
+          <ActionButtons>
+            <PurpleButton onClick={startGame}>
               <ButtonContent>
-                <Share color="white" />
-                <ButtonText>공유하기</ButtonText>
+                <Play color="white" />
+                <ButtonText>게임시작</ButtonText>
               </ButtonContent>
             </PurpleButton>
-          )}
-        </ActionButtons>
-      </BottomSheet>
+          </ActionButtons>
+        </BottomSheet>
+      )}
     </Container>
   );
 };
@@ -663,7 +630,7 @@ const GrayButton = styled.button`
   cursor: pointer;
 `;
 
-const PurpleButton = styled.button`
+export const PurpleButton = styled.button`
   width: 100%;
   border: none;
   border-radius: 8px;
@@ -672,14 +639,14 @@ const PurpleButton = styled.button`
   cursor: pointer;
 `;
 
-const ButtonContent = styled.div`
+export const ButtonContent = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
 `;
 
-const ButtonText = styled.span`
+export const ButtonText = styled.span`
   color: white;
   font-size: 22px;
   font-family: 'DungGeunMo', sans-serif;
