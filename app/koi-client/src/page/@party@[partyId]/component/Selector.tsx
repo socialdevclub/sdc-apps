@@ -6,6 +6,10 @@ import Feed from './Feed';
 import Stock from './Stock';
 import { LOCAL_STORAGE_KEY } from '../../../config/localStorage';
 
+const DefaultComponent = () => {
+  return <center>환영합니다! 호스트의 지시를 따라주세요!</center>;
+};
+
 const Selector = () => {
   const { partyId } = useParams();
   const navigate = useNavigate();
@@ -21,8 +25,8 @@ const Selector = () => {
     navigate('/');
   }
 
-  if (!party) {
-    return <></>;
+  if (!party?.activityName) {
+    return <DefaultComponent />;
   }
 
   return (
@@ -31,9 +35,9 @@ const Selector = () => {
       caseBy={{
         FEED: <Feed party={party} />,
         POLL: <Poll />,
-        STOCK: <Stock party={party} />,
+        STOCK: <Stock partyId={party._id} stockId={party.activityName} />,
       }}
-      defaultComponent={<center>환영합니다! 호스트의 지시를 따라주세요!</center>}
+      defaultComponent={<DefaultComponent />}
     />
   );
 };
