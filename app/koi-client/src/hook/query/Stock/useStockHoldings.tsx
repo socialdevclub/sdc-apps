@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { formatPercentage } from '../../../utils/stock';
 import useQueryStock from './useQueryStock'; // 경로는 실제 프로젝트 구조에 맞게 수정해주세요
 import useUserFindOne from './useUserFindOne'; // 경로는 실제 프로젝트 구조에 맞게 수정해주세요
 
@@ -75,7 +76,7 @@ interface Props {
  *   </div>
  * );
  */
-export const useStockHoldings = ({ stockId, userId }: Props) => {
+const useStockHoldings = ({ stockId, userId }: Props) => {
   // 주식 정보 가져오기
   const { companiesPrice, data: stockData } = useQueryStock(stockId);
 
@@ -113,7 +114,7 @@ export const useStockHoldings = ({ stockId, userId }: Props) => {
       const profitLoss = totalValue - totalCost;
 
       // 손익률 계산 (퍼센트)
-      const profitLossPercentage = totalCost > 0 ? Math.round((profitLoss / totalCost) * 100 * 10) / 10 : 0;
+      const profitLossPercentage = totalCost > 0 ? formatPercentage(profitLoss / totalCost) : 0;
 
       result.push({
         averagePrice,
