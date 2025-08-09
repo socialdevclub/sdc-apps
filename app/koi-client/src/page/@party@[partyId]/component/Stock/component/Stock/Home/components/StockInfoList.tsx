@@ -6,7 +6,7 @@ import DoughnutChart from '../../../../component-presentation/DoughnutChart.tsx'
 import StockInfoCard from '../../../../component-presentation/StockInfoCard.tsx';
 import { Query } from '../../../../../../../../hook/index.ts';
 import { useQueryStock } from '../../../../../../../../hook/query/Stock';
-import useStockHoldings from '../../../../../../../../hook/query/Stock/useStockHoldings.tsx';
+import useStockHoldings from '../../../../hook/useStockHoldings.tsx';
 import { getStockMessages } from '../../../../../../../../utils/stock.ts';
 import StockDrawer from '../../StockDrawer/index.tsx';
 import { H3, TitleWrapper } from '../Home.styles.tsx';

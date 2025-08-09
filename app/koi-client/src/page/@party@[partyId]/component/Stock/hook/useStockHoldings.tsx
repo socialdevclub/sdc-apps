@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { formatPercentage } from '../../../utils/stock';
-import useQueryStock from './useQueryStock'; // 경로는 실제 프로젝트 구조에 맞게 수정해주세요
-import useUserFindOne from './useUserFindOne'; // 경로는 실제 프로젝트 구조에 맞게 수정해주세요
+import { formatPercentage } from '../../../../../utils/stock';
+import useQueryStock from '../../../../../hook/query/Stock/useQueryStock'; // 경로는 실제 프로젝트 구조에 맞게 수정해주세요
+import useUserFindOne from '../../../../../hook/query/Stock/useUserFindOne'; // 경로는 실제 프로젝트 구조에 맞게 수정해주세요
 
 /**
  * 사용자가 보유한 주식의 상세 정보를 나타내는 인터페이스

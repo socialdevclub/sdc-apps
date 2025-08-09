@@ -1,6 +1,6 @@
 import { MessageInstance } from 'antd/es/message/interface';
 import { Query } from '../../../../../../../hook';
-import useStockHoldings from '../../../../../../../hook/query/Stock/useStockHoldings.tsx';
+import useStockHoldings from '../../../hook/useStockHoldings.tsx';
 import StartLoan from '../StartLoan';
 import { Container, Divider, StickyBottom } from './Home.styles';
 import TimeIndicator from './components/TimeIndicator.tsx';
