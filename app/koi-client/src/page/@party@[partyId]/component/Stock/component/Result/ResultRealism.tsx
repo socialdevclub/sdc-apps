@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Response, StockSchemaWithId } from 'shared~type-stock';
-import DoughnutChart from '../../../../../../component-presentation/DoughnutChart';
-import LineChart from '../../../../../../component-presentation/LineChart';
+import DoughnutChart from '../../component-presentation/DoughnutChart';
+import LineChart from '../../component-presentation/LineChart';
 import { calculateInvestmentData } from '../../utils/calculateInvestmentData';
 import { calculateCompanyReturnRate } from '../../utils/calculateReturnRate';
 import { formatRatio, formatPercentage, formatChangeRate, calculateChangeRate } from '../../utils/calculatePercentage';

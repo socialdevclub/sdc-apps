@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { getAnimalImageSource } from '../utils/stock.ts';
+import { getAnimalImageSource } from '../../../../../utils/stock.ts';
 
 interface StockCardProps {
   companyName: string;
