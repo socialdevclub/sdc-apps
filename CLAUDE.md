@@ -34,8 +34,8 @@ yarn test:e2e               # Run end-to-end tests
 
 ### Monorepo Structure
 - **app/**: Main applications
-  - `koi-client`: React frontend with Vite, Emotion, Tanstack Query, Jotai, Socket.IO
-  - `koi-server`: NestJS backend with MongoDB, DynamoDB, Socket.IO, AWS Lambda
+  - `koi-client`: React frontend with Vite, Emotion, Tanstack Query, Jotai
+  - `koi-server`: NestJS backend with DynamoDB, AWS Lambda
   - `sdc-ai-server`: AI service for OpenAI integration
   - `sdc-discord-server`: Discord bot service
   
@@ -50,26 +50,34 @@ yarn test:e2e               # Run end-to-end tests
 - **State Management**: Jotai atoms in `src/store/`
 - **Hooks**: Custom hooks in `src/hook/` organized by feature (e.g., `hook-stock/`, `hook-party/`)
 - **API Calls**: Tanstack Query hooks for data fetching
-- **Real-time**: Socket.IO integration for live updates
+- **Real-time Updates**: Polling-based using Tanstack Query's `refetchInterval`
 
 ### Backend (koi-server) Patterns
 - **Module Architecture**: NestJS modules with Controller/Service/Repository pattern
-- **Database**: MongoDB (Mongoose) for primary data, DynamoDB for stock game data
-- **Real-time**: Socket.IO gateways for WebSocket communication
+- **Database**: DynamoDB for primary game data and state management
+- **API Design**: RESTful endpoints with polling support for real-time updates
 - **Feature Modules**: Separated as packages (`feature-nest-poll`, `feature-nest-stock`)
 - **Error Handling**: Centralized exception filters and logging
 
 ### Key Technical Details
 - **Authentication**: Supabase-based auth with profile management
-- **Real-time Game State**: Socket.IO events for stock price updates and game phases
+- **Real-time Game State**: Polling-based updates for stock prices and game phases (1 second intervals)
 - **Stock Game Phases**: waiting → playing → results cycle
 - **Party System**: Room-based multiplayer with host/player roles
 - **Testing**: Vitest (frontend), Jest (backend), Playwright (E2E mobile-focused)
 - **Build System**: Turbo for monorepo optimization, Vite for frontend, Webpack for Lambda
 
-### Database Schema Locations
-- MongoDB schemas: `app/koi-server/src/*/schema/*.schema.ts`
-- DynamoDB schemas: `package/feature/feature-nest-stock/src/repository/*.repository.ts`
+### Real-time Architecture
+- **Implementation**: HTTP polling instead of WebSockets
+- **Poll Updates**: 1 second interval using Tanstack Query's `refetchInterval`
+- **Stock Updates**: Time-based refetch triggers on minute changes
+- **Optimization**: Client-side caching with Tanstack Query
+
+### Database Architecture
+- **Primary Database**: DynamoDB for all game data (stock, party, poll, game state)
+- **Authentication**: Supabase (PostgreSQL) for user authentication and profiles
+- **DynamoDB Schemas**: Located in `package/feature/feature-nest-*/src/repository/*.repository.ts`
+- **Migration Status**: MongoDB is being phased out (deprecated)
 
 ### Environment Configuration
 - Uses `local.socialdev.club` for local development (CORS handling)
@@ -82,6 +90,6 @@ yarn test:e2e               # Run end-to-end tests
 - TypeScript strict mode is enabled - avoid using `any` type
 - ESLint is configured with Airbnb style guide - run `yarn lint` before committing
 - Mobile-first development approach - test on mobile viewport sizes
-- Real-time features require Socket.IO server running alongside HTTP server
+- Real-time updates use polling mechanism - no WebSocket server required
 - Stock game data uses DynamoDB - ensure AWS credentials are configured
 - Frontend routes use lazy loading for better performance
