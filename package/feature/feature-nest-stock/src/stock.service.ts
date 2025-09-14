@@ -5,7 +5,6 @@ import { ceilToUnit } from '@toss/utils';
 import dayjs from 'dayjs';
 import { StockConfig } from 'shared~config';
 import { UserService } from './user/user.service';
-import { LogService } from './log/log.service';
 import { StockRepository } from './stock.repository';
 import { UserRepository } from './user/user.repository';
 
@@ -17,7 +16,6 @@ export class StockService {
     private readonly userRepository: UserRepository,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
-    private readonly logService: LogService,
   ) {}
 
   async find(): Promise<StockSchemaWithId[]> {
@@ -410,7 +408,6 @@ export class StockService {
   async deleteStock(stockId: string): Promise<boolean> {
     try {
       // 관련된 데이터 모두 삭제
-      await this.logService.deleteAllByStock(stockId);
       await this.userService.removeAllUser(stockId);
       await this.stockRepository.deleteMany({ _id: stockId });
 

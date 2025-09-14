@@ -4,7 +4,6 @@ import { getDateDistance } from '@toss/date';
 import dayjs from 'dayjs';
 import { UserRepository } from './user/user.repository';
 import { StockRepository } from './stock.repository';
-import { LogService } from './log/log.service';
 
 @Injectable()
 export class StockProcessor {
@@ -12,7 +11,6 @@ export class StockProcessor {
     @Inject(forwardRef(() => UserRepository))
     private readonly userRepository: UserRepository,
     private readonly stockRepository: StockRepository,
-    private readonly logService: LogService,
   ) {}
 
   async buyStock(
@@ -138,26 +136,17 @@ export class StockProcessor {
         this.stockRepository.updateOne(stockId, { remainingStocks: updatedRemainingStocks }),
       ]);
 
-      // 로그 상태 업데이트
-      await this.logService.updateOne({ queueId: attributes?.queueMessageId }, { date: new Date(), status: 'SUCCESS' });
-
       return {
         message: `주식을 ${amount}주 구매하였습니다.`,
         status: 200,
       };
     } catch (error) {
       console.error(error);
-      await this.logService.updateOne(
-        { queueId: attributes?.queueMessageId },
-        { failedReason: error instanceof Error ? error.message : `${error}`, status: 'FAILED' },
-      );
 
       return {
         message: `${error instanceof Error ? error.message : `${error}`}`,
         status: 500,
       };
-    } finally {
-      this.logService.deleteOldStatusLogs().catch(console.error);
     }
   }
 
@@ -289,25 +278,16 @@ export class StockProcessor {
         this.stockRepository.updateOne(stockId, { remainingStocks: updatedRemainingStocks }),
       ]);
 
-      // 로그 상태 업데이트
-      await this.logService.updateOne({ queueId: attributes?.queueMessageId }, { date: new Date(), status: 'SUCCESS' });
-
       return {
         message: `주식을 ${amount}주 판매하였습니다.`,
         status: 200,
       };
     } catch (error) {
       console.error(error);
-      await this.logService.updateOne(
-        { queueId: attributes?.queueMessageId },
-        { failedReason: error instanceof Error ? error.message : `${error}`, status: 'FAILED' },
-      );
       return {
         message: `${error instanceof Error ? error.message : `${error}`}`,
         status: 500,
       };
-    } finally {
-      this.logService.deleteOldStatusLogs().catch(console.error);
     }
   }
 }
