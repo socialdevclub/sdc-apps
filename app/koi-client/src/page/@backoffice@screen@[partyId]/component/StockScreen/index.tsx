@@ -6,9 +6,11 @@ import { QRCode } from 'antd';
 import { PartySchemaWithId } from 'shared~type-party';
 import dayjs from 'dayjs';
 import { Query } from '../../../../hook';
+import { useTradeDetection } from '../../../../hook/useTradeDetection';
 import prependZero from '../../../../service/prependZero';
 import PlayingWrapper from './PlayingWrapper';
 import Table from './Table';
+import TradeFeed from './TradeFeed';
 
 interface Props {
   party: PartySchemaWithId;
@@ -28,6 +30,7 @@ export default function StockScreen({ party }: Props) {
     refetchInterval: 500,
   });
   const { mutateAsync: mutateUpdateStock } = Query.Stock.useUpdateStock();
+  const { trades } = useTradeDetection(stock?._id || '');
 
   const startedTime = useMemo(() => dayjs(stock?.startedTime).toDate(), [stock?.startedTime]);
   const isTransaction = stock?.isTransaction ?? false;
@@ -110,6 +113,7 @@ export default function StockScreen({ party }: Props) {
               <Wrapper>
                 <Container>{isTransaction && <Table stockId={stock._id} />}</Container>
               </Wrapper>
+              {isTransaction && <TradeFeed trades={trades} />}
             </PlayingWrapper>
           ),
         }}

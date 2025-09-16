@@ -4,7 +4,6 @@ import { Query } from '../../hook';
 import { fetchProfileByUsername } from '../../hook/query/Supabase/useQueryProfileByUsername';
 import { ControlButton, ControlButtonGroup } from '.';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface UserListProps {
   stockId: string;
 }

@@ -3,7 +3,6 @@ import { Modal, Input, Form, message } from 'antd';
 import styled from '@emotion/styled';
 import { useParams } from 'react-router-dom';
 import { useDebounce } from '@toss/react';
-import { generateBoothUserId } from '../../utils/booth';
 import { Query } from '../../hook';
 
 interface Props {
@@ -100,10 +99,10 @@ const BoothNicknameModal: React.FC<Props> = ({ isOpen, onSubmit, onCancel }) => 
     enabled: !!partyId && !!nickname && nickname.length >= 2,
     refetchInterval: 1000, // Poll for real-time updates
   });
-  
+
   // Extract regular user IDs (non-booth users) from party
-  const regularUserIds = party?.joinedUserIds?.filter(id => !id.startsWith('booth_')) || [];
-  
+  const regularUserIds = party?.joinedUserIds || [];
+
   // Fetch profiles of regular users to get their nicknames
   const { data: userProfiles } = Query.Supabase.useQueryProfileById(regularUserIds);
 
@@ -148,19 +147,16 @@ const BoothNicknameModal: React.FC<Props> = ({ isOpen, onSubmit, onCancel }) => 
     }
 
     // Check if nickname is already taken in the party
-    const boothUserId = generateBoothUserId(value);
     const normalizedValue = value.toLowerCase();
-    
-    // Check if it's taken by a booth user
-    const takenByBoothUser = party.joinedUserIds?.includes(boothUserId);
-    
+
     // Check if it's taken by a regular user
-    const takenByRegularUser = userProfiles?.data?.some(profile => {
-      // Compare nicknames case-insensitively
-      return profile.username?.toLowerCase() === normalizedValue;
-    }) || false;
-    
-    const isAvailable = !takenByBoothUser && !takenByRegularUser;
+    const takenByRegularUser =
+      userProfiles?.data?.some((profile) => {
+        // Compare nicknames case-insensitively
+        return profile.username?.toLowerCase() === normalizedValue;
+      }) || false;
+
+    const isAvailable = !takenByRegularUser;
 
     setValidationMessage(isAvailable ? '✓ 사용 가능한 닉네임입니다.' : '이미 사용 중인 닉네임입니다.');
   }, 500);
@@ -185,18 +181,15 @@ const BoothNicknameModal: React.FC<Props> = ({ isOpen, onSubmit, onCancel }) => 
 
     // If we have a partyId, check against the party data
     if (partyId && party) {
-      const boothUserId = generateBoothUserId(nickname);
       const normalizedNickname = nickname.toLowerCase();
-      
-      // Check booth users
-      const takenByBoothUser = party.joinedUserIds?.includes(boothUserId);
-      
-      // Check regular users
-      const takenByRegularUser = userProfiles?.data?.some(profile => {
-        return profile.username?.toLowerCase() === normalizedNickname;
-      }) || false;
 
-      if (takenByBoothUser || takenByRegularUser) {
+      // Check regular users
+      const takenByRegularUser =
+        userProfiles?.data?.some((profile) => {
+          return profile.username?.toLowerCase() === normalizedNickname;
+        }) || false;
+
+      if (takenByRegularUser) {
         message.error('사용 가능한 닉네임을 입력해주세요.');
         return;
       }
