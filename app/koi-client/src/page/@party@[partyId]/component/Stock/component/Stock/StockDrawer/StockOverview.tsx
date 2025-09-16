@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
-import { MessageInstance } from 'antd/es/message/interface';
-import InfoHeader from '../../../../../../../component-presentation/InfoHeader';
+import AnimatedInfoHeader from '../../../../../../../component-presentation/AnimatedInfoHeader';
 import MessageBalloon from '../../../../../../../component-presentation/MessageBalloon';
 import StockLineChart from '../../../../../../../component-presentation/StockLineChart';
 import StockBuyingNotification from '../StockBuyingNotification';
@@ -26,7 +25,6 @@ interface StockOverviewProps {
     company: string;
     count: number;
   }[];
-  messageApi: MessageInstance;
 }
 
 const StockOverview: React.FC<StockOverviewProps> = ({
@@ -40,7 +38,6 @@ const StockOverview: React.FC<StockOverviewProps> = ({
   isDisabled: isDisabledOverview,
   isCanBuy,
   보유주식,
-  messageApi,
 }) => {
   const {
     data: stock,
@@ -63,12 +60,16 @@ const StockOverview: React.FC<StockOverviewProps> = ({
     userRefetchInterval: 500,
   });
 
-  const { onClickSell, isSellLoading, onClickBuy, isBuyLoading } = useTradeStock({ messageApi, refetchUser });
+  const { onClickSell, isSellLoading, onClickBuy, isBuyLoading } = useTradeStock({
+    onShowError: () => {},
+    onShowSuccess: () => {},
+    refetchUser,
+  });
 
   const [isCooldown, setIsCooldown] = useState(false);
   const startCooldown = () => {
     setIsCooldown(true);
-    setTimeout(() => setIsCooldown(false), 1000);
+    setTimeout(() => setIsCooldown(false), 500);
   };
 
   const chartPriceData = useMemo(
@@ -103,7 +104,7 @@ const StockOverview: React.FC<StockOverviewProps> = ({
   return (
     <>
       {selectedCompany && (
-        <InfoHeader
+        <AnimatedInfoHeader
           title={selectedCompany}
           subtitle={`보유 주식: ${currentStockCount}`}
           subTitleColor="#d1d5db"
@@ -113,6 +114,7 @@ const StockOverview: React.FC<StockOverviewProps> = ({
           badge={renderStockChangesInfo(selectedCompany, stock, companiesPrice, timeIdx ?? 0)}
           src={getAnimalImageSource(selectedCompany)}
           width={50}
+          currentStockCount={currentStockCount}
         />
       )}
 
@@ -134,10 +136,9 @@ const StockOverview: React.FC<StockOverviewProps> = ({
             backgroundColor: BEARISH_COLOR,
             disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
             flex: 1,
-            onClick: () => {
-              // setDrawerState('SELL');
+            onClick: async () => {
               startCooldown();
-              onClickSell({
+              await onClickSell({
                 amount: 1,
                 callback: () => refetchUser(),
                 company: selectedCompany,
@@ -153,10 +154,9 @@ const StockOverview: React.FC<StockOverviewProps> = ({
             backgroundColor: BULLISH_COLOR,
             disabled: isDisabled || !isCanBuy || maxBuyableCountWithLimit === 0,
             flex: 1,
-            onClick: () => {
-              // setDrawerState('BUY');
+            onClick: async () => {
               startCooldown();
-              onClickBuy({
+              await onClickBuy({
                 amount: 1,
                 callback: () => refetchUser(),
                 company: selectedCompany,
@@ -177,9 +177,9 @@ const StockOverview: React.FC<StockOverviewProps> = ({
           {
             backgroundColor: '#374151',
             disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
-            onClick: () => {
+            onClick: async () => {
               startCooldown();
-              onClickSell({
+              await onClickSell({
                 amount: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
                 callback: () => refetchUser(),
                 company: selectedCompany,
