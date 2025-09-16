@@ -61,8 +61,6 @@ const StockOverview: React.FC<StockOverviewProps> = ({
   });
 
   const { onClickSell, isSellLoading, onClickBuy, isBuyLoading } = useTradeStock({
-    onShowError: () => {},
-    onShowSuccess: () => {},
     refetchUser,
   });
 
