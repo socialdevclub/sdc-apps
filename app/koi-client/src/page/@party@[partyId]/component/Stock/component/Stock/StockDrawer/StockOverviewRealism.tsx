@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useAtomValue } from 'jotai';
-import { MessageInstance } from 'antd/es/message/interface';
 import InfoHeader from '../../../../../../../component-presentation/InfoHeader';
 import MessageBalloon from '../../../../../../../component-presentation/MessageBalloon';
 import StockLineChart from '../../../../../../../component-presentation/StockLineChart';
@@ -9,10 +8,10 @@ import ButtonGroup from '../../../../../../../component-presentation/ButtonGroup
 import { Query } from '../../../../../../../hook';
 import { calculateProfitRate, getAnimalImageSource, renderStockChangesInfo } from '../../../../../../../utils/stock';
 import { UserStore } from '../../../../../../../store';
+import { StockDrawerState } from '.';
 import { BEARISH_COLOR, BULLISH_COLOR } from '../../../color';
-import { useTradeStock } from '../../../../../hook/useTradeStock';
 
-interface StockOverviewProps {
+interface StockOverviewRealismProps {
   stockId: string;
   selectedCompany: string;
   stockMessages: string[];
@@ -26,10 +25,10 @@ interface StockOverviewProps {
     company: string;
     count: number;
   }[];
-  messageApi: MessageInstance;
+  setDrawerState: (state: StockDrawerState) => void;
 }
 
-const StockOverview: React.FC<StockOverviewProps> = ({
+const StockOverviewRealism: React.FC<StockOverviewRealismProps> = ({
   stockId,
   selectedCompany,
   stockMessages,
@@ -37,10 +36,10 @@ const StockOverview: React.FC<StockOverviewProps> = ({
   priceData,
   remainingStock,
   maxBuyableCountWithLimit,
-  isDisabled: isDisabledOverview,
+  isDisabled,
   isCanBuy,
   보유주식,
-  messageApi,
+  setDrawerState,
 }) => {
   const {
     data: stock,
@@ -62,14 +61,6 @@ const StockOverview: React.FC<StockOverviewProps> = ({
     userId,
     userRefetchInterval: 500,
   });
-
-  const { onClickSell, isSellLoading, onClickBuy, isBuyLoading } = useTradeStock({ messageApi, refetchUser });
-
-  const [isCooldown, setIsCooldown] = useState(false);
-  const startCooldown = () => {
-    setIsCooldown(true);
-    setTimeout(() => setIsCooldown(false), 1000);
-  };
 
   const chartPriceData = useMemo(
     () => (selectedCompany ? priceData[selectedCompany].slice(0, (timeIdx ?? 0) + 1) : [100000]),
@@ -94,9 +85,7 @@ const StockOverview: React.FC<StockOverviewProps> = ({
     [averagePurchasePrice, companiesPrice, selectedCompany, 보유주식],
   );
 
-  const isDisabled = isDisabledOverview || isSellLoading || isBuyLoading || isCooldown;
-
-  if (!stock || !userId) {
+  if (!stock) {
     return <></>;
   }
 
@@ -135,17 +124,16 @@ const StockOverview: React.FC<StockOverviewProps> = ({
             disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
             flex: 1,
             onClick: () => {
-              // setDrawerState('SELL');
-              startCooldown();
-              onClickSell({
-                amount: 1,
-                callback: () => refetchUser(),
-                company: selectedCompany,
-                round: stock.round,
-                stockId,
-                unitPrice: companiesPrice[selectedCompany],
-                userId,
-              });
+              setDrawerState('SELL');
+              //   onClickSell({
+              //     amount: 1,
+              //     callback: () => refetchUser(),
+              //     company: selectedCompany,
+              //     round: stock.round,
+              //     stockId,
+              //     unitPrice: companiesPrice[selectedCompany],
+              //     userId,
+              //   });
             },
             text: '판매하기',
           },
@@ -154,17 +142,16 @@ const StockOverview: React.FC<StockOverviewProps> = ({
             disabled: isDisabled || !isCanBuy || maxBuyableCountWithLimit === 0,
             flex: 1,
             onClick: () => {
-              // setDrawerState('BUY');
-              startCooldown();
-              onClickBuy({
-                amount: 1,
-                callback: () => refetchUser(),
-                company: selectedCompany,
-                round: stock.round,
-                stockId,
-                unitPrice: companiesPrice[selectedCompany],
-                userId,
-              });
+              setDrawerState('BUY');
+              //   onClickBuy({
+              //     amount: 1,
+              //     callback: () => refetchUser(),
+              //     company: selectedCompany,
+              //     round: stock.round,
+              //     stockId,
+              //     unitPrice: companiesPrice[selectedCompany],
+              //     userId,
+              //   });
             },
             text: '구매하기',
           },
@@ -172,13 +159,12 @@ const StockOverview: React.FC<StockOverviewProps> = ({
         direction="row"
         padding="0 16px 12px 16px"
       />
-      <ButtonGroup
+      {/* <ButtonGroup
         buttons={[
           {
             backgroundColor: '#374151',
             disabled: isDisabled || !보유주식.find(({ company }) => company === selectedCompany)?.count,
-            onClick: () => {
-              startCooldown();
+            onClick: () =>
               onClickSell({
                 amount: 보유주식.find(({ company }) => company === selectedCompany)?.count ?? 0,
                 callback: () => refetchUser(),
@@ -187,15 +173,14 @@ const StockOverview: React.FC<StockOverviewProps> = ({
                 stockId,
                 unitPrice: companiesPrice[selectedCompany],
                 userId,
-              });
-            },
+              }),
             text: '모두 팔기',
           },
         ]}
         padding="0 16px 12px 16px"
-      />
+      /> */}
     </>
   );
 };
 
-export default StockOverview;
+export default StockOverviewRealism;
