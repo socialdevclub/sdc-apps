@@ -53,8 +53,6 @@ const StockDrawer = ({ drawerOpen, handleCloseDrawer, selectedCompany, stockMess
     refetchInterval: Number.POSITIVE_INFINITY,
   });
   const { isBuyLoading, isSellLoading, onClickBuy, onClickSell } = useTradeStock({
-    onShowError: () => {},
-    onShowSuccess: () => {},
     refetchUser,
   });
 
