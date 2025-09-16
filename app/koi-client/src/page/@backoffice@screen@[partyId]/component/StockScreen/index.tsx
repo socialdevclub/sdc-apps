@@ -124,8 +124,6 @@ export default function StockScreen({ party }: Props) {
               <Container>
                 <QRCode value={`${window.location.origin}/party/${party._id}`} bgColor="#ffffff" size={300} />
                 <QRInfo>
-                  <QRTitle>SDC 부스 게임</QRTitle>
-                  <QRSubtitle>실시간 주식 게임에 참여하세요!</QRSubtitle>
                   <QRUrl>{`${window.location.origin}/party/${party._id}`}</QRUrl>
                 </QRInfo>
               </Container>
