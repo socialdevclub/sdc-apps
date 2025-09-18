@@ -256,10 +256,12 @@ function Result({ stockId }: ResultProps) {
 
       {stock.gameMode === 'stock' && (
         <BottomSection>
-          <Button color="#374151" onClick={handleShare}>
+          {/*
+            <Button color="#374151" onClick={handleShare}>
             <Share size={24} />
             <Label>공유하기</Label>
-          </Button>
+            </Button>
+            */}
           <Button color="#F63C6B" onClick={() => handleExit()}>
             <LogOut size={24} />
             <Label>나가기</Label>
