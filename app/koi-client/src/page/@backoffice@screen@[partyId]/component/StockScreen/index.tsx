@@ -11,6 +11,7 @@ import prependZero from '../../../../service/prependZero';
 import PlayingWrapper from './PlayingWrapper';
 import Table from './Table';
 import TradeFeed from './TradeFeed';
+import { css } from '@emotion/react';
 
 interface Props {
   party: PartySchemaWithId;
@@ -116,6 +117,16 @@ export default function StockScreen({ party }: Props) {
               {isTransaction && <TradeFeed trades={trades} />}
             </PlayingWrapper>
           ),
+          RESULT: (
+            <>
+              <TimeBox>소셜데브클럽이 궁금하다면?</TimeBox>
+              <Wrapper>
+                <Container>
+                  <QRCode value={`https://www.instagram.com/socialdev.club/`} bgColor="#ffffff" size={300} />
+                </Container>
+              </Wrapper>
+            </>
+          )
         }}
         defaultComponent={
           <>
