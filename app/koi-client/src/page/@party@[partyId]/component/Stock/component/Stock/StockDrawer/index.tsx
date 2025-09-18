@@ -7,7 +7,6 @@ import { MEDIA_QUERY } from '../../../../../../../config/common';
 import { Query } from '../../../../../../../hook';
 import { UserStore } from '../../../../../../../store';
 import { useTradeStock } from '../../../../../hook/useTradeStock';
-import StockOverview from './StockOverview';
 import StockTransaction from './StockTransaction';
 import StockOverviewRealism from './StockOverviewRealism';
 
@@ -131,7 +130,7 @@ const StockDrawer = ({ drawerOpen, handleCloseDrawer, selectedCompany, stockMess
       {(() => {
         switch (drawerState) {
           case 'OVERVIEW':
-            return stock.gameMode === 'realism' ? (
+            return (
               <StockOverviewRealism
                 stockId={stockId}
                 selectedCompany={selectedCompany}
@@ -143,19 +142,6 @@ const StockDrawer = ({ drawerOpen, handleCloseDrawer, selectedCompany, stockMess
                 isDisabled={isDisabled}
                 isCanBuy={isCanBuy}
                 setDrawerState={setDrawerState}
-                보유주식={보유주식}
-              />
-            ) : (
-              <StockOverview
-                stockId={stockId}
-                selectedCompany={selectedCompany}
-                stockMessages={stockMessages}
-                currentStockCount={currentStockCount}
-                priceData={priceData}
-                remainingStock={remainingStock}
-                maxBuyableCountWithLimit={maxBuyableCountWithLimit}
-                isDisabled={isDisabled}
-                isCanBuy={isCanBuy}
                 보유주식={보유주식}
               />
             );
