@@ -42,8 +42,8 @@ export const HeroBanner = () => {
       <styles.SubTitle
         text={
           isDesktop
-            ? '회사 밖에서 진짜 재미를 찾고 싶다면, 소데클에서 같이 게임 만들래?'
-            : '소데클에서 같이 네트워킹 게임 만들래?'
+            ? '창작 에너지를 터뜨릴 곳을 찾고 있다면, 소데클에서 같이 게임 만들래?'
+            : '소데클에서 같이 소셜게임 만들래?'
         }
         highlights={[
           {
@@ -56,12 +56,12 @@ export const HeroBanner = () => {
           },
           {
             color: 'white',
-            text: '진짜 재미',
+            text: '창작 에너지',
           },
         ]}
       />
       <styles.ButtonWrapper>
-        <styles.Button onClick={() => window.open(DISCORD_INVITE_LINK, '_blank')}>합류하기</styles.Button>
+        <styles.Button onClick={() => window.open(DISCORD_INVITE_LINK, '_blank')}>3기 합류하기 (~09.29)</styles.Button>
       </styles.ButtonWrapper>
     </styles.Container>
   );

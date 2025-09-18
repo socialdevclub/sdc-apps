@@ -28,7 +28,7 @@ export const OurGoalSection = () => {
     <styles.Container>
       <styles.Title>Our Goal</styles.Title>
       <styles.Description
-        text={`모두가 즐길 수 있는 체험형 게임을 개발하여\n사람과 사람을 연결하고, 이색적인 콘텐츠 경험을 설계해요`}
+        text={`모두가 즐길 수 있는 체험형 게임을 창작하여\n사람과 사람을 연결하고, 이색적인 콘텐츠 경험을 설계해요`}
         highlights={['체험형 게임', '사람과 사람을 연결', '이색적인 콘텐츠 경험']}
       />
       <styles.CardWrapper>

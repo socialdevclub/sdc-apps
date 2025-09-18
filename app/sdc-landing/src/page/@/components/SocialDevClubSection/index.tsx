@@ -5,9 +5,9 @@ const SocialDevClubSection = () => {
     <Style.Container>
       <Style.BackgroundImage>
         <Style.Title>Social Dev Club</Style.Title>
-        <Style.Subtitle>게임으로 사람과 사람을 연결하는</Style.Subtitle>
+        <Style.Subtitle>가짜오타쿠들이 모여 예술혼 터뜨리는</Style.Subtitle>
         <Style.Highlight>
-          네트워킹 게임 개발 커뮤니티, <Style.HighlightSpan>소셜데브클럽</Style.HighlightSpan>
+          소셜게임 창작 커뮤니티, <Style.HighlightSpan>소셜데브클럽</Style.HighlightSpan>
         </Style.Highlight>
       </Style.BackgroundImage>
       <Style.Image src="/assets/img/SocialDevClubImage.png" alt="Social Dev Club People" />
