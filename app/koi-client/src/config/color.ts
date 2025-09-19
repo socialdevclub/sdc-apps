@@ -9,3 +9,4 @@ export const colorDown = '#60A5FA';
 export const pastelGreen = '#BEF264';
 export const pastelViolet = '#c983ff';
 export const green = '#16A34A';
+export const BottomButtonBlue = '#007AFF';
